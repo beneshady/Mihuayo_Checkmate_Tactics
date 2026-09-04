@@ -1,0 +1,5 @@
+[mcp_servers.cocos_creator_local]
+command = "node"
+args = ["dist/index.js"]
+cwd = ".tools/cocos-creator-local-mcp"
+startup_timeout_sec = 120
