@@ -50,7 +50,9 @@ export class GameManager extends Component {
             return;
         }
 
-        this.mapBuilder.buildMap(this.state);
-        this.unitBuilder.buildUnits(this.state, this.mapBuilder.makeLayout(this.state));
+        // 地图逐块落下完成后，再生成棋子（棋子同样逐枚落下）
+        this.mapBuilder.buildMap(this.state, () => {
+            this.unitBuilder.buildUnits(this.state, this.mapBuilder.makeLayout(this.state));
+        });
     }
 }
