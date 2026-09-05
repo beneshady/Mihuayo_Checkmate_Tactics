@@ -1,0 +1,51 @@
+{
+  "name": "codex-editor-bridge",
+  "package_version": 2,
+  "version": "0.1.0",
+  "title": "Codex Editor Bridge",
+  "description": "Localhost bridge for Codex-assisted Cocos Creator scene inspection and simple scene operations.",
+  "author": "Codex",
+  "editor": ">=3.8.0",
+  "main": "./browser.js",
+  "contributions": {
+    "menu": [
+      {
+        "path": "Developer/Codex Editor Bridge/Print Status",
+        "message": "print-status"
+      }
+    ],
+    "scene": {
+      "script": "./scene.js"
+    },
+    "messages": {
+      "print-status": {
+        "public": true,
+        "description": "Print Codex Editor Bridge status.",
+        "methods": [
+          "printStatus"
+        ]
+      },
+      "start-server": {
+        "public": true,
+        "description": "Start the Codex Editor Bridge HTTP server.",
+        "methods": [
+          "startServer"
+        ]
+      },
+      "stop-server": {
+        "public": true,
+        "description": "Stop the Codex Editor Bridge HTTP server.",
+        "methods": [
+          "stopServer"
+        ]
+      },
+      "scene-summary": {
+        "public": true,
+        "description": "Return a summary of the currently open scene.",
+        "methods": [
+          "sceneSummary"
+        ]
+      }
+    }
+  }
+}
