@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Node, Prefab, Sprite, Vec3, error, instantiate, tween, warn } from 'cc';
+import { _decorator, Color, Component, Node, Prefab, Sprite, Tween, Vec3, error, instantiate, tween, warn } from 'cc';
 import { BattleState, BattleUnit, gridToIso } from '../Core/BattleState';
 import { IsoLayout, TOP_CENTER_Y_PX } from '../Map/IsoLayout';
 import { Unit } from './Unit';
@@ -38,6 +38,9 @@ export class UnitBuilder extends Component {
 
     @property({ tooltip: '棋子移动动画时长（秒）' })
     public unitMoveDuration = 0.2;
+
+    @property({ tooltip: '受击抖动振幅（世界单位）' })
+    public shakeAmplitude = 6;
 
     /** unitId → 棋子节点注册表（运行期定位视图；重开局时随 buildUnits 重建） */
     private unitNodes = new Map<string, Node>();
@@ -86,9 +89,39 @@ export class UnitBuilder extends Component {
         }
         const { isoX, isoY } = gridToIso(x, y, layout);
         const target = new Vec3(isoX, isoY + this.baseOffsetY(layout), 0);
+        Tween.stopAllByTarget(node); // 打断进行中的抖动/移动，防 tween 叠加冲突
         tween(node)
             .to(this.unitMoveDuration, { position: target }, { easing: 'quadOut' })
             .start();
+    }
+
+    /** 受击抖动：水平 x 方向衰减抖动（先停现有 tween，防与移动动画冲突） */
+    public shakeUnitView(unitId: string): void {
+        const node = this.unitNodes.get(unitId);
+        if (!node) {
+            return;
+        }
+        Tween.stopAllByTarget(node);
+        const base = node.position.clone();
+        const a = this.shakeAmplitude;
+        tween(node)
+            .to(0.045, { position: new Vec3(base.x + a, base.y, 0) })
+            .to(0.045, { position: new Vec3(base.x - a, base.y, 0) })
+            .to(0.04, { position: new Vec3(base.x + a * 0.5, base.y, 0) })
+            .to(0.04, { position: new Vec3(base.x - a * 0.25, base.y, 0) })
+            .to(0.03, { position: new Vec3(base.x, base.y, 0) })
+            .start();
+    }
+
+    /** 阵亡销毁：停 tween 并销毁节点（state 移除由规则层完成） */
+    public removeUnitView(unitId: string): void {
+        const node = this.unitNodes.get(unitId);
+        if (!node) {
+            return;
+        }
+        this.unitNodes.delete(unitId);
+        Tween.stopAllByTarget(node);
+        node.destroy();
     }
 
     /**

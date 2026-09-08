@@ -36,7 +36,8 @@ export interface UnitDef {
     name?: string;
     maxHp: number;
     mp?: number;
-    attack?: number;
+    /** 攻击力（近战伤害 = attack）；必填，缺失即 parse 报错 */
+    attack: number;
     moveSpecs: MoveSpec[];
 }
 
@@ -110,11 +111,11 @@ export function parseUnitDefs(raw: unknown): UnitDef[] {
         const def: UnitDef = {
             id,
             maxHp: requireNumber(unit.maxHp, `$.units[${index}].maxHp`),
+            attack: requireNumber(unit.attack, `$.units[${index}].attack`),
             moveSpecs,
         };
         if (unit.name !== undefined) def.name = requireString(unit.name, `$.units[${index}].name`);
         if (unit.mp !== undefined) def.mp = requireNumber(unit.mp, `$.units[${index}].mp`);
-        if (unit.attack !== undefined) def.attack = requireNumber(unit.attack, `$.units[${index}].attack`);
         return def;
     });
 }

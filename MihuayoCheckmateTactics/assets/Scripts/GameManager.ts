@@ -1,12 +1,15 @@
-import { _decorator, Button, Camera, Canvas, Component, EventTouch, JsonAsset, Node, Vec3, error, log, warn } from 'cc';
+import { _decorator, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Node, Vec3, error, log, warn } from 'cc';
 import { BattlePlayer, BattleState, isoToGrid, parseBattleState } from './Core/BattleState';
-import { advanceTurn, checkOutcome, getCurrentPlayer, isHumanTurn, moveUnitTo, resetTurn } from './Core/Rules';
+import { advanceTurn, attackUnit, checkOutcome, getCurrentPlayer, isHumanTurn, moveUnitTo, resetTurn } from './Core/Rules';
+import { decideAiMove } from './Core/EnemyAI';
 import { computeReachableCells, ReachableCell } from './Core/movement';
 import { UnitDef, getUnitDef, parseUnitDefs } from './Core/UnitDefs';
+import { getUnitInfo } from './Core/UnitInfo';
 import { IsoLayout } from './Map/IsoLayout';
 import { MapBuilder } from './Map/MapBuilder';
 import { MoveHighlighter } from './Map/MoveHighlighter';
 import { UnitBuilder } from './Unit/UnitBuilder';
+import { UnitInfoPanel } from './UI/UnitInfoPanel';
 
 const { ccclass, property } = _decorator;
 
@@ -51,8 +54,23 @@ export class GameManager extends Component {
     @property({ tooltip: '点击拾取调试日志（验证触摸坐标→格子换算；接入视角系统前可开着核对）' })
     public debugPick = false;
 
-    @property({ tooltip: '敌方回合自动快过的延迟（秒）；敌方 AI 未接入时的占位' })
+    @property({ tooltip: '敌方 AI 行动前的思考延迟（秒）' })
     public aiDelay = 0.5;
+
+    @property({ tooltip: '敌方行动后的停留时长（秒）；应不小于 UnitBuilder.unitMoveDuration，保证移动动画播完再交回回合' })
+    public enemySettleDelay = 0.6;
+
+    @property({ type: UnitInfoPanel, tooltip: '棋子信息面板（点击任意棋子显示信息；M0 占位 UI）' })
+    public unitInfoPanel: UnitInfoPanel | null = null;
+
+    @property({ type: Button, tooltip: '攻击按钮（选中我方棋子后显示；点击进入攻击目标选择）' })
+    public attackButton: Button | null = null;
+
+    @property({ type: Color, tooltip: '攻击目标高亮色（含透明度）：有敌棋的格，可点攻击' })
+    public attackHighlightColor: Color = new Color(232, 64, 64, 130);
+
+    @property({ type: Color, tooltip: '攻击范围高亮色（含透明度）：范围内的空格，仅示意不可点' })
+    public attackRangeHighlightColor: Color = new Color(150, 150, 150, 80);
 
     /** 内存中的战局实时状态；存档 = 序列化它，读档 = 解析成它 */
     private state: BattleState | null = null;
@@ -76,6 +94,8 @@ export class GameManager extends Component {
     private interactStage: InteractStage = 'idle';
     private selectedUnitId: string | null = null;
     private targetingCells: ReachableCell[] = [];
+    /** targeting 的目的模式：移动（蓝高亮）或攻击（红高亮） */
+    private targetingMode: 'move' | 'attack' = 'move';
 
     /** 只读访问当前战局状态（未初始化时为 null） */
     public get battleState(): BattleState | null {
@@ -131,8 +151,16 @@ export class GameManager extends Component {
             this.actionButton.node.on(Button.EventType.CLICK, this.onActionClicked, this);
             this.cancelButton.node.on(Button.EventType.CLICK, this.onCancelClicked, this);
         }
+        if (!this.attackButton) {
+            warn('[GameManager] 未配置 attackButton：无法攻击。请在 Canvas 下建「攻击」按钮并拖到该属性');
+        } else {
+            this.attackButton.node.on(Button.EventType.CLICK, this.onAttackClicked, this);
+        }
         if (!this.highlighter) {
             warn('[GameManager] 未配置 highlighter：看不到可走格高亮。请建 HighlightRoot（挂 MoveHighlighter，置于 MapRoot 与 UnitRoot 之间）并拖到该属性');
+        }
+        if (!this.unitInfoPanel) {
+            warn('[GameManager] 未配置 unitInfoPanel：点击棋子不显示信息。请在 Canvas 下建 UnitInfoPanel（挂 UnitInfoPanel 组件）并拖到该属性');
         }
 
         // 触摸监听挂在 Canvas（GameRoot 的父级）：地块/棋子/空白点击都会派发到它；
@@ -193,11 +221,29 @@ export class GameManager extends Component {
         const active = getCurrentPlayer(this.state);
         log(`[流程] 第 ${this.state.turn.round} 轮 — ${human ? '我方' : '敌方'}回合（${active?.id}）`);
 
-        if (!human || !this.turnEndButton) {
-            // 敌方回合（AI 未接入）自动快过占位；或我方回合未配置按钮时也自动快过（调试兜底）
+        if (!human) {
+            // 敌方回合：AI 思考延迟后随机行动一步，再交回回合
+            this.scheduleOnce(() => this.runEnemyTurn(), this.aiDelay);
+        } else if (!this.turnEndButton) {
+            // 我方回合未配置按钮：调试兜底，自动快过
             this.scheduleOnce(() => this.endCurrentTurn(), this.aiDelay);
         }
         // 我方回合（已配置按钮）：等待玩家点击「结束回合」按钮
+    }
+
+    /** 敌方回合：AI 决策一步并执行（先改状态唯一事实源，再投影视图），停留后交回回合 */
+    private runEnemyTurn(): void {
+        if (!this.state || !this.layout || this.flowStage !== 'enemyTurn') return;
+        const action = decideAiMove(this.state, this.defs);
+        if (!action) {
+            log('[AI] 敌方无可走棋子，跳过行动');
+        } else if (moveUnitTo(this.state, action.unitId, action.to.x, action.to.y)) {
+            this.unitBuilder?.moveUnitView(action.unitId, action.to.x, action.to.y, this.layout);
+            log(`[AI] ${action.unitId} 移动到 (${action.to.x}, ${action.to.y})`);
+        } else {
+            warn(`[AI] 移动被规则拒绝：${action.unitId} → (${action.to.x}, ${action.to.y})`);
+        }
+        this.scheduleOnce(() => this.endCurrentTurn(), this.enemySettleDelay);
     }
 
     /** 结束当前行动方回合，推进到下一方（结束按钮 / 敌方快过调用） */
@@ -220,6 +266,9 @@ export class GameManager extends Component {
         if (this.actionButton) {
             this.actionButton.node.active = this.interactStage === 'selected';
         }
+        if (this.attackButton) {
+            this.attackButton.node.active = this.interactStage === 'selected';
+        }
         if (this.cancelButton) {
             this.cancelButton.node.active = this.interactStage === 'targeting';
         }
@@ -230,8 +279,10 @@ export class GameManager extends Component {
         this.interactStage = 'idle';
         this.selectedUnitId = null;
         this.targetingCells = [];
+        this.targetingMode = 'move';
         this.highlighter?.clear();
         this.updateActionButtons();
+        this.hideUnitInfo();
     }
 
     // ---------- 棋盘触摸拾取 ----------
@@ -242,7 +293,11 @@ export class GameManager extends Component {
      * targeting 阶段只认格子（旗子矩形不参与命中，避免旗身遮挡可走格）。
      */
     private onBoardTouchEnd(event: EventTouch): void {
-        if (!this.state || !this.layout || this.flowStage !== 'playerTurn') return;
+        if (!this.state || !this.layout) return;
+        // 查看（点棋子看信息）不分回合；操作（选中/移动）仅我方回合
+        const canOperate = this.flowStage === 'playerTurn';
+        const canInspect = canOperate || this.flowStage === 'enemyTurn';
+        if (!canOperate && !canInspect) return; // generating/ended：不响应
         if (this.isUiTap(event.target)) return;
 
         const screen = event.getLocation();
@@ -255,17 +310,20 @@ export class GameManager extends Component {
         }
 
         if (this.interactStage !== 'targeting') {
-            // 棋子命中（旗子内容矩形，地图本地空间）：选中 / 改选我方棋子
+            // 棋子命中（旗子内容矩形，地图本地空间）：查看信息（任意棋子）/ 选中（仅我方回合）
             const unitId = this.unitBuilder?.hitUnitAt(local.x, local.y, this.state.units, this.layout);
             if (unitId) {
                 if (this.debugPick) log(`[拾取] 命中棋子 ${unitId}`);
-                this.onUnitClicked(unitId);
+                if (canOperate) this.onUnitClicked(unitId); // 内部 cancelSelection 会先收起面板
+                if (canInspect) this.showUnitInfo(unitId); // 放最后：保证面板显示最新点中的棋子
                 return;
             }
         }
 
         if (grid) {
             this.onTileClicked(grid.x, grid.y);
+            // 非 targeting 态的非棋子点击一律收起信息面板（targeting 保留：点非可走格忽略的决策）
+            if (this.interactStage !== 'targeting') this.hideUnitInfo();
             return;
         }
         this.onBlankClicked();
@@ -296,7 +354,7 @@ export class GameManager extends Component {
 
     /** 命中节点或其祖先落在交互按钮上时不算棋盘点击（按钮自身逻辑照常触发） */
     private isUiTap(target: Node | null): boolean {
-        const uiNodes = [this.turnEndButton?.node, this.actionButton?.node, this.cancelButton?.node];
+        const uiNodes = [this.turnEndButton?.node, this.actionButton?.node, this.attackButton?.node, this.cancelButton?.node];
         let node: Node | null = target;
         while (node) {
             if (uiNodes.indexOf(node) !== -1) return true;
@@ -315,6 +373,24 @@ export class GameManager extends Component {
             node = node.parent;
         }
         return null;
+    }
+
+    // ---------- 棋子信息面板（占位 UI；查看不分回合） ----------
+
+    /** 显示指定棋子的信息（数据组装在 Core，面板只负责格式化显示） */
+    private showUnitInfo(unitId: string): void {
+        if (!this.state || !this.unitInfoPanel) return;
+        const info = getUnitInfo(this.state, unitId, this.defs);
+        if (info) {
+            this.unitInfoPanel.show(info);
+        } else {
+            this.unitInfoPanel.hide();
+        }
+    }
+
+    /** 收起信息面板 */
+    private hideUnitInfo(): void {
+        this.unitInfoPanel?.hide();
     }
 
     // ---------- 交互子状态转移 ----------
@@ -349,8 +425,41 @@ export class GameManager extends Component {
             log('[交互] 该棋子当前无可走格（可点空白取消选中）');
             return; // 保持 selected，「行动」按钮仍在
         }
+        this.targetingMode = 'move';
         this.interactStage = 'targeting';
-        this.highlighter?.show(this.targetingCells, this.layout);
+        this.highlighter?.show([{ cells: this.targetingCells }], this.layout);
+        this.updateActionButtons();
+    }
+
+    /**
+     * 点「攻击」：复用移动校验链路的可达格 → 红色高亮有敌棋的格（可点攻击），
+     * 灰色高亮范围内空格（仅示意攻击范围、不可点）——无目标时也有可见反馈，避免"像没反应"。
+     * 完全没有可达格（被己方围死）才保持 selected 并提示。
+     */
+    private onAttackClicked(): void {
+        if (!this.state || !this.layout || this.interactStage !== 'selected' || !this.selectedUnitId) return;
+        const unit = this.state.units.find((u) => u.id === this.selectedUnitId);
+        const def = unit ? getUnitDef(this.defs, unit.defId) : undefined;
+        if (!unit || !def) {
+            warn(`[交互] 找不到棋子或其定义：${this.selectedUnitId}`);
+            return;
+        }
+        const reach = computeReachableCells(this.state, unit, def);
+        const targets = reach.filter((cell) => cell.capture);
+        const range = reach.filter((cell) => !cell.capture);
+        if (targets.length === 0) {
+            log('[交互] 攻击范围内没有敌方棋子');
+        }
+        if (targets.length === 0 && range.length === 0) {
+            return; // 完全没有可达格：无从展示，保持 selected，「攻击」按钮仍在
+        }
+        this.targetingMode = 'attack';
+        this.targetingCells = targets; // 仅红色格可点；灰格点击按「非目标格忽略」处理
+        this.interactStage = 'targeting';
+        this.highlighter?.show([
+            { cells: range, color: this.attackRangeHighlightColor },
+            { cells: targets, color: this.attackHighlightColor },
+        ], this.layout);
         this.updateActionButtons();
     }
 
@@ -367,8 +476,12 @@ export class GameManager extends Component {
     private onTileClicked(x: number, y: number): void {
         if (this.interactStage === 'targeting' && this.selectedUnitId) {
             const reachable = this.targetingCells.some((cell) => cell.x === x && cell.y === y);
-            if (!reachable) return; // 非可走格忽略（已定决策）
-            this.executeMove(this.selectedUnitId, x, y);
+            if (!reachable) return; // 非可走/非攻击目标格忽略（已定决策）
+            if (this.targetingMode === 'attack') {
+                this.executeAttack(this.selectedUnitId, x, y);
+            } else {
+                this.executeMove(this.selectedUnitId, x, y);
+            }
             return;
         }
         if (this.interactStage === 'selected') {
@@ -376,8 +489,9 @@ export class GameManager extends Component {
         }
     }
 
-    /** 点中棋盘外空白：任何非 idle 交互态下取消选中回 idle */
+    /** 点中棋盘外空白：任何非 idle 交互态下取消选中回 idle；信息面板一律收起 */
     private onBlankClicked(): void {
+        this.hideUnitInfo();
         if (this.interactStage !== 'idle') {
             this.cancelSelection();
         }
@@ -392,6 +506,26 @@ export class GameManager extends Component {
         }
         this.unitBuilder?.moveUnitView(unitId, x, y, this.layout);
         log(`[交互] ${unitId} 移动到 (${x}, ${y})`);
+        this.cancelSelection();
+    }
+
+    /** 攻击：先改逻辑状态（扣血/阵亡移除），再驱动受击抖动或阵亡销毁，最后清交互态 */
+    private executeAttack(attackerId: string, x: number, y: number): void {
+        if (!this.state) return;
+        const defender = this.state.units.find((u) => u.pos.x === x && u.pos.y === y);
+        if (!attackUnit(this.state, attackerId, x, y, this.defs)) {
+            warn(`[交互] 攻击被规则拒绝：${attackerId} → (${x}, ${y})`);
+            return;
+        }
+        if (defender) {
+            if (this.state.units.indexOf(defender) !== -1) {
+                this.unitBuilder?.shakeUnitView(defender.id);
+                log(`[交互] ${attackerId} 攻击 ${defender.id}，剩余 HP ${defender.hp}`);
+            } else {
+                this.unitBuilder?.removeUnitView(defender.id);
+                log(`[交互] ${attackerId} 击杀 ${defender.id}`);
+            }
+        }
         this.cancelSelection();
     }
 

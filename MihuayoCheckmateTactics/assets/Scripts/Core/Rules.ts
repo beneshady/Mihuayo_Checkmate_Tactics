@@ -1,4 +1,5 @@
 import { BattlePlayer, BattleState, BattleUnit } from './BattleState';
+import { UnitDef, getUnitDef } from './UnitDefs';
 
 /**
  * 战局规则（纯 TS，零引擎依赖）。
@@ -69,6 +70,35 @@ export function moveUnitTo(state: BattleState, unitId: string, x: number, y: num
         return false;
     }
     unit.pos = { x, y };
+    return true;
+}
+
+/**
+ * 近战攻击判定（落子规则唯一入口：先校验再改状态；视图更新由协调者驱动）。
+ * 校验：攻守双方存在、目标格为敌方单位、攻击方定义存在。
+ * 攻击范围（是否在攻击目标高亮内）由调用方保证：高亮即许可（与 moveUnitTo 同约定）。
+ * 伤害 = 攻击方 attack；目标 hp ≤ 0 时阵亡，直接移出战局（视图销毁由协调者驱动；
+ * 全灭结算由 checkOutcome 在回合开始时判定）。
+ * 本函数阵营无关：我方/AI 走同一入口，AI 攻击是后续 decideAiMove 的扩展点。
+ */
+export function attackUnit(state: BattleState, attackerId: string, x: number, y: number, defs: UnitDef[]): boolean {
+    const attacker = state.units.find((u) => u.id === attackerId);
+    if (!attacker) {
+        return false;
+    }
+    const defender = state.units.find((u) => u.pos.x === x && u.pos.y === y);
+    if (!defender || defender.owner === attacker.owner) {
+        return false;
+    }
+    const atkDef = getUnitDef(defs, attacker.defId);
+    if (!atkDef) {
+        return false;
+    }
+    const defDef = getUnitDef(defs, defender.defId);
+    defender.hp = (defender.hp ?? defDef?.maxHp ?? 1) - atkDef.attack;
+    if (defender.hp <= 0) {
+        state.units.splice(state.units.indexOf(defender), 1);
+    }
     return true;
 }
 
