@@ -1,5 +1,5 @@
-import { _decorator, Color, Component, Prefab, Sprite, Vec3, error, instantiate, tween } from 'cc';
-import { BattleState, gridToIso } from '../Core/BattleState';
+import { _decorator, Color, Component, Node, Prefab, Sprite, Vec3, error, instantiate, tween, warn } from 'cc';
+import { BattleState, BattleUnit, gridToIso } from '../Core/BattleState';
 import { IsoLayout, TOP_CENTER_Y_PX } from '../Map/IsoLayout';
 import { Unit } from './Unit';
 
@@ -11,6 +11,11 @@ const { ccclass, property } = _decorator;
  * 旗杆底在 y=191（内容底部）。更换棋子图时 MUST 重新实测并同步此值。
  */
 const FLAG_BASE_Y_PX = 191;
+const FLAG_CONTENT_LEFT_PX = 80;
+const FLAG_CONTENT_RIGHT_PX = 167;
+const FLAG_CONTENT_TOP_PX = 16;
+/** 旗子画布的一半（256x256 画布 → 128），与上述实测值同源 */
+const UNIT_CANVAS_HALF_PX = 128;
 
 /** 棋子从格点上方多少世界单位落下（+y 向上，起点高于终点） */
 const UNIT_DROP_Y = 140;
@@ -30,6 +35,61 @@ export class UnitBuilder extends Component {
 
     @property({ tooltip: '单枚棋子的落下动画时长（秒）' })
     public unitRevealDuration = 0.25;
+
+    @property({ tooltip: '棋子移动动画时长（秒）' })
+    public unitMoveDuration = 0.2;
+
+    /** unitId → 棋子节点注册表（运行期定位视图；重开局时随 buildUnits 重建） */
+    private unitNodes = new Map<string, Node>();
+
+    /** 按 unitId 取棋子节点（不存在时返回 undefined） */
+    public getUnitNode(unitId: string): Node | undefined {
+        return this.unitNodes.get(unitId);
+    }
+
+    /** 旗底对齐修正：让旗子内容底落在格点（世界单位） */
+    private baseOffsetY(layout: IsoLayout): number {
+        return (FLAG_BASE_Y_PX - TOP_CENTER_Y_PX) * layout.scale;
+    }
+
+    /**
+     * 命中检测：返回被点中的棋子 unitId，未命中返回 undefined。
+     * localX/localY 为地图容器本地坐标（调用方先把触点转到本地，缩放/平移不影响结果）。
+     * 命中矩形 = 旗子内容矩形（画布像素 × 布局缩放），与视图精确重合；
+     * 按 depth（x+y）从深到浅遍历——棋子重叠时前景优先。
+     */
+    public hitUnitAt(localX: number, localY: number, units: BattleUnit[], layout: IsoLayout): string | undefined {
+        const sorted = [...units].sort((a, b) => (b.pos.x + b.pos.y) - (a.pos.x + a.pos.y));
+        for (const unit of sorted) {
+            const { isoX, isoY } = gridToIso(unit.pos.x, unit.pos.y, layout);
+            const nodeY = isoY + this.baseOffsetY(layout);
+            const left = isoX + (FLAG_CONTENT_LEFT_PX - UNIT_CANVAS_HALF_PX) * layout.scale;
+            const right = isoX + (FLAG_CONTENT_RIGHT_PX - UNIT_CANVAS_HALF_PX) * layout.scale;
+            const bottom = nodeY - (FLAG_BASE_Y_PX - UNIT_CANVAS_HALF_PX) * layout.scale; // 旗底 = 格点
+            const top = nodeY + (UNIT_CANVAS_HALF_PX - FLAG_CONTENT_TOP_PX) * layout.scale; // 旗顶
+            if (localX >= left && localX <= right && localY >= bottom && localY <= top) {
+                return unit.id;
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * 把棋子视图移动到目标格（逻辑状态已由协调者改好，这里只做表现投影）。
+     * 复用落下的 quadOut 节奏；找不到该棋子视图时警告并忽略。
+     */
+    public moveUnitView(unitId: string, x: number, y: number, layout: IsoLayout): void {
+        const node = this.unitNodes.get(unitId);
+        if (!node) {
+            warn(`[UnitBuilder] 找不到棋子视图：${unitId}，跳过移动表现`);
+            return;
+        }
+        const { isoX, isoY } = gridToIso(x, y, layout);
+        const target = new Vec3(isoX, isoY + this.baseOffsetY(layout), 0);
+        tween(node)
+            .to(this.unitMoveDuration, { position: target }, { easing: 'quadOut' })
+            .start();
+    }
 
     /**
      * 按战局状态生成棋子：逐枚从上方落下（depth 顺序）。
@@ -53,7 +113,10 @@ export class UnitBuilder extends Component {
         // 旗底对齐：让旗子内容底(y=FLAG_BASE_Y_PX) 落在地块顶面中心(格点)。
         // gridToIso 返回的 isoY 已含地块顶面中心对齐格点的修正；棋子与其同点，
         // 故旗底相对格点再上移 (FLAG_BASE_Y_PX - TOP_CENTER_Y_PX)·scale 即可。
-        const baseOffsetY = (FLAG_BASE_Y_PX - TOP_CENTER_Y_PX) * layout.scale;
+        const offsetY = this.baseOffsetY(layout);
+
+        // 重建注册表：buildUnits 可能在重开局时再次调用
+        this.unitNodes.clear();
 
         let index = 0;
         for (const unit of units) {
@@ -61,8 +124,9 @@ export class UnitBuilder extends Component {
             this.node.addChild(node);
             node.name = `unit_${unit.id}_${unit.owner}`;
             const { isoX, isoY } = gridToIso(unit.pos.x, unit.pos.y, layout);
-            const finalY = isoY + baseOffsetY;
+            const finalY = isoY + offsetY;
             node.getComponent(Unit)!.setUnit(unit.id, unit.owner);
+            this.unitNodes.set(unit.id, node);
 
             // 未轮到不显形：先隐藏（保持全尺寸）；到点时由 scheduleOnce 激活，再从上方落下并淡入。
             node.active = false;

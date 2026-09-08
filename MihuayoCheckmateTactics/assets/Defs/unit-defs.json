@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "units": [
+    {
+      "id": "soldier",
+      "name": "兵",
+      "maxHp": 100,
+      "attack": 10,
+      "moveSpecs": [
+        { "type": "step", "dir": { "dx": 1, "dy": 0 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": 0 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 0, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 0, "dy": -1 }, "passage": "solid" }
+      ]
+    }
+  ]
+}

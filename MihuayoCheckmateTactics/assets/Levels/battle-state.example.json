@@ -49,12 +49,12 @@
     { "id": "p2", "name": "敌军", "team": 1, "controller": "ai", "extra": {} }
   ],
   "units": [
-    { "id": "u1", "defId": "spearman", "owner": "p1", "pos": { "x": 1, "y": 4 }, "hp": 100, "extra": {} },
-    { "id": "u2", "defId": "spearman", "owner": "p1", "pos": { "x": 2, "y": 5 }, "hp": 100, "extra": {} },
-    { "id": "u3", "defId": "archer", "owner": "p1", "pos": { "x": 1, "y": 6 }, "hp": 80, "extra": {} },
-    { "id": "u4", "defId": "swordsman", "owner": "p2", "pos": { "x": 8, "y": 2 }, "hp": 120, "extra": {} },
-    { "id": "u5", "defId": "swordsman", "owner": "p2", "pos": { "x": 7, "y": 3 }, "hp": 120, "extra": {} },
-    { "id": "u6", "defId": "archer", "owner": "p2", "pos": { "x": 8, "y": 5 }, "hp": 80, "extra": {} }
+    { "id": "u1", "defId": "soldier", "owner": "p1", "pos": { "x": 1, "y": 4 }, "hp": 100, "extra": {} },
+    { "id": "u2", "defId": "soldier", "owner": "p1", "pos": { "x": 2, "y": 5 }, "hp": 100, "extra": {} },
+    { "id": "u3", "defId": "soldier", "owner": "p1", "pos": { "x": 1, "y": 6 }, "hp": 80, "extra": {} },
+    { "id": "u4", "defId": "soldier", "owner": "p2", "pos": { "x": 8, "y": 2 }, "hp": 120, "extra": {} },
+    { "id": "u5", "defId": "soldier", "owner": "p2", "pos": { "x": 7, "y": 3 }, "hp": 120, "extra": {} },
+    { "id": "u6", "defId": "soldier", "owner": "p2", "pos": { "x": 8, "y": 5 }, "hp": 80, "extra": {} }
   ],
   "turn": {
     "round": 1,

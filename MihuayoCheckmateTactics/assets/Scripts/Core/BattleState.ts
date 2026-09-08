@@ -273,3 +273,25 @@ export function gridToIso(x: number, y: number, options: IsoOptions): IsoCoord {
         depth: x + y,
     };
 }
+
+/**
+ * 等距世界坐标 → 逻辑格坐标（gridToIso 的逆运算，供触摸拾取使用）。
+ * 输入必须是地块所在容器的本地坐标；调用方先用容器世界矩阵的逆把触点转到本地，
+ * 因此本函数对任意平移/缩放视角都成立。逻辑格出界返回 null。
+ */
+export function isoToGrid(
+    isoX: number,
+    isoY: number,
+    options: IsoOptions,
+    width: number,
+    height: number,
+): GridPos | null {
+    const diff = isoX / options.halfTileW; // x − y
+    const sum = (options.anchorOffsetY - isoY) / options.halfTileH; // x + y
+    const x = Math.round((diff + sum) / 2);
+    const y = Math.round((sum - diff) / 2);
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+        return null;
+    }
+    return { x, y };
+}
