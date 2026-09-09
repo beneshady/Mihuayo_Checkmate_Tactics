@@ -52,7 +52,7 @@
 ### rules
 
 - `rulesetId`：规则集在静态配置中的 id。
-- `params`：本局参数，如 `maxRounds`、`winConditions` / `loseConditions`（数组，每项 `{ "type": "...", ...参数 }`，type 对应规则集里注册的条件实现）。
+- `params`：本局参数，如 `maxRounds`、`winConditions` / `loseConditions`（数组，每项 `{ "type": "...", ...参数 }`，type 对应规则集里注册的条件实现）。当前已实现条件：`eliminateAllEnemies` / `loseAllUnits` / `eliminateDef`（参数 `defId`，如"击杀帅即胜"）。
 
 ### map
 
@@ -66,7 +66,7 @@
   - `controller`：控制方标记，`"human"` / `"ai"`，缺省按 `"human"` 处理。
   - `team`：阵营编号，支持未来扩展多方势力。
 - **单人游戏（已确认）**：全局只有一个 `controller: "human"` 的参战方；敌方参战方为 `controller: "ai"`，AI 势力数量不限。
-- `units[]`：`{ id, defId, owner, pos: {x, y}, hp, extra }`；hp 只存当前值，满值由 def 推导。
+- `units[]`：`{ id, defId, owner, pos: {x, y}, hp, stamina, extra }`；hp / stamina 只存当前值，满值由 def 推导（stamina 每回合开始回满，缺省视为满）。
   - 可选：`actedThisTurn`（本回合是否已行动）、`statuses[]`（`{ id, turns, power? }`，效果 defId + 剩余回合 + 强度）。
 - **敌我同表**（已确认需求）：我方棋子与敌方棋子共用同一个 `units` 数组，不分子列表；用 `owner` 指向 `players` 中的参战方区分敌我（示例中 `p1` = 玩家、`p2` = AI 敌军）。
 - `turn`：`round`（回合数）、`order[]`（行动顺序，player id）、`active`（当前行动方）、`phase`（开放字符串，如 `command` / `battle` / `result`，新增阶段不改结构）。

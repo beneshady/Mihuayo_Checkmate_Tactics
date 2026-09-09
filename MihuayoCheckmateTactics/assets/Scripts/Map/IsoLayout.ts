@@ -35,3 +35,13 @@ export function makeIsoLayout(halfTileW: number, map: BattleMap): IsoLayout {
     const anchorOffsetY = depthCenter * halfTileH - (128 - TOP_CENTER_Y_PX) * scale;
     return { scale, halfTileW, halfTileH, anchorOffsetY };
 }
+
+/**
+ * 顶面中心相对地块节点位置（画布中心）的世界偏移 ≈ 27（halfTileW=64 时）。
+ * gridToIso / isoToGrid 这对互逆函数锚在「画布中心空间」（y=128），
+ * 而可见顶面菱形中心在 y=TOP_CENTER_Y_PX——两者差 52px × scale。
+ * 棋子底座站位、触摸拾取修正等一切"视觉语义"统一用本函数换算（单一事实源）。
+ */
+export function topFaceOffsetY(layout: IsoLayout): number {
+    return (128 - TOP_CENTER_Y_PX) * layout.scale;
+}

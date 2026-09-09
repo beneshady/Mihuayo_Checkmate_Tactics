@@ -9,6 +9,8 @@
 - 当前开发机已确认 Cocos Creator 3.8.8 实际安装路径为 `E:\ProgramData\cocos\editors\Creator\3.8.8\CocosCreator.exe`（不是文档早期记录的 C 盘路径；调用工具时必须显式传入 `creatorPath`）。
 - **2D/UI 渲染顺序（已验证 + 官方手册确认）**：Canvas 下的 UI 节点按节点树**深度优先**排序渲染，`siblingIndex` 控制同级顺序，最后一个渲染的显示在最上层；`UIRenderer.priority` 在该场景下不生效。来源：[Cocos 3.8 手册 · 渲染排序规则](https://docs.cocos.com/creator/3.8/manual/zh/ui-system/components/engine/priority.html)。
 - **等距地图方向（已踩坑验证）**：Cocos 的 `+y` 轴向上。等距投影中深度（x+y）越大越靠近镜头，因此 `isoY` 必须随深度**递减**（`isoY = -(x+y)*halfTileH + offset`）。若随深度递增，整张地图上下颠倒，前景砖的墙体会压住后景砖的顶面，表现为"内部楼梯"。渲染顺序本身正确时也会出现，属于坐标系方向问题而非排序问题。
+- **触摸拾取坐标（已踩坑验证）**：`getUILocation` 基于设计分辨率左下角，实际视口宽高比与设计分辨率不一致时会与节点世界坐标整体错位；应使用 `getLocation()`（实际运行时屏幕，左下角原点）+ 渲染相机 `screenToWorld` 换算（本项目收口在 `GameManager.touchToWorld`）。
+- **gridToIso 语义（已踩坑验证）**：`gridToIso`/`isoToGrid` 这对互逆函数锚在地块"画布中心"空间（y=128），可见顶面中心（棋子落点/玩家点击目标）在其上方 `(128−76)·scale` 处；凡需与"可见顶面"对齐的表现 MUST 用 `IsoLayout.topFaceOffsetY(layout)` 换算（单一事实源）。高亮通过 `MoveHighlighter.offsetX/offsetY` 手动校准；触摸拾取已在 `GameManager.onBoardTouchEnd` 反算前减去同一偏移——未修正时偏移达 0.72 格位，约 72% 的菱形点击面积会解析到后方邻格（实测"点 A 却选旁边格"即此因，2026-02 修复）。
 - 项目尚未创建，因此团队最终采用的 Cocos Creator 版本、支持设备基线、导出流程和性能预算仍为 `TBD`。
 - 当前尚未验证任何项目特定的 Cocos 实现 Pattern。
 

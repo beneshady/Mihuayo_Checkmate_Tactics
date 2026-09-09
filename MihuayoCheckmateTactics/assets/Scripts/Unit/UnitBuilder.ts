@@ -1,28 +1,23 @@
-import { _decorator, Color, Component, Node, Prefab, Sprite, Tween, Vec3, error, instantiate, tween, warn } from 'cc';
+import { _decorator, Color, Component, Graphics, Node, Prefab, Sprite, Tween, UITransform, Vec3, error, instantiate, tween, warn } from 'cc';
 import { BattleState, BattleUnit, gridToIso } from '../Core/BattleState';
-import { IsoLayout, TOP_CENTER_Y_PX } from '../Map/IsoLayout';
+import { IsoLayout, topFaceOffsetY } from '../Map/IsoLayout';
 import { Unit } from './Unit';
 
 const { ccclass, property } = _decorator;
 
 /**
- * 旗子图实测几何（图像像素；y 自图像顶部起算）。
- * 两张旗子均为 256x256 画布，不透明内容 x:[80..167] y:[16..191]（88x176），
- * 旗杆底在 y=191（内容底部）。更换棋子图时 MUST 重新实测并同步此值。
+ * 棋子视图生成（M0/M1：按棋子类型 defId 设置贴图、按裁剪后高度归一世界高度）。
+ * 位置 = 地块顶面中心；锚点为底边中心（底座底边顶在顶面中心）。
+ * 阵营区分：在棋子底部画一个带色圆环（我方=金色、敌方=红色），贴图本身不区分阵营。
+ * 渲染层次：UnitRoot 节点 MUST 排在 MapRoot 之后（树序后渲染，棋子盖在地块上）。
  */
-const FLAG_BASE_Y_PX = 191;
-const FLAG_CONTENT_LEFT_PX = 80;
-const FLAG_CONTENT_RIGHT_PX = 167;
-const FLAG_CONTENT_TOP_PX = 16;
-/** 旗子画布的一半（256x256 画布 → 128），与上述实测值同源 */
-const UNIT_CANVAS_HALF_PX = 128;
 
 /** 棋子从格点上方多少世界单位落下（+y 向上，起点高于终点） */
 const UNIT_DROP_Y = 140;
 
 /**
- * 按战局状态的 units 生成棋子视图（M0：只摆位置与外观，不含交互）。
- * 位置 = 所属格点 + 旗底对齐修正；缩放与地块同一套（IsoLayout.scale）。
+ * 按战局状态的 units 生成棋子视图（M1：按棋子类型选择贴图，含阵营标记）。
+ * 位置 = 所属格点 + 顶面中心对齐修正；缩放按裁剪高度归一（各棋子等高）。
  * 渲染层次：UnitRoot 节点 MUST 排在 MapRoot 之后（树序后渲染，棋子盖在地块上）。
  */
 @ccclass('UnitBuilder')
@@ -42,6 +37,15 @@ export class UnitBuilder extends Component {
     @property({ tooltip: '受击抖动振幅（世界单位）' })
     public shakeAmplitude = 6;
 
+    @property({ tooltip: '棋子归一化后的世界高度（单位与世界坐标一致，与 halfTileW=64 可比）' })
+    public unitWorldHeight = 100;
+
+    @property({ type: Color, tooltip: '我方棋子脚下阵营标记色（controller="human" 方）' })
+    public sideMarkerSelfColor: Color = new Color(255, 200, 60);
+
+    @property({ type: Color, tooltip: '敌方棋子脚下阵营标记色' })
+    public sideMarkerEnemyColor: Color = new Color(232, 64, 64);
+
     /** unitId → 棋子节点注册表（运行期定位视图；重开局时随 buildUnits 重建） */
     private unitNodes = new Map<string, Node>();
 
@@ -50,27 +54,26 @@ export class UnitBuilder extends Component {
         return this.unitNodes.get(unitId);
     }
 
-    /** 旗底对齐修正：让旗子内容底落在格点（世界单位） */
-    private baseOffsetY(layout: IsoLayout): number {
-        return (FLAG_BASE_Y_PX - TOP_CENTER_Y_PX) * layout.scale;
-    }
-
     /**
      * 命中检测：返回被点中的棋子 unitId，未命中返回 undefined。
      * localX/localY 为地图容器本地坐标（调用方先把触点转到本地，缩放/平移不影响结果）。
-     * 命中矩形 = 旗子内容矩形（画布像素 × 布局缩放），与视图精确重合；
+     * 命中矩形 = 该棋子实际渲染的裁剪尺寸 × 节点缩放（锚点底边中心），与视图精确重合；
      * 按 depth（x+y）从深到浅遍历——棋子重叠时前景优先。
      */
-    public hitUnitAt(localX: number, localY: number, units: BattleUnit[], layout: IsoLayout): string | undefined {
+    public hitUnitAt(localX: number, localY: number, units: BattleUnit[]): string | undefined {
         const sorted = [...units].sort((a, b) => (b.pos.x + b.pos.y) - (a.pos.x + a.pos.y));
         for (const unit of sorted) {
-            const { isoX, isoY } = gridToIso(unit.pos.x, unit.pos.y, layout);
-            const nodeY = isoY + this.baseOffsetY(layout);
-            const left = isoX + (FLAG_CONTENT_LEFT_PX - UNIT_CANVAS_HALF_PX) * layout.scale;
-            const right = isoX + (FLAG_CONTENT_RIGHT_PX - UNIT_CANVAS_HALF_PX) * layout.scale;
-            const bottom = nodeY - (FLAG_BASE_Y_PX - UNIT_CANVAS_HALF_PX) * layout.scale; // 旗底 = 格点
-            const top = nodeY + (UNIT_CANVAS_HALF_PX - FLAG_CONTENT_TOP_PX) * layout.scale; // 旗顶
-            if (localX >= left && localX <= right && localY >= bottom && localY <= top) {
+            const node = this.unitNodes.get(unit.id);
+            if (!node) continue;
+            const sprite = node.getComponent(Sprite);
+            if (!sprite || !sprite.spriteFrame) continue;
+            const size = node.getComponent(UITransform)!.contentSize; // 裁剪后像素尺寸
+            const s = node.scale.x;
+            const w = size.width * s;
+            const h = size.height * s;
+            const cx = node.position.x;
+            const cy = node.position.y + h / 2; // 锚点底边中心
+            if (localX >= cx - w / 2 && localX <= cx + w / 2 && localY >= cy - h / 2 && localY <= cy + h / 2) {
                 return unit.id;
             }
         }
@@ -88,7 +91,7 @@ export class UnitBuilder extends Component {
             return;
         }
         const { isoX, isoY } = gridToIso(x, y, layout);
-        const target = new Vec3(isoX, isoY + this.baseOffsetY(layout), 0);
+        const target = new Vec3(isoX, isoY + topFaceOffsetY(layout), 0);
         Tween.stopAllByTarget(node); // 打断进行中的抖动/移动，防 tween 叠加冲突
         tween(node)
             .to(this.unitMoveDuration, { position: target }, { easing: 'quadOut' })
@@ -143,10 +146,8 @@ export class UnitBuilder extends Component {
             (a, b) => (a.pos.x + a.pos.y) - (b.pos.x + b.pos.y),
         );
 
-        // 旗底对齐：让旗子内容底(y=FLAG_BASE_Y_PX) 落在地块顶面中心(格点)。
-        // gridToIso 返回的 isoY 已含地块顶面中心对齐格点的修正；棋子与其同点，
-        // 故旗底相对格点再上移 (FLAG_BASE_Y_PX - TOP_CENTER_Y_PX)·scale 即可。
-        const offsetY = this.baseOffsetY(layout);
+        // 顶面中心：让棋子底座底边(y=0，锚点底边)落在顶面中心。
+        const offsetY = topFaceOffsetY(layout);
 
         // 重建注册表：buildUnits 可能在重开局时再次调用
         this.unitNodes.clear();
@@ -158,13 +159,25 @@ export class UnitBuilder extends Component {
             node.name = `unit_${unit.id}_${unit.owner}`;
             const { isoX, isoY } = gridToIso(unit.pos.x, unit.pos.y, layout);
             const finalY = isoY + offsetY;
-            node.getComponent(Unit)!.setUnit(unit.id, unit.owner);
+            node.getComponent(Unit)!.setUnit(unit.id, unit.owner, unit.defId);
+
+            // 底边中心锚点：棋子底座底边顶在顶面中心
+            node.getComponent(UITransform)?.setAnchorPoint(0.5, 0);
+
+            // 尺寸归一：按裁剪后高度统一世界高度（各棋子等高；缺帧回退布局缩放）
+            const sprite = node.getComponent(Sprite);
+            const frame = sprite?.spriteFrame ?? null;
+            const contentH = frame ? frame.rect.height : 0;
+            const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : layout.scale;
+            node.setScale(unitScale, unitScale, 1);
+
+            // 阵营标记：玩家(controller=human)金、敌方红
+            this.addSideMarker(node, unit.owner, state);
+
             this.unitNodes.set(unit.id, node);
 
             // 未轮到不显形：先隐藏（保持全尺寸）；到点时由 scheduleOnce 激活，再从上方落下并淡入。
             node.active = false;
-            node.setScale(layout.scale, layout.scale, 1);
-            const sprite = node.getComponent(Sprite);
             if (sprite) sprite.color = new Color(255, 255, 255, 0); // 从透明开始，下落时淡入
             const finalPos = new Vec3(isoX, finalY, 0);
             const beginY = finalY + UNIT_DROP_Y;
@@ -186,5 +199,37 @@ export class UnitBuilder extends Component {
 
         const totalReveal = (units.length - 1) * this.unitRevealInterval + this.unitRevealDuration;
         this.scheduleOnce(() => { onComplete?.(); }, Math.max(totalReveal, 0));
+    }
+
+    /** 玩家（controller=human）的 owner id；无人方时返回 undefined */
+    private selfOwnerId(state: BattleState): string | undefined {
+        const self = state.players.find((p) => p.controller === 'human');
+        return self?.id;
+    }
+
+    /**
+     * 在棋子底部画一个带色圆环作为阵营标记（底边中心上方，紧贴底座/踩点边缘）。
+     * 用描边圆环（透明中心），避免盖住棋子本体；绘制在棋子本地坐标系，随节点缩放。
+     */
+    private addSideMarker(node: Node, ownerId: string, state: BattleState): void {
+        const sprite = node.getComponent(Sprite);
+        if (!sprite || !sprite.spriteFrame) {
+            return;
+        }
+        const color = ownerId === this.selfOwnerId(state) ? this.sideMarkerSelfColor : this.sideMarkerEnemyColor;
+
+        const marker = new Node('sideMarker');
+        marker.layer = node.layer;
+        node.addChild(marker);
+        const g = marker.addComponent(Graphics);
+        const size = node.getComponent(UITransform)!.contentSize;
+        // 半径按棋子裁剪宽度比例取（本地单位：随节点缩放映射到世界）
+        const rx = size.width * 0.34;
+        const ry = rx * 0.4;
+        g.lineWidth = Math.max(2, size.height * 0.02);
+        g.strokeColor = color;
+        marker.setPosition(0, ry, 0);
+        g.ellipse(0, 0, rx, ry);
+        g.stroke();
     }
 }

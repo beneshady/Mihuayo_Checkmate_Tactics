@@ -2,10 +2,128 @@
   "formatVersion": 1,
   "units": [
     {
+      "id": "shuai",
+      "name": "帅",
+      "maxHp": 140,
+      "attack": 0,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
+      "onlyOnTerrain": "road",
+      "moveSpecs": [],
+      "attackSpecs": []
+    },
+    {
+      "id": "che",
+      "name": "车",
+      "maxHp": 120,
+      "attack": 45,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
+      "moveSpecs": [
+        { "type": "slide", "dir": { "dx": 1, "dy": 0 }, "passage": "solid" },
+        { "type": "slide", "dir": { "dx": -1, "dy": 0 }, "passage": "solid" },
+        { "type": "slide", "dir": { "dx": 0, "dy": 1 }, "passage": "solid" },
+        { "type": "slide", "dir": { "dx": 0, "dy": -1 }, "passage": "solid" }
+      ],
+      "attackSpecs": [
+        { "type": "step", "dir": { "dx": 1, "dy": 0 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": 0 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 0, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 0, "dy": -1 }, "passage": "solid" }
+      ]
+    },
+    {
+      "id": "ma",
+      "name": "马",
+      "maxHp": 100,
+      "attack": 35,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
+      "moveSpecs": [
+        { "type": "jump", "dir": { "dx": 1, "dy": 2 }, "passage": "leg", "leg": { "dx": 0, "dy": 1 } },
+        { "type": "jump", "dir": { "dx": -1, "dy": 2 }, "passage": "leg", "leg": { "dx": 0, "dy": 1 } },
+        { "type": "jump", "dir": { "dx": 1, "dy": -2 }, "passage": "leg", "leg": { "dx": 0, "dy": -1 } },
+        { "type": "jump", "dir": { "dx": -1, "dy": -2 }, "passage": "leg", "leg": { "dx": 0, "dy": -1 } },
+        { "type": "jump", "dir": { "dx": 2, "dy": 1 }, "passage": "leg", "leg": { "dx": 1, "dy": 0 } },
+        { "type": "jump", "dir": { "dx": 2, "dy": -1 }, "passage": "leg", "leg": { "dx": 1, "dy": 0 } },
+        { "type": "jump", "dir": { "dx": -2, "dy": 1 }, "passage": "leg", "leg": { "dx": -1, "dy": 0 } },
+        { "type": "jump", "dir": { "dx": -2, "dy": -1 }, "passage": "leg", "leg": { "dx": -1, "dy": 0 } }
+      ]
+    },
+    {
+      "id": "pao",
+      "name": "炮",
+      "maxHp": 80,
+      "attack": 50,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
+      "moveSpecs": [
+        { "type": "slide", "dir": { "dx": 1, "dy": 0 }, "passage": "solid" },
+        { "type": "slide", "dir": { "dx": -1, "dy": 0 }, "passage": "solid" },
+        { "type": "slide", "dir": { "dx": 0, "dy": 1 }, "passage": "solid" },
+        { "type": "slide", "dir": { "dx": 0, "dy": -1 }, "passage": "solid" }
+      ],
+      "attackSpecs": [
+        { "type": "slide", "dir": { "dx": 1, "dy": 0 }, "passage": "screen", "screen": 1 },
+        { "type": "slide", "dir": { "dx": -1, "dy": 0 }, "passage": "screen", "screen": 1 },
+        { "type": "slide", "dir": { "dx": 0, "dy": 1 }, "passage": "screen", "screen": 1 },
+        { "type": "slide", "dir": { "dx": 0, "dy": -1 }, "passage": "screen", "screen": 1 }
+      ]
+    },
+    {
+      "id": "xiang",
+      "name": "象",
+      "maxHp": 130,
+      "attack": 35,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
+      "waterPassable": false,
+      "moveSpecs": [
+        { "type": "jump", "dir": { "dx": 2, "dy": 2 }, "passage": "leg", "leg": { "dx": 1, "dy": 1 } },
+        { "type": "jump", "dir": { "dx": -2, "dy": 2 }, "passage": "leg", "leg": { "dx": -1, "dy": 1 } },
+        { "type": "jump", "dir": { "dx": 2, "dy": -2 }, "passage": "leg", "leg": { "dx": 1, "dy": -1 } },
+        { "type": "jump", "dir": { "dx": -2, "dy": -2 }, "passage": "leg", "leg": { "dx": -1, "dy": -1 } }
+      ]
+    },
+    {
+      "id": "shi",
+      "name": "士",
+      "maxHp": 100,
+      "attack": 35,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
+      "onlyOnTerrain": "road",
+      "moveSpecs": [
+        { "type": "step", "dir": { "dx": 1, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 1, "dy": -1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": -1 }, "passage": "solid" }
+      ],
+      "attackSpecs": [
+        { "type": "step", "dir": { "dx": 1, "dy": 0 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": 0 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 0, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 0, "dy": -1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 1, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": 1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": 1, "dy": -1 }, "passage": "solid" },
+        { "type": "step", "dir": { "dx": -1, "dy": -1 }, "passage": "solid" }
+      ]
+    },
+    {
       "id": "soldier",
       "name": "兵",
-      "maxHp": 100,
-      "attack": 10,
+      "maxHp": 80,
+      "attack": 35,
+      "maxStamina": 2,
+      "moveCost": 1,
+      "attackCost": 1,
       "moveSpecs": [
         { "type": "step", "dir": { "dx": 1, "dy": 0 }, "passage": "solid" },
         { "type": "step", "dir": { "dx": -1, "dy": 0 }, "passage": "solid" },

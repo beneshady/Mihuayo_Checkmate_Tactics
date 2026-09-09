@@ -3,7 +3,7 @@
   "meta": {
     "kind": "battleInit",
     "battleId": "demo-01",
-    "displayName": "教学关：第一次遭遇战",
+    "displayName": "教学关：地形与兵种",
     "createdAt": "2026-02-06T10:00:00+08:00",
     "savedAt": "2026-02-06T10:00:00+08:00",
     "extra": {}
@@ -31,14 +31,14 @@
         "type": "tileGrid",
         "default": "plain",
         "cells": [
-          ["plain", "plain", "plain", "forest", "forest", "plain", "plain", "plain", "water", "water"],
-          ["plain", "plain", "plain", "forest", "plain", "plain", "plain", "plain", "water", "water"],
-          ["plain", "hill", "plain", "plain", "plain", "plain", "forest", "plain", "plain", "plain"],
-          ["plain", "plain", "plain", "plain", "road", "road", "plain", "plain", "plain", "plain"],
-          ["plain", "plain", "plain", "plain", "road", "road", "plain", "plain", "plain", "plain"],
-          ["forest", "plain", "plain", "plain", "plain", "plain", "plain", "hill", "plain", "plain"],
-          ["forest", "forest", "plain", "plain", "plain", "plain", "plain", "hill", "hill", "plain"],
-          ["plain", "plain", "plain", "water", "water", "plain", "plain", "plain", "plain", "plain"]
+          ["plain", "plain", "forest", "plain", "plain", "plain", "plain", "forest", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "road", "road", "road"],
+          ["water", "water", "plain", "plain", "plain", "forest", "plain", "road", "road", "road"],
+          ["plain", "water", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "forest", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["road", "road", "road", "plain", "plain", "plain", "forest", "plain", "plain", "plain"],
+          ["road", "road", "road", "plain", "water", "plain", "plain", "plain", "forest", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
         ]
       }
     ],
@@ -49,12 +49,10 @@
     { "id": "p2", "name": "敌军", "team": 1, "controller": "ai", "extra": {} }
   ],
   "units": [
-    { "id": "u1", "defId": "soldier", "owner": "p1", "pos": { "x": 1, "y": 4 }, "hp": 100, "extra": {} },
-    { "id": "u2", "defId": "soldier", "owner": "p1", "pos": { "x": 2, "y": 5 }, "hp": 100, "extra": {} },
-    { "id": "u3", "defId": "soldier", "owner": "p1", "pos": { "x": 1, "y": 6 }, "hp": 80, "extra": {} },
-    { "id": "u4", "defId": "soldier", "owner": "p2", "pos": { "x": 8, "y": 2 }, "hp": 120, "extra": {} },
-    { "id": "u5", "defId": "soldier", "owner": "p2", "pos": { "x": 7, "y": 3 }, "hp": 120, "extra": {} },
-    { "id": "u6", "defId": "soldier", "owner": "p2", "pos": { "x": 8, "y": 5 }, "hp": 80, "extra": {} }
+    { "id": "u1", "defId": "che", "owner": "p1", "pos": { "x": 0, "y": 4 }, "extra": {} },
+    { "id": "u2", "defId": "pao", "owner": "p1", "pos": { "x": 1, "y": 4 }, "extra": {} },
+    { "id": "u3", "defId": "soldier", "owner": "p1", "pos": { "x": 2, "y": 4 }, "extra": {} },
+    { "id": "u4", "defId": "soldier", "owner": "p2", "pos": { "x": 7, "y": 3 }, "extra": {} }
   ],
   "turn": {
     "round": 1,

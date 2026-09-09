@@ -28,6 +28,8 @@ export interface BattleMeta {
 
 export interface BattleCondition {
     type: string;
+    /** eliminateDef 专用：目标棋子 defId（如"击杀帅即胜"） */
+    defId?: string;
 }
 
 export interface BattleRules {
@@ -87,6 +89,8 @@ export interface BattleUnit {
     owner: string;
     pos: GridPos;
     hp?: number;
+    /** 当前体力（缺省视为满，满值由 def.maxStamina 决定）；每回合开始回满 */
+    stamina?: number;
     actedThisTurn?: boolean;
     statuses?: UnitStatus[];
     extra?: Record<string, unknown>;

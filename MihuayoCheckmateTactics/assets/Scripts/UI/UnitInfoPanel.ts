@@ -45,6 +45,7 @@ export class UnitInfoPanel extends Component {
         return [
             `【${info.name}】（${info.side === 'self' ? '我方' : '敌方'}）`,
             `生命：${info.hp}/${info.maxHp}`,
+            `体力：${info.stamina}/${info.maxStamina}`,
             `攻击：${info.attack}`,
             `位置：(${info.pos.x}, ${info.pos.y})`,
         ].join('\n');

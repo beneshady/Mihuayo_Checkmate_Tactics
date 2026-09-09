@@ -17,6 +17,9 @@ export interface UnitInfo {
     /** 当前生命（hp 未定义视为满血；与存活判定 `hp ?? 1` 口径不同，M0 关卡数据两者一致不触发） */
     hp: number;
     maxHp: number;
+    /** 当前体力（stamina 未定义视为满） */
+    stamina: number;
+    maxStamina: number;
     attack: number;
     pos: GridPos;
 }
@@ -38,6 +41,8 @@ export function getUnitInfo(state: BattleState, unitId: string, defs: UnitDef[])
         side: owner?.controller === 'human' ? 'self' : 'enemy',
         hp: unit.hp ?? def.maxHp,
         maxHp: def.maxHp,
+        stamina: unit.stamina ?? def.maxStamina,
+        maxStamina: def.maxStamina,
         attack: def.attack,
         pos: { x: unit.pos.x, y: unit.pos.y },
     };

@@ -1,11 +1,11 @@
-import { _decorator, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Node, Vec3, error, log, warn } from 'cc';
+import { _decorator, Button, Camera, Canvas, Color, Component, director, EventTouch, JsonAsset, Node, Vec3, error, log, warn } from 'cc';
 import { BattlePlayer, BattleState, isoToGrid, parseBattleState } from './Core/BattleState';
 import { advanceTurn, attackUnit, checkOutcome, getCurrentPlayer, isHumanTurn, moveUnitTo, resetTurn } from './Core/Rules';
-import { decideAiMove } from './Core/EnemyAI';
+import { decideAiAction } from './Core/EnemyAI';
 import { computeReachableCells, ReachableCell } from './Core/movement';
 import { UnitDef, getUnitDef, parseUnitDefs } from './Core/UnitDefs';
 import { getUnitInfo } from './Core/UnitInfo';
-import { IsoLayout } from './Map/IsoLayout';
+import { IsoLayout, topFaceOffsetY } from './Map/IsoLayout';
 import { MapBuilder } from './Map/MapBuilder';
 import { MoveHighlighter } from './Map/MoveHighlighter';
 import { UnitBuilder } from './Unit/UnitBuilder';
@@ -18,6 +18,9 @@ export type FlowStage = 'generating' | 'playerTurn' | 'enemyTurn' | 'ended';
 
 /** 棋子交互子状态：无选中 → 已选中（显示「行动」）→ 目标选择（显示「取消」+ 高亮可走格） */
 export type InteractStage = 'idle' | 'selected' | 'targeting';
+
+/** 敌方单回合最大步数保险（正常 ≈ 全员体力总和，远达不到） */
+const MAX_ENEMY_STEPS = 40;
 
 /**
  * 战局协调者（M0）：持有内存中的战局状态（唯一事实源），
@@ -96,6 +99,9 @@ export class GameManager extends Component {
     private targetingCells: ReachableCell[] = [];
     /** targeting 的目的模式：移动（蓝高亮）或攻击（红高亮） */
     private targetingMode: 'move' | 'attack' = 'move';
+
+    /** 敌方回合步进计数（防死循环保险；进入敌方回合时清零） */
+    private enemyStepCount = 0;
 
     /** 只读访问当前战局状态（未初始化时为 null） */
     public get battleState(): BattleState | null {
@@ -214,7 +220,7 @@ export class GameManager extends Component {
             return;
         }
 
-        resetTurn(this.state);
+        resetTurn(this.state, this.defs);
         const human = isHumanTurn(this.state);
         this.flowStage = human ? 'playerTurn' : 'enemyTurn';
         this.updateButton();
@@ -231,19 +237,53 @@ export class GameManager extends Component {
         // 我方回合（已配置按钮）：等待玩家点击「结束回合」按钮
     }
 
-    /** 敌方回合：AI 决策一步并执行（先改状态唯一事实源，再投影视图），停留后交回回合 */
+    /** 敌方回合：进入步进循环（每步一动作，直到无可为 / 步数上限），停留后交回回合 */
     private runEnemyTurn(): void {
         if (!this.state || !this.layout || this.flowStage !== 'enemyTurn') return;
-        const action = decideAiMove(this.state, this.defs);
-        if (!action) {
-            log('[AI] 敌方无可走棋子，跳过行动');
-        } else if (moveUnitTo(this.state, action.unitId, action.to.x, action.to.y)) {
-            this.unitBuilder?.moveUnitView(action.unitId, action.to.x, action.to.y, this.layout);
-            log(`[AI] ${action.unitId} 移动到 (${action.to.x}, ${action.to.y})`);
-        } else {
-            warn(`[AI] 移动被规则拒绝：${action.unitId} → (${action.to.x}, ${action.to.y})`);
+        this.enemyStepCount = 0;
+        this.performEnemyStep();
+    }
+
+    /** 敌方一步：决策 → 执行（先改状态唯一事实源，再投影视图）→ 胜负判定 → 排下一步 */
+    private performEnemyStep(): void {
+        if (!this.state || !this.layout || this.flowStage !== 'enemyTurn') return;
+        if (this.enemyStepCount >= MAX_ENEMY_STEPS) {
+            warn(`[AI] 敌方步数达到上限 ${MAX_ENEMY_STEPS}，强制结束回合`);
+            this.scheduleOnce(() => this.endCurrentTurn(), this.enemySettleDelay);
+            return;
         }
-        this.scheduleOnce(() => this.endCurrentTurn(), this.enemySettleDelay);
+        const action = decideAiAction(this.state, this.defs);
+        if (!action) {
+            log('[AI] 敌方无可为动作，结束回合');
+            this.scheduleOnce(() => this.endCurrentTurn(), this.enemySettleDelay);
+            return;
+        }
+        this.enemyStepCount++;
+        if (action.type === 'attack') {
+            if (!this.applyAttack(action.unitId, action.to.x, action.to.y)) {
+                warn(`[AI] 攻击被规则拒绝：${action.unitId} → (${action.to.x}, ${action.to.y})`);
+                this.scheduleOnce(() => this.endCurrentTurn(), this.enemySettleDelay);
+                return;
+            }
+            log(`[AI] ${action.unitId} 攻击 → (${action.to.x}, ${action.to.y}）：${action.reason}`);
+        } else {
+            if (!moveUnitTo(this.state, action.unitId, action.to.x, action.to.y, this.defs)) {
+                warn(`[AI] 移动被规则拒绝：${action.unitId} → (${action.to.x}, ${action.to.y})`);
+                this.scheduleOnce(() => this.endCurrentTurn(), this.enemySettleDelay);
+                return;
+            }
+            this.unitBuilder?.moveUnitView(action.unitId, action.to.x, action.to.y, this.layout);
+            log(`[AI] ${action.unitId} 移动 → (${action.to.x}, ${action.to.y}）：${action.reason}`);
+        }
+
+        // AI 中途打完收工：全灭判定即时生效，不再排下一步
+        if (this.checkBattleEnd()) {
+            return;
+        }
+
+        // 步间隔 ≥ 移动动画时长，保证动画播完再走下一步
+        const moveDuration = this.unitBuilder ? this.unitBuilder.unitMoveDuration : 0.2;
+        this.scheduleOnce(() => this.performEnemyStep(), Math.max(this.aiDelay, moveDuration + 0.05));
     }
 
     /** 结束当前行动方回合，推进到下一方（结束按钮 / 敌方快过调用） */
@@ -261,16 +301,33 @@ export class GameManager extends Component {
         }
     }
 
-    /** 按交互子状态切换行动/取消按钮：selected → 行动，targeting → 取消 */
+    /** 按交互子状态切换行动/取消按钮：selected → 行动+攻击，targeting → 取消；体力不足的按钮置灰 */
     private updateActionButtons(): void {
+        const selected = this.interactStage === 'selected';
         if (this.actionButton) {
-            this.actionButton.node.active = this.interactStage === 'selected';
+            this.actionButton.node.active = selected;
         }
         if (this.attackButton) {
-            this.attackButton.node.active = this.interactStage === 'selected';
+            this.attackButton.node.active = selected;
         }
         if (this.cancelButton) {
             this.cancelButton.node.active = this.interactStage === 'targeting';
+        }
+        if (!selected) {
+            // 非 selected 态按钮隐藏；恢复可点，避免下次显示时残留置灰
+            if (this.actionButton) this.actionButton.interactable = true;
+            if (this.attackButton) this.attackButton.interactable = true;
+            return;
+        }
+        // 体力门控：当前选中棋子体力不足以支付对应消耗时置灰（点击由 Button 拦截，规则层仍兜底）
+        const unit = this.state?.units.find((u) => u.id === this.selectedUnitId);
+        const def = unit ? getUnitDef(this.defs, unit.defId) : undefined;
+        const stamina = unit && def ? unit.stamina ?? def.maxStamina : 0;
+        if (this.actionButton) {
+            this.actionButton.interactable = !!def && stamina >= (def.moveCost ?? 1);
+        }
+        if (this.attackButton) {
+            this.attackButton.interactable = !!def && stamina >= (def.attackCost ?? 1);
         }
     }
 
@@ -303,7 +360,9 @@ export class GameManager extends Component {
         const screen = event.getLocation();
         const world = this.touchToWorld(event);
         const local = this.worldToMapLocal(world);
-        const grid = isoToGrid(local.x, local.y, this.layout, this.state.map.width, this.state.map.height);
+        // 触点在「顶面中心空间」（可见菱形），isoToGrid 锚在「画布中心空间」：
+        // 先减去顶面偏移换算回画布空间再逆映射，否则 ~72% 菱形面积会解析到后方邻格（实测踩坑）。
+        const grid = isoToGrid(local.x, local.y - topFaceOffsetY(this.layout), this.layout, this.state.map.width, this.state.map.height);
         if (this.debugPick) {
             const where = grid ? `格(${grid.x},${grid.y})` : '界外';
             log(`[拾取] 屏幕(${screen.x.toFixed(0)},${screen.y.toFixed(0)}) → 世界(${world.x.toFixed(0)},${world.y.toFixed(0)}) → 本地(${local.x.toFixed(0)},${local.y.toFixed(0)}) → ${where}`);
@@ -311,7 +370,7 @@ export class GameManager extends Component {
 
         if (this.interactStage !== 'targeting') {
             // 棋子命中（旗子内容矩形，地图本地空间）：查看信息（任意棋子）/ 选中（仅我方回合）
-            const unitId = this.unitBuilder?.hitUnitAt(local.x, local.y, this.state.units, this.layout);
+            const unitId = this.unitBuilder?.hitUnitAt(local.x, local.y, this.state.units);
             if (unitId) {
                 if (this.debugPick) log(`[拾取] 命中棋子 ${unitId}`);
                 if (canOperate) this.onUnitClicked(unitId); // 内部 cancelSelection 会先收起面板
@@ -444,7 +503,7 @@ export class GameManager extends Component {
             warn(`[交互] 找不到棋子或其定义：${this.selectedUnitId}`);
             return;
         }
-        const reach = computeReachableCells(this.state, unit, def);
+        const reach = computeReachableCells(this.state, unit, def, 'attack');
         const targets = reach.filter((cell) => cell.capture);
         const range = reach.filter((cell) => !cell.capture);
         if (targets.length === 0) {
@@ -500,33 +559,58 @@ export class GameManager extends Component {
     /** 落子：先改逻辑状态（唯一事实源），再投影视图，最后清交互态 */
     private executeMove(unitId: string, x: number, y: number): void {
         if (!this.state || !this.layout) return;
-        if (!moveUnitTo(this.state, unitId, x, y)) {
+        if (!moveUnitTo(this.state, unitId, x, y, this.defs)) {
             warn(`[交互] 移动被规则拒绝：${unitId} → (${x}, ${y})`);
             return;
         }
         this.unitBuilder?.moveUnitView(unitId, x, y, this.layout);
         log(`[交互] ${unitId} 移动到 (${x}, ${y})`);
         this.cancelSelection();
+        this.checkBattleEnd();
     }
 
-    /** 攻击：先改逻辑状态（扣血/阵亡移除），再驱动受击抖动或阵亡销毁，最后清交互态 */
+    /** 攻击（玩家流程入口）：应用攻击并投影表现，最后清交互态 */
     private executeAttack(attackerId: string, x: number, y: number): void {
         if (!this.state) return;
-        const defender = this.state.units.find((u) => u.pos.x === x && u.pos.y === y);
-        if (!attackUnit(this.state, attackerId, x, y, this.defs)) {
+        if (!this.applyAttack(attackerId, x, y)) {
             warn(`[交互] 攻击被规则拒绝：${attackerId} → (${x}, ${y})`);
             return;
+        }
+        this.cancelSelection();
+        this.checkBattleEnd();
+    }
+
+    /**
+     * 应用一次攻击并投影表现（玩家 / AI 共用）：
+     * 规则层扣血/阵亡移除，视图层受击抖动或阵亡销毁。返回是否成功。
+     */
+    private applyAttack(attackerId: string, x: number, y: number): boolean {
+        if (!this.state) return false;
+        const defender = this.state.units.find((u) => u.pos.x === x && u.pos.y === y);
+        if (!attackUnit(this.state, attackerId, x, y, this.defs)) {
+            return false;
         }
         if (defender) {
             if (this.state.units.indexOf(defender) !== -1) {
                 this.unitBuilder?.shakeUnitView(defender.id);
-                log(`[交互] ${attackerId} 攻击 ${defender.id}，剩余 HP ${defender.hp}`);
+                log(`[战斗] ${attackerId} 攻击 ${defender.id}，剩余 HP ${defender.hp}`);
             } else {
                 this.unitBuilder?.removeUnitView(defender.id);
-                log(`[交互] ${attackerId} 击杀 ${defender.id}`);
+                log(`[战斗] ${attackerId} 击杀 ${defender.id}`);
             }
         }
-        this.cancelSelection();
+        return true;
+    }
+
+    /** 行动后即时胜负判定：有结果则进入 ended 并返回 true（玩家/AI 行动路径共用；回合开始的判定仍在 enterTurn） */
+    private checkBattleEnd(): boolean {
+        if (!this.state) return false;
+        const outcome = checkOutcome(this.state);
+        if (outcome) {
+            this.enterEnded(outcome);
+            return true;
+        }
+        return false;
     }
 
     private enterEnded(outcome: { winner: string; reason: string }): void {
@@ -536,5 +620,14 @@ export class GameManager extends Component {
             this.state.result = outcome;
         }
         log(`[流程] 战局结束 — ${outcome.winner ? `胜者 ${outcome.winner}` : '平局'}（${outcome.reason}）`);
+        // M0 占位：暂无结算界面，结束 2 秒后刷新本场景重开（正式 Result UI + 重开按钮后续替换）
+        const RELOAD_DELAY_SEC = 2;
+        this.scheduleOnce(() => {
+            const scene = director.getScene();
+            if (scene) {
+                log(`[流程] ${RELOAD_DELAY_SEC} 秒后刷新场景重开：${scene.name}`);
+                director.loadScene(scene.name);
+            }
+        }, RELOAD_DELAY_SEC);
     }
 }

@@ -13,7 +13,9 @@
 
 ## 当前架构
 
-Gameplay 结构、Game State 模型、跨 Feature Contract、系统通信、Platform Boundary、Save System 和其他应用架构均为 `TBD`。在 Cocos Spike 或 Vertical Slice 验证之前，不得将可能的方案写成项目规则。
+已接受 [ADR-0001 · 游戏逻辑分层——纯 TS 规则 / 哑视图 / 薄协调者](decisions/0001-gameplay-layering.md)：纯 TS Core（规则/解析/坐标）→ 哑视图（Builder/Component）→ 薄协调者（GameManager）；战局状态唯一事实源在 GameManager、视图为投影；规则模块放 `Scripts/Core`。
+
+其余（Game State 模型细节、跨 Feature Contract、系统通信、Platform Boundary、Save System 和其他应用架构）仍为 `TBD`；在验证之前不得将可能的方案写成项目规则。
 
 ## 架构决定
 

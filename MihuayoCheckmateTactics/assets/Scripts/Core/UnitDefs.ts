@@ -36,9 +36,21 @@ export interface UnitDef {
     name?: string;
     maxHp: number;
     mp?: number;
-    /** 攻击力（近战伤害 = attack）；必填，缺失即 parse 报错 */
+    /** 攻击力（伤害 = attack）；必填，缺失即 parse 报错 */
     attack: number;
+    /** 最大体力；每回合开始回满（resetTurn），移动/攻击消耗 moveCost/attackCost */
+    maxStamina: number;
+    /** 移动一次消耗的体力（缺省 1） */
+    moveCost?: number;
+    /** 攻击一次消耗的体力（缺省 1） */
+    attackCost?: number;
+    /** 能否进入水面地形（缺省可）；false 时不可进入、也不可攻击水中目标（象） */
+    waterPassable?: boolean;
+    /** 只能在此地形 id 上移动（缺省不限；士/帅 = 'road' 地宫） */
+    onlyOnTerrain?: string;
     moveSpecs: MoveSpec[];
+    /** 攻击走法（缺省回退 moveSpecs，即"打=走"，如马/兵）；车/炮/士与移动不同源时显式给出 */
+    attackSpecs?: MoveSpec[];
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -60,9 +72,43 @@ function requireNumber(value: unknown, path: string): number {
     return value;
 }
 
+function requireArray(value: unknown, path: string): unknown[] {
+    if (!Array.isArray(value)) throw new BattleParseError(path, '应为数组（array）');
+    return value;
+}
+
 function requireDir(value: unknown, path: string): MoveDir {
     const dir = requireObject(value, path);
     return { dx: requireNumber(dir.dx, `${path}.dx`), dy: requireNumber(dir.dy, `${path}.dy`) };
+}
+
+function requireBoolean(value: unknown, path: string): boolean {
+    if (typeof value !== 'boolean') throw new BattleParseError(path, '应为布尔值（boolean）');
+    return value;
+}
+
+/** 解析一条走法数组（moveSpecs / attackSpecs 共用） */
+function parseMoveSpecArray(value: unknown, path: string): MoveSpec[] {
+    const movesRaw = requireArray(value, path);
+    return movesRaw.map((move, j) => {
+        const spec = requireObject(move, `${path}[${j}]`);
+        const type = requireString(spec.type, `${path}[${j}].type`) as MoveType;
+        if (type !== 'step' && type !== 'slide' && type !== 'jump') {
+            throw new BattleParseError(`${path}[${j}].type`, `未知走法类型 "${type}"`);
+        }
+        const passage = requireString(spec.passage, `${path}[${j}].passage`) as Passage;
+        if (passage !== 'solid' && passage !== 'screen' && passage !== 'leg' && passage !== 'fly') {
+            throw new BattleParseError(`${path}[${j}].passage`, `未知通过规则 "${passage}"`);
+        }
+        const result: MoveSpec = {
+            type,
+            dir: requireDir(spec.dir, `${path}[${j}].dir`),
+            passage,
+        };
+        if (passage === 'screen') result.screen = requireNumber(spec.screen, `${path}[${j}].screen`);
+        if (passage === 'leg') result.leg = requireDir(spec.leg, `${path}[${j}].leg`);
+        return result;
+    });
 }
 
 /**
@@ -86,36 +132,26 @@ export function parseUnitDefs(raw: unknown): UnitDef[] {
         if (seen.has(id)) throw new BattleParseError(`$.units[${index}].id`, `重复的棋子类型 id "${id}"`);
         seen.add(id);
 
-        const movesRaw = unit.moveSpecs;
-        if (!Array.isArray(movesRaw)) throw new BattleParseError(`$.units[${index}].moveSpecs`, '应为数组（array）');
-        const moveSpecs = movesRaw.map((move, j) => {
-            const spec = requireObject(move, `$.units[${index}].moveSpecs[${j}]`);
-            const type = requireString(spec.type, `$.units[${index}].moveSpecs[${j}].type`) as MoveType;
-            if (type !== 'step' && type !== 'slide' && type !== 'jump') {
-                throw new BattleParseError(`$.units[${index}].moveSpecs[${j}].type`, `未知走法类型 "${type}"`);
-            }
-            const passage = requireString(spec.passage, `$.units[${index}].moveSpecs[${j}].passage`) as Passage;
-            if (passage !== 'solid' && passage !== 'screen' && passage !== 'leg' && passage !== 'fly') {
-                throw new BattleParseError(`$.units[${index}].moveSpecs[${j}].passage`, `未知通过规则 "${passage}"`);
-            }
-            const result: MoveSpec = {
-                type,
-                dir: requireDir(spec.dir, `$.units[${index}].moveSpecs[${j}].dir`),
-                passage,
-            };
-            if (passage === 'screen') result.screen = requireNumber(spec.screen, `$.units[${index}].moveSpecs[${j}].screen`);
-            if (passage === 'leg') result.leg = requireDir(spec.leg, `$.units[${index}].moveSpecs[${j}].leg`);
-            return result;
-        });
-
         const def: UnitDef = {
             id,
             maxHp: requireNumber(unit.maxHp, `$.units[${index}].maxHp`),
             attack: requireNumber(unit.attack, `$.units[${index}].attack`),
-            moveSpecs,
+            maxStamina: requireNumber(unit.maxStamina, `$.units[${index}].maxStamina`),
+            moveSpecs: parseMoveSpecArray(unit.moveSpecs, `$.units[${index}].moveSpecs`),
         };
         if (unit.name !== undefined) def.name = requireString(unit.name, `$.units[${index}].name`);
         if (unit.mp !== undefined) def.mp = requireNumber(unit.mp, `$.units[${index}].mp`);
+        if (unit.moveCost !== undefined) def.moveCost = requireNumber(unit.moveCost, `$.units[${index}].moveCost`);
+        if (unit.attackCost !== undefined) def.attackCost = requireNumber(unit.attackCost, `$.units[${index}].attackCost`);
+        if (unit.waterPassable !== undefined) {
+            def.waterPassable = requireBoolean(unit.waterPassable, `$.units[${index}].waterPassable`);
+        }
+        if (unit.onlyOnTerrain !== undefined) {
+            def.onlyOnTerrain = requireString(unit.onlyOnTerrain, `$.units[${index}].onlyOnTerrain`);
+        }
+        if (unit.attackSpecs !== undefined) {
+            def.attackSpecs = parseMoveSpecArray(unit.attackSpecs, `$.units[${index}].attackSpecs`);
+        }
         return def;
     });
 }

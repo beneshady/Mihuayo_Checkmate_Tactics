@@ -31,7 +31,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 10
+      "__id__": 15
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -144,12 +144,27 @@
     "__prefab": {
       "__id__": 7
     },
-    "ownerSprites": [
+    "typeSprites": [
       {
         "__id__": 8
       },
       {
         "__id__": 9
+      },
+      {
+        "__id__": 10
+      },
+      {
+        "__id__": 11
+      },
+      {
+        "__id__": 12
+      },
+      {
+        "__id__": 13
+      },
+      {
+        "__id__": 14
       }
     ],
     "unitId": "",
@@ -161,18 +176,55 @@
     "fileId": "5emvapo61AaqTikVGOyKar"
   },
   {
-    "__type__": "UnitSpriteEntry",
-    "ownerId": "p1",
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "shuai",
     "spriteFrame": {
-      "__uuid__": "613fdd67-324f-48ac-a0c8-1dfe1aaf621a@f9941",
+      "__uuid__": "72db0d4d-cde7-4d65-abb1-a1b70c611b1a@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
   {
-    "__type__": "UnitSpriteEntry",
-    "ownerId": "p2",
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "che",
     "spriteFrame": {
-      "__uuid__": "66ca351f-7118-43f7-94d6-6c9e77cba90e@f9941",
+      "__uuid__": "2ab9e5ae-c980-4a7b-84ae-dd70eccb1c96@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    }
+  },
+  {
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "ma",
+    "spriteFrame": {
+      "__uuid__": "7ceed788-0a93-4dcc-882a-0d9d864c46d7@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    }
+  },
+  {
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "pao",
+    "spriteFrame": {
+      "__uuid__": "3e5d2b92-d757-4566-92a9-e66324f2eab2@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    }
+  },
+  {
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "xiang",
+    "spriteFrame": {
+      "__uuid__": "e992e366-831c-454e-b08f-3a3f768536fa@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    }
+  },
+  {
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "shi",
+    "spriteFrame": null
+  },
+  {
+    "__type__": "UnitTypeSpriteEntry",
+    "defId": "soldier",
+    "spriteFrame": {
+      "__uuid__": "4ecff56f-64eb-4155-b4c8-1221086a2298@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -185,6 +237,7 @@
       "__id__": 0
     },
     "fileId": "09LsoF0SxBJLXMCfZJmEs/",
+    "instance": null,
     "targetOverrides": null
   }
 ]
