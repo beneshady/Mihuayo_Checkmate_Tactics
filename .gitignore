@@ -1,0 +1,13 @@
+# 网页开发依赖与构建产物
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# 本地环境与调试文件
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
