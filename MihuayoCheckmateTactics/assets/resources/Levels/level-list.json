@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "levels": [
-    { "id": "level-01", "name": "第 1 关 · 初阵", "rewardGold": 100 },
-    { "id": "level-02", "name": "第 2 关 · 荒林遭遇", "rewardGold": 150 }
+    { "id": "level-01", "name": "第一关 · 初阵", "rewardGold": 100 },
+    { "id": "level-02", "name": "第二关 · 荒林遭遇", "rewardGold": 150 }
   ]
 }
