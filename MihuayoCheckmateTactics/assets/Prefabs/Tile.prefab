@@ -76,8 +76,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 256,
-      "height": 256
+      "width": 2048,
+      "height": 2048
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -113,12 +113,12 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "65c3eb8f-94a2-41fc-ad19-5281ddad8725@f9941",
+      "__uuid__": "d5ff3383-fe0b-43a0-bc55-20cced2f503f@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -126,7 +126,7 @@
     },
     "_fillStart": 0,
     "_fillRange": 0,
-    "_isTrimmedMode": true,
+    "_isTrimmedMode": false,
     "_useGrayscale": false,
     "_atlas": null,
     "_id": ""
@@ -175,7 +175,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "plain",
     "spriteFrame": {
-      "__uuid__": "65c3eb8f-94a2-41fc-ad19-5281ddad8725@f9941",
+      "__uuid__": "d5ff3383-fe0b-43a0-bc55-20cced2f503f@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -183,7 +183,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "water",
     "spriteFrame": {
-      "__uuid__": "3ecf322b-54c5-4177-8563-ff0d0e073821@f9941",
+      "__uuid__": "8c437980-22d4-486c-a28f-ac781773c89b@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -191,7 +191,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "forest",
     "spriteFrame": {
-      "__uuid__": "4cee018e-30f4-41f8-a737-26b503232e77@f9941",
+      "__uuid__": "daaacf4f-2850-4f7b-96ef-91a339698096@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -207,7 +207,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "road",
     "spriteFrame": {
-      "__uuid__": "057c1713-a96a-4440-89b1-04e21fcfa614@f9941",
+      "__uuid__": "6baf1a05-1f09-43c6-90ed-a200a2a44ccc@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },

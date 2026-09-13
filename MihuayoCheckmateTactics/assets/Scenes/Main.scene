@@ -23,7 +23,7 @@
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 66
+      "__id__": 67
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -54,7 +54,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 67
+      "__id__": 68
     },
     "_id": "1de2137a-148d-4bdc-a7b1-d9e8e18303a4"
   },
@@ -80,13 +80,13 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 63
-      },
-      {
         "__id__": 64
       },
       {
         "__id__": 65
+      },
+      {
+        "__id__": 66
       }
     ],
     "_prefab": null,
@@ -178,7 +178,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 360,
+    "_orthoHeight": 562.6143790849674,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -233,6 +233,9 @@
     "_components": [
       {
         "__id__": 12
+      },
+      {
+        "__id__": 63
       }
     ],
     "_prefab": null,
@@ -810,7 +813,7 @@
     "_string": "结束回合",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24.40972222222222,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1125,7 +1128,7 @@
     "_string": "行动",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24.40972222222222,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1440,7 +1443,7 @@
     "_string": "攻击",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24.40972222222222,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1755,7 +1758,7 @@
     "_string": "取消",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24.40972222222222,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2031,8 +2034,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 45.8020425853485,
-      "height": 50.39999999999999
+      "width": 45.8203125,
+      "height": 50.4
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -2064,7 +2067,7 @@
     "_string": "label",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24.40972222222222,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2707,6 +2710,24 @@
     "_id": "2d5qWLcPFN6IoXGwfZkEAB"
   },
   {
+    "__type__": "2150bnM7FtIk5sq6SodMODu",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 5
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "canvas": {
+      "__id__": 2
+    },
+    "zoomMax": 3,
+    "contentMargin": 24,
+    "inertiaTau": 0.15,
+    "_id": "01abZSPiJM9KrukVYchwx1"
+  },
+  {
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
@@ -2785,28 +2806,28 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 68
-    },
-    "shadows": {
       "__id__": 69
     },
-    "_skybox": {
+    "shadows": {
       "__id__": 70
     },
-    "fog": {
+    "_skybox": {
       "__id__": 71
     },
-    "octree": {
+    "fog": {
       "__id__": 72
     },
-    "skin": {
+    "octree": {
       "__id__": 73
     },
-    "lightProbeInfo": {
+    "skin": {
       "__id__": 74
     },
-    "postSettings": {
+    "lightProbeInfo": {
       "__id__": 75
+    },
+    "postSettings": {
+      "__id__": 76
     },
     "bakedWithStationaryMainLight": false,
     "bakedWithHighpLightmap": false

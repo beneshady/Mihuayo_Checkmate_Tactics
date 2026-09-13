@@ -73,6 +73,9 @@ export class MapBuilder extends Component {
             this.node.addChild(node);
             node.name = `tile_${cell.x}_${cell.y}_${cell.terrainId}`;
             const { isoX, isoY } = gridToIso(cell.x, cell.y, layout);
+            // 先落到最终位置（未显形不参与视觉，显形时再改到下落起点）：
+            // BoardCamera.fitToContent 的内容包围盒在 buildMap 返回后立即可用
+            node.setPosition(isoX, isoY, 0);
             node.getComponent(Tile)!.setTerrain(cell.terrainId);
 
             // 未轮到不显形：先隐藏（保持全尺寸）；同一 depth 行一起出现并下落，行与行从后往前错峰。

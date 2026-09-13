@@ -7,6 +7,7 @@ import { grantBattleReward } from './Core/PlayerProfile';
 import { computeReachableCells, ReachableCell } from './Core/movement';
 import { UnitDef, getUnitDef, parseUnitDefs } from './Core/UnitDefs';
 import { getUnitInfo } from './Core/UnitInfo';
+import { BoardCamera } from './Map/BoardCamera';
 import { IsoLayout, topFaceOffsetY } from './Map/IsoLayout';
 import { MapBuilder } from './Map/MapBuilder';
 import { MoveHighlighter } from './Map/MoveHighlighter';
@@ -243,6 +244,9 @@ export class GameManager extends Component {
             this.unitBuilder!.buildUnits(state, this.layout!);
             this.beginFlow();
         });
+        // 落块动画开始前就取景（buildMap 同步建块，位置已定）：全战斗都在 fit 视角下进行，
+        // 避免"原比例先大后缩"的生硬镜头变化
+        this.getComponent(BoardCamera)?.fitToContent();
     }
 
     /** 关卡生成完毕后进入回合循环 */
@@ -391,6 +395,8 @@ export class GameManager extends Component {
      * targeting 阶段只认格子（旗子矩形不参与命中，避免旗身遮挡可走格）。
      */
     private onBoardTouchEnd(event: EventTouch): void {
+        // 拖拽/捏合/惯性期间的抬起不算点选（手势消歧在 BoardCamera；同节点组件直接取用）
+        if (this.getComponent(BoardCamera)?.suppressTap(event.touch ? event.touch.getID() : -1)) return;
         if (!this.state || !this.layout) return;
         // 查看（点棋子看信息）不分回合；操作（选中/移动）仅我方回合
         const canOperate = this.flowStage === 'playerTurn';
