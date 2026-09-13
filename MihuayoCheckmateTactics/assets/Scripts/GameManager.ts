@@ -1,7 +1,9 @@
-import { _decorator, Button, Camera, Canvas, Color, Component, director, EventTouch, JsonAsset, Node, Vec3, error, log, warn } from 'cc';
+import { _decorator, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Node, resources, Vec3, error, log, warn } from 'cc';
 import { BattlePlayer, BattleState, isoToGrid, parseBattleState } from './Core/BattleState';
 import { advanceTurn, attackUnit, checkOutcome, getCurrentPlayer, isHumanTurn, moveUnitTo, resetTurn } from './Core/Rules';
 import { decideAiAction } from './Core/EnemyAI';
+import { getLevelEntry, LevelEntry, LevelList, parseLevelList } from './Core/LevelConfig';
+import { grantBattleReward } from './Core/PlayerProfile';
 import { computeReachableCells, ReachableCell } from './Core/movement';
 import { UnitDef, getUnitDef, parseUnitDefs } from './Core/UnitDefs';
 import { getUnitInfo } from './Core/UnitInfo';
@@ -9,7 +11,9 @@ import { IsoLayout, topFaceOffsetY } from './Map/IsoLayout';
 import { MapBuilder } from './Map/MapBuilder';
 import { MoveHighlighter } from './Map/MoveHighlighter';
 import { UnitBuilder } from './Unit/UnitBuilder';
+import { ResultPanel } from './UI/ResultPanel';
 import { UnitInfoPanel } from './UI/UnitInfoPanel';
+import { loadProfile, saveProfile } from './UI/ProfileStore';
 
 const { ccclass, property } = _decorator;
 
@@ -30,8 +34,11 @@ const MAX_ENEMY_STEPS = 40;
  */
 @ccclass('GameManager')
 export class GameManager extends Component {
-    @property({ type: JsonAsset, tooltip: '开局的战局初始化 JSON（battleInit）' })
-    public levelAsset: JsonAsset | null = null;
+    @property({ type: JsonAsset, tooltip: '关卡列表配置（resources/Levels/level-list.json）' })
+    public levelListAsset: JsonAsset | null = null;
+
+    @property({ type: Node, tooltip: '结算面板根节点（挂 ResultPanel 组件：胜利发奖落档，返回选关）' })
+    public resultPanelNode: Node | null = null;
 
     @property({ type: MapBuilder, tooltip: '地图生成器（MapRoot 上的 MapBuilder 组件）' })
     public mapBuilder: MapBuilder | null = null;
@@ -103,6 +110,9 @@ export class GameManager extends Component {
     /** 敌方回合步进计数（防死循环保险；进入敌方回合时清零） */
     private enemyStepCount = 0;
 
+    /** 当前关卡条目（levelListAsset 解析所得；结算发奖用） */
+    private levelEntry: LevelEntry | null = null;
+
     /** 只读访问当前战局状态（未初始化时为 null） */
     public get battleState(): BattleState | null {
         return this.state;
@@ -119,8 +129,8 @@ export class GameManager extends Component {
     }
 
     start(): void {
-        if (!this.levelAsset) {
-            error('[GameManager] 未配置 levelAsset：请把 Levels 下的关卡 JSON 拖到该属性');
+        if (!this.levelListAsset) {
+            error('[GameManager] 未配置 levelListAsset：请把 resources/Levels 下的 level-list.json 拖到该属性');
             return;
         }
         if (!this.mapBuilder) {
@@ -182,23 +192,54 @@ export class GameManager extends Component {
             error('[GameManager] 未找到 Canvas 节点：棋子交互不可用');
         }
 
+        // 关卡列表：配置表决定"有哪些关"，存档决定"这次进哪关"（currentLevelId 非法回落第 1 关）
+        let levelList: LevelList;
         try {
-            this.state = parseBattleState(this.levelAsset.json);
+            levelList = parseLevelList(this.levelListAsset.json);
         } catch (err) {
-            error(`[GameManager] 战局数据非法，启动中止 —— ${(err as Error).message}`);
+            error(`[GameManager] 关卡列表非法，启动中止 —— ${(err as Error).message}`);
             return;
         }
+        const profile = loadProfile();
+        const requested = profile.currentLevelId;
+        const entry = (requested ? getLevelEntry(levelList.levels, requested) : undefined) ?? levelList.levels[0];
+        if (!entry) {
+            error(`[GameManager] 关卡 "${requested ?? '(空)'}" 不在列表中，启动中止`);
+            return;
+        }
+        this.levelEntry = entry;
+        log(`[GameManager] 载入关卡：${entry.name}（${entry.id}）`);
 
-        const state = this.state;
-        this.mapNode = this.mapBuilder.node;
-        this.layout = this.mapBuilder.makeLayout(state);
+        // 战局 JSON 按约定动态加载：resources/Levels/<file ?? id>.json
+        const fileName = entry.file ?? entry.id;
+        resources.load(`Levels/${fileName}`, JsonAsset, (err, asset) => {
+            if (err || !asset) {
+                error(`[GameManager] 关卡战局加载失败：Levels/${fileName} —— ${err ? err.message : '资源为空'}`);
+                return;
+            }
+            let state: BattleState;
+            try {
+                state = parseBattleState(asset.json);
+            } catch (parseErr) {
+                error(`[GameManager] 战局数据非法，启动中止 —— ${(parseErr as Error).message}`);
+                return;
+            }
+            this.state = state;
+            this.initializeBattle(state);
+        });
+    }
+
+    /** 战局数据就绪后的统一初始化：布局 → 隐藏按钮 → 建图 → 建棋子 → 进回合循环 */
+    private initializeBattle(state: BattleState): void {
+        this.mapNode = this.mapBuilder!.node;
+        this.layout = this.mapBuilder!.makeLayout(state);
 
         // 初始隐藏按钮（生成阶段 / 敌方回合不显示）
         this.updateButton();
         this.updateActionButtons();
 
         // 地图逐块落下完成后，再生成棋子；然后进入回合循环
-        this.mapBuilder.buildMap(state, () => {
+        this.mapBuilder!.buildMap(state, () => {
             this.unitBuilder!.buildUnits(state, this.layout!);
             this.beginFlow();
         });
@@ -620,14 +661,24 @@ export class GameManager extends Component {
             this.state.result = outcome;
         }
         log(`[流程] 战局结束 — ${outcome.winner ? `胜者 ${outcome.winner}` : '平局'}（${outcome.reason}）`);
-        // M0 占位：暂无结算界面，结束 2 秒后刷新本场景重开（正式 Result UI + 重开按钮后续替换）
-        const RELOAD_DELAY_SEC = 2;
-        this.scheduleOnce(() => {
-            const scene = director.getScene();
-            if (scene) {
-                log(`[流程] ${RELOAD_DELAY_SEC} 秒后刷新场景重开：${scene.name}`);
-                director.loadScene(scene.name);
-            }
-        }, RELOAD_DELAY_SEC);
+
+        // 结算面板：胜利发奖落档（复通同样发奖，暂不防刷），随后由玩家返回选关
+        const panel = this.resultPanelNode?.getComponent(ResultPanel) ?? null;
+        if (!panel) {
+            warn('[GameManager] 未配置 resultPanelNode：战局已结束但无结算面板。请在 Canvas 下建结算面板（挂 ResultPanel）并拖到该属性');
+            return;
+        }
+        const humanId = this.state?.players.find((p) => p.controller === 'human')?.id;
+        const win = !!outcome.winner && !!humanId && outcome.winner === humanId;
+        if (win && this.levelEntry) {
+            const profile = loadProfile();
+            grantBattleReward(profile, this.levelEntry.id, this.levelEntry.rewardGold);
+            saveProfile(profile);
+            panel.show('win', this.levelEntry.rewardGold, outcome.reason);
+        } else if (!outcome.winner) {
+            panel.show('draw', 0, outcome.reason);
+        } else {
+            panel.show('lose', 0, outcome.reason);
+        }
     }
 }

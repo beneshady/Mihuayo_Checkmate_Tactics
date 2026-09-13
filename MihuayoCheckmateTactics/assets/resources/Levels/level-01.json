@@ -1,0 +1,67 @@
+{
+  "formatVersion": 1,
+  "meta": {
+    "kind": "battleInit",
+    "battleId": "level-01",
+    "displayName": "第 1 关 · 初阵",
+    "createdAt": "2026-02-06T10:00:00+08:00",
+    "savedAt": "2026-02-06T10:00:00+08:00",
+    "extra": {}
+  },
+  "rules": {
+    "rulesetId": "core-v1",
+    "params": {
+      "maxRounds": 20,
+      "winConditions": [
+        { "type": "eliminateAllEnemies" }
+      ],
+      "loseConditions": [
+        { "type": "loseAllUnits" }
+      ]
+    },
+    "extra": {}
+  },
+  "map": {
+    "gridType": "square",
+    "width": 10,
+    "height": 8,
+    "layers": [
+      {
+        "id": "terrain",
+        "type": "tileGrid",
+        "default": "plain",
+        "cells": [
+          ["plain", "plain", "forest", "plain", "plain", "plain", "plain", "forest", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "road", "road", "road"],
+          ["water", "water", "plain", "plain", "plain", "forest", "plain", "road", "road", "road"],
+          ["plain", "water", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "forest", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["road", "road", "road", "plain", "plain", "plain", "forest", "plain", "plain", "plain"],
+          ["road", "road", "road", "plain", "water", "plain", "plain", "plain", "forest", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
+        ]
+      }
+    ],
+    "extra": {}
+  },
+  "players": [
+    { "id": "p1", "name": "玩家", "team": 0, "controller": "human", "extra": {} },
+    { "id": "p2", "name": "敌军", "team": 1, "controller": "ai", "extra": {} }
+  ],
+  "units": [
+    { "id": "u1", "defId": "che", "owner": "p1", "pos": { "x": 0, "y": 4 }, "extra": {} },
+    { "id": "u2", "defId": "pao", "owner": "p1", "pos": { "x": 1, "y": 4 }, "extra": {} },
+    { "id": "u3", "defId": "soldier", "owner": "p1", "pos": { "x": 2, "y": 4 }, "extra": {} },
+    { "id": "u4", "defId": "soldier", "owner": "p2", "pos": { "x": 7, "y": 3 }, "extra": {} }
+  ],
+  "turn": {
+    "round": 1,
+    "order": ["p1", "p2"],
+    "active": "p1",
+    "phase": "command",
+    "extra": {}
+  },
+  "rng": { "seed": 20260206, "calls": 0 },
+  "result": null,
+  "history": { "commands": [] }
+}
