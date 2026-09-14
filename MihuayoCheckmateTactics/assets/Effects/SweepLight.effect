@@ -1,0 +1,115 @@
+// SweepLight：2D 扫光（强化原色）——一条斜向光带周期性扫过 Sprite，光带经过处把原色提亮，
+// 其余区域原样渲染。基于 builtin-2d-sprite.effect（Creator 3.8.8）扩展，
+// 移植自 Cocos 论坛"扫光shader"帖（Creator 2.x 版）的"强化扫光"模式。
+// 光带参数（方向/半宽/中心/强度）由 SweepLight.ts 组件按帧驱动：
+// 组件在世界空间按 Sprite 包围盒精确计算光带中心，shader 只做投影 + 软边带 + 提亮。
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: sprite-vs:vert
+      frag: sprite-fs:frag
+      depthStencilState:
+        depthTest: false
+        depthWrite: false
+      blendState:
+        targets:
+        - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendDstAlpha: one_minus_src_alpha
+      rasterizerState:
+        cullMode: none
+      properties:
+        alphaThreshold: { value: 0.5 }
+        sweepA: { value: [0.7071, 0.7071, 80.0, -100000.0] }
+        sweepB: { value: [0.35, 0.0, 0.0, 0.0] }
+}%
+
+CCProgram sprite-vs %{
+  precision highp float;
+  #include <builtin/uniforms/cc-global>
+  #if USE_LOCAL
+    #include <builtin/uniforms/cc-local>
+  #endif
+  #if SAMPLE_FROM_RT
+    #include <common/common-define>
+  #endif
+  in vec3 a_position;
+  in vec2 a_texCoord;
+  in vec4 a_color;
+
+  out vec4 color;
+  out vec2 uv0;
+  out vec2 v_pos; // 扫光用：世界（UI）单位下的顶点坐标，与 SweepLight.ts 的世界投影计算同一空间
+
+  vec4 vert () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if USE_LOCAL
+      pos = cc_matWorld * pos;
+    #endif
+
+    v_pos = pos.xy;
+
+    #if USE_PIXEL_ALIGNMENT
+      pos = cc_matView * pos;
+      pos.xyz = floor(pos.xyz);
+      pos = cc_matProj * pos;
+    #else
+      pos = cc_matViewProj * pos;
+    #endif
+
+    uv0 = a_texCoord;
+    #if SAMPLE_FROM_RT
+      CC_HANDLE_RT_SAMPLE_FLIP(uv0);
+    #endif
+    color = a_color;
+
+    return pos;
+  }
+}%
+
+CCProgram sprite-fs %{
+  precision highp float;
+  #include <builtin/internal/embedded-alpha>
+  #include <builtin/internal/alpha-test>
+
+  in vec4 color;
+  in vec2 v_pos;
+
+  #if USE_TEXTURE
+    in vec2 uv0;
+    #pragma builtin(local)
+    layout(set = 2, binding = 12) uniform sampler2D cc_spriteTexture;
+  #endif
+
+  // 自定义扫光参数（SweepLight.ts 每帧通过 material.setProperty 驱动）
+  // 注意：Cocos effect 编译器自动分配 UBO 的 set/binding，不要手写 layout 限定（会导致导入失败）
+  uniform SweepBlock {
+    vec4 sweepA; // xy=扫光方向（单位向量） z=光带半宽（世界单位） w=光带中心（沿方向的投影值）
+    vec4 sweepB; // x=提亮强度（光带处 rgb *= 1+强度）
+  };
+
+  vec4 frag () {
+    vec4 o = vec4(1, 1, 1, 1);
+
+    #if USE_TEXTURE
+      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+      #if IS_GRAY
+        float gray  = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
+        o.r = o.g = o.b = gray;
+      #endif
+    #endif
+
+    o *= color;
+
+    // 扫光（强化原色）：软边光带，alpha 不动，只提亮 rgb
+    float proj = dot(v_pos, sweepA.xy);
+    float dist = abs(proj - sweepA.w);
+    float band = 1.0 - smoothstep(sweepA.z * 0.2, sweepA.z, dist);
+    o.rgb *= 1.0 + band * sweepB.x;
+
+    ALPHA_TEST(o);
+    return o;
+  }
+}%

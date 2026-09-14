@@ -1,0 +1,20 @@
+{
+  "__type__": "cc.Material",
+  "_name": "SweepLight",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "e8e22637-601c-4849-878e-a67a75126b97"
+  },
+  "_techIdx": 0,
+  "_defines": [
+    {
+      "USE_TEXTURE": true
+    }
+  ],
+  "_props": {
+    "alphaThreshold": 0.5,
+    "sweepA": [0.7071, 0.7071, 80.0, -100000.0],
+    "sweepB": [0.35, 0.0, 0.0, 0.0]
+  }
+}

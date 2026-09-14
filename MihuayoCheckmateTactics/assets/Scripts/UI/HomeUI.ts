@@ -2,6 +2,8 @@ import { _decorator, AudioSource, Button, Component, director, input, Input, ins
 import { getLevelEntry, LevelEntry, parseLevelList } from '../Core/LevelConfig';
 import { isLevelUnlocked, newProfile, PlayerProfile } from '../Core/PlayerProfile';
 import { loadProfile, saveProfile } from './ProfileStore';
+import { SceneFadeOverlay } from './SceneFadeOverlay';
+import { SfxPlayer } from './SfxPlayer';
 
 const { ccclass, property } = _decorator;
 
@@ -51,6 +53,12 @@ export class HomeUI extends Component {
     @property({ type: Node, tooltip: '背景音乐节点（挂 AudioSource，playOnAwake 必须为关；由本组件起播一次）' })
     public bgmNode: Node | null = null;
 
+    @property({ type: Node, tooltip: '场景过渡遮罩（Canvas 最顶层全屏黑 Sprite，初始隐藏；挂 SceneFadeOverlay+BlockInputEvents；点关卡淡出用）' })
+    public fadeOverlay: Node | null = null;
+
+    @property({ type: Node, tooltip: 'UI 音效节点（挂 AudioSource+SfxPlayer，playOnAwake 必须为关）' })
+    public sfxNode: Node | null = null;
+
     @property({ type: JsonAsset, tooltip: '关卡列表配置（resources/Levels/level-list.json）' })
     public levelListAsset: JsonAsset | null = null;
 
@@ -68,6 +76,9 @@ export class HomeUI extends Component {
 
     /** 金币 Label 组件缓存（goldLabel 节点引用解析所得） */
     private goldLabelComp: Label | null = null;
+
+    /** UI 音效播放器（sfxNode 引用解析所得；缺失时全部音效静默降级） */
+    private sfxPlayer: SfxPlayer | null = null;
 
     /** 标题页状态：true=只显示 LOGO；任意输入后进入主菜单并不再回到标题页 */
     private titlePhase = false;
@@ -88,11 +99,12 @@ export class HomeUI extends Component {
         }
         this.profile = loadProfile();
         this.goldLabelComp = this.goldLabel?.getComponent(Label) ?? null;
+        this.sfxPlayer = this.sfxNode?.getComponent(SfxPlayer) ?? null;
 
-        this.wireButton(this.startBattleButton, () => this.showPanel(this.levelSelectPanel, () => this.renderLevelList()));
-        this.wireButton(this.barracksButton, () => this.showPanel(this.barracksPanel));
-        this.wireButton(this.backToMenuButton, () => this.showPanel(this.menuPanel));
-        this.wireButton(this.barracksBackButton, () => this.showPanel(this.menuPanel));
+        this.wireButton(this.startBattleButton, () => this.showPanel(this.levelSelectPanel, () => this.renderLevelList()), 'in');
+        this.wireButton(this.barracksButton, () => this.showPanel(this.barracksPanel), 'in');
+        this.wireButton(this.backToMenuButton, () => this.showPanel(this.menuPanel), 'out');
+        this.wireButton(this.barracksBackButton, () => this.showPanel(this.menuPanel), 'out');
         this.showPanel(this.menuPanel);
         this.enterTitlePhase();
         this.ensureBgmStarted();
@@ -117,13 +129,21 @@ export class HomeUI extends Component {
         player.play();
     }
 
-    /** 统一挂按钮点击：引用存节点，Button 组件的 click 事件发在其节点上；缺失只警告降级 */
-    private wireButton(button: Node | null, onClick: () => void): void {
+    /** 统一挂按钮点击：引用存节点，Button 组件的 click 事件发在其节点上；缺失只警告降级。
+     *  sfx：'in'=进入类按钮（Click in），'out'=返回类按钮（Click out） */
+    private wireButton(button: Node | null, onClick: () => void, sfx?: 'in' | 'out'): void {
         if (!button) {
             warn('[HomeUI] 有按钮未配置引用，对应入口不可用');
             return;
         }
-        button.on(Button.EventType.CLICK, onClick, this);
+        button.on(Button.EventType.CLICK, () => {
+            if (sfx === 'in') {
+                this.sfxPlayer?.playClickIn();
+            } else if (sfx === 'out') {
+                this.sfxPlayer?.playClickOut();
+            }
+            onClick();
+        }, this);
     }
 
     /** 面板切换：三面板互斥 active；金币条每次刷新；进入前可选渲染 */
@@ -208,6 +228,13 @@ export class HomeUI extends Component {
         }
         this.profile.currentLevelId = entry.id;
         saveProfile(this.profile);
-        director.loadScene('Main');
+        this.sfxPlayer?.playFade();
+        // 淡出到全黑后再切场景；遮罩缺失时退化为直接切换（优雅降级）
+        const overlay = this.fadeOverlay?.getComponent(SceneFadeOverlay) ?? null;
+        if (overlay) {
+            overlay.fadeOut(() => director.loadScene('Main'));
+        } else {
+            director.loadScene('Main');
+        }
     }
 }
