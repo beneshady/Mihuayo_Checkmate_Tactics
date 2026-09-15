@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>象棋战术游戏 M0 玩法验证版</title>
+<style>
+  :root {
+    --panel-bg: rgba(24, 26, 32, 0.92);
+    --panel-border: #4a5062;
+    --text: #e8e4d8;
+    --ally: #d8543f;
+    --enemy: #7fa8d9;
+    --accent: #d9a441;
+    --danger: #e05252;
+    --ok: #6fbf73;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #14161c;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: var(--text); }
+  #scene { position: absolute; inset: 0; }
+  #scene canvas { display: block; }
+
+  /* ---------- 顶部状态栏 ---------- */
+  #topbar { position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: center;
+    background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px;
+    padding: 8px 16px; font-size: 14px; z-index: 10; max-width: 92vw; }
+  #topbar .item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  #topbar .label { color: #9aa0b0; }
+  .pips { display: inline-flex; gap: 3px; }
+  .pip { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid currentColor; }
+  .pip.on { background: currentColor; }
+  .pip.ally { color: var(--ally); }
+  .pip.enemy { color: var(--enemy); }
+  #gold, #kills { color: var(--accent); font-weight: bold; }
+
+  /* ---------- 危险 / 分析提示 ---------- */
+  #banner { position: absolute; top: 62px; left: 50%; transform: translateX(-50%);
+    z-index: 11; display: none; padding: 6px 22px; border-radius: 8px; font-size: 15px;
+    font-weight: bold; text-align: center; }
+  #banner.danger { display: block; background: var(--danger); color: #fff;
+    box-shadow: 0 0 14px rgba(224,82,82,.6); }
+  #banner.info { display: block; background: rgba(40,44,56,.95); color: #b8c4dd; font-weight: normal; }
+
+  /* ---------- 左侧面板 ---------- */
+  #panel { position: absolute; top: 8px; left: 8px; width: 252px; max-height: calc(100% - 16px);
+    background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 10px;
+    padding: 10px; font-size: 13px; z-index: 10; overflow-y: auto; }
+  #panel h3 { font-size: 13px; color: var(--accent); margin: 8px 0 4px; border-bottom: 1px solid #3a4050; padding-bottom: 3px; }
+  #panel h3:first-child { margin-top: 0; }
+  .unit-row { display: flex; align-items: center; gap: 6px; padding: 3px 2px; }
+  .unit-row .icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-weight: bold; font-size: 14px; flex: none; }
+  .unit-row.ally .icon { background: #3a1e18; color: var(--ally); border: 1.5px solid var(--ally); }
+  .unit-row.enemy .icon { background: #1b2634; color: var(--enemy); border: 1.5px solid var(--enemy); border-radius: 4px; }
+  .unit-row .acted-tag { color: #9aa0b0; font-size: 12px; }
+  .unit-row .cur { color: var(--accent); }
+  #intent-list .intent-row { padding: 3px 2px; border-bottom: 1px dashed #333947; line-height: 1.5; }
+  #intent-list .num { display: inline-block; width: 17px; height: 17px; border-radius: 50%;
+    background: #444c60; color: #fff; text-align: center; line-height: 17px; font-size: 11px; margin-right: 4px; }
+  .st-success { color: var(--ok); }
+  .st-cancelled, .st-removed { color: #888; text-decoration: line-through; }
+  .st-miss { color: #d9a441; }
+  .st-standby { color: #888; }
+  #preview-box { background: #20242e; border: 1px solid #3a4050; border-radius: 8px; padding: 8px; line-height: 1.6; }
+  #preview-box .title { color: var(--accent); font-weight: bold; }
+  #preview-box .warn { color: var(--danger); font-weight: bold; }
+  #help-text { color: #aab2c4; line-height: 1.65; font-size: 12px; }
+  #help-text b { color: var(--accent); }
+
+  /* ---------- 右下操作按钮 ---------- */
+  #actions { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column;
+    gap: 8px; z-index: 10; align-items: stretch; width: 150px; }
+  button { font-family: inherit; font-size: 15px; padding: 9px 14px; border-radius: 8px;
+    border: 1px solid #5a627a; background: #2c3140; color: var(--text); cursor: pointer; }
+  button:hover:not(:disabled) { background: #3a4053; }
+  button:disabled { opacity: .38; cursor: default; }
+  button.primary { background: #8a5a20; border-color: var(--accent); font-weight: bold; }
+  button.primary:hover:not(:disabled) { background: #a06a26; }
+  button.danger { background: #6e2a2a; border-color: var(--danger); }
+  button.danger:hover:not(:disabled) { background: #8a3333; }
+
+  /* ---------- 覆盖层 ---------- */
+  .overlay { position: absolute; inset: 0; background: rgba(8, 10, 14, 0.72); z-index: 20;
+    display: none; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .dialog { background: #1c2029; border: 1px solid var(--panel-border); border-radius: 14px;
+    padding: 26px 34px; max-width: min(560px, 92vw); max-height: 88vh; overflow-y: auto; text-align: center; }
+  .dialog h2 { color: var(--accent); margin-bottom: 14px; font-size: 24px; }
+  .dialog h2.lose { color: var(--danger); }
+  .dialog .stats { margin: 14px 0; line-height: 2; font-size: 15px; text-align: left; display: inline-block; }
+  .dialog .stats b { color: var(--accent); }
+  .dialog .row { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .goods { display: flex; gap: 14px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+  .good { background: #242a36; border: 1px solid #4a5062; border-radius: 10px; padding: 14px 18px; width: 150px; }
+  .good .icon { font-size: 34px; margin-bottom: 6px; }
+  .good .name { font-size: 16px; font-weight: bold; color: var(--accent); }
+  .good .desc { font-size: 12px; color: #9aa0b0; margin: 6px 0 10px; line-height: 1.5; min-height: 48px; }
+  .good .price { color: var(--accent); font-weight: bold; margin-bottom: 8px; }
+  .good button { width: 100%; font-size: 13px; padding: 7px; }
+  .good.sold { opacity: .45; }
+  #shop-team { text-align: left; display: inline-block; line-height: 1.9; font-size: 14px; }
+  #confirm-text { font-size: 16px; margin-bottom: 4px; line-height: 1.7; }
+  .hint { font-size: 12px; color: #8a92a6; margin-top: 10px; }
+  @media (max-width: 900px) {
+    #panel { width: 210px; font-size: 12px; }
+    #actions { width: 128px; }
+    button { font-size: 13px; padding: 8px 8px; }
+  }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div id="topbar">
+  <span class="item"><span class="label">波次</span><b id="wave">1</b>/2</span>
+  <span class="item"><span class="label">回合</span><b id="turn">1</b></span>
+  <span class="item"><span class="label">帅</span><span class="pips" id="king-hp"></span></span>
+  <span class="item"><span class="label">将</span><span class="pips" id="boss-hp"></span></span>
+  <span class="item" id="rook-stat"><span class="label">车</span><b id="rook-lv">Lv.1</b><span id="rook-xp" style="color:#9aa0b0">XP 0/2</span></span>
+  <span class="item"><span class="label">金币</span><span id="gold">0</span></span>
+  <span class="item"><span class="label">击杀</span><span id="kills">0</span></span>
+</div>
+
+<div id="banner"></div>
+
+<div id="panel">
+  <h3>我方单位</h3>
+  <div id="ally-list"></div>
+  <h3>敌方意图（按执行顺序）</h3>
+  <div id="intent-list"></div>
+  <h3>动作预览</h3>
+  <div id="preview-box">点选我方棋子后选择目标，这里会显示路径、伤害与敌方威胁变化。</div>
+  <h3>规则速览 <button id="btn-help" style="font-size:11px;padding:2px 8px;">展开</button></h3>
+  <div id="help-text" style="display:none">
+    <b>帅</b>：九宫内横竖一步，或沿米字线（中心↔四角）斜走一步。3 HP，被攻击时攻击者不前进。<br>
+    <b>车</b>：横竖直线，不可越子。攻击可贯穿直线上的敌人（按等级 1/2/3 个）；遇将/帅造成 1 伤并停在起点。杀敌升级：2 杀→Lv.2，4 杀→Lv.3。<br>
+    <b>马</b>：日字，正交相邻马腿被堵则不可走。<br>
+    <b>炮</b>：隔一子（炮架）打目标；移动不越子。<br>
+    <b>卒</b>：向前一步；过河（y≤4）后可横走，不后退。<br>
+    每回合每子一动（移动或攻击）。敌方意图公开锁定，按编号执行；被堵/失配则取消。击杀第二波敌将获胜；帅死或被将死则失败。
+  </div>
+</div>
+
+<div id="actions">
+  <button id="btn-execute" class="primary" disabled>执 行</button>
+  <button id="btn-cancel" disabled>取消选择</button>
+  <button id="btn-end">结束回合</button>
+  <button id="btn-pause">暂 停</button>
+</div>
+
+<!-- 结束回合确认 -->
+<div class="overlay" id="ov-confirm">
+  <div class="dialog">
+    <div id="confirm-text"></div>
+    <div class="row">
+      <button id="btn-confirm-yes" class="primary">确定，结束回合</button>
+      <button id="btn-confirm-no">继续行动</button>
+    </div>
+  </div>
+</div>
+
+<!-- 暂停 -->
+<div class="overlay" id="ov-pause">
+  <div class="dialog">
+    <h2>已暂停</h2>
+    <div class="row">
+      <button id="btn-resume" class="primary">继 续</button>
+      <button id="btn-restart-1" class="danger">重新开始</button>
+    </div>
+    <div class="hint">暂停期间敌人不会行动，动画与分析均冻结。</div>
+  </div>
+</div>
+
+<!-- 商店 -->
+<div class="overlay" id="ov-shop">
+  <div class="dialog">
+    <h2>第一波告捷</h2>
+    <div>敌将已斩，剩余敌军退场。获得 <b style="color:var(--accent)">2</b> 金币。</div>
+    <div style="margin-top:10px">当前余额：<b id="shop-gold" style="color:var(--accent)">2</b> 金币</div>
+    <div class="goods">
+      <div class="good" id="good-horse">
+        <div class="icon">🐎</div>
+        <div class="name">马</div>
+        <div class="desc">日字走位，可堵马腿与穿插解围。部署于 (2,0)。</div>
+        <div class="price">2 金币</div>
+        <button id="btn-buy-horse">购 买</button>
+      </div>
+      <div class="good" id="good-cannon">
+        <div class="icon">🎯</div>
+        <div class="name">炮</div>
+        <div class="desc">隔山打牛，改变敌方炮架格局。部署于 (1,2)。</div>
+        <div class="price">2 金币</div>
+        <button id="btn-buy-cannon">购 买</button>
+      </div>
+    </div>
+    <div id="shop-team"></div>
+    <div class="row">
+      <button id="btn-next-wave" class="primary">进入第二波</button>
+    </div>
+    <div class="hint">最多购买一枚队友；也可以不买直接进入第二波。</div>
+  </div>
+</div>
+
+<!-- 结果 -->
+<div class="overlay" id="ov-result">
+  <div class="dialog">
+    <h2 id="result-title">胜利</h2>
+    <div id="result-text"></div>
+    <div class="stats" id="result-stats"></div>
+    <div class="row">
+      <button id="btn-restart-2" class="primary">重新开始</button>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
