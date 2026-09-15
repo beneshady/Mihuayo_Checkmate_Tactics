@@ -1,62 +1,12 @@
-// 通关验证：确定性 beam search 自动寻找完整通关动作序列（马/炮两购买分支）。
-// 成功条件同时覆盖 GDD 8.2 要求：第一波升级、一次购买、购买队友实际参战、
-// 第二波斩将、整局存在达到 Lv.3 的路径。
-// 仅用于生成验收记录，不进入游戏本体。运行：node tests/find-playthrough.cjs
-const R = require('../web/js/rules.js');
-const fs = require('node:fs');
-const path = require('node:path');
-
-function score(s) {
-  const r = s.units.find(u => u.id === 'rook'), k = R.king(s, 'player'), e = R.king(s, 'enemy');
-  if (!k || !r || s.result === 'dead' || s.result === 'mate') return -1e6;
-  return (s.wave - 1) * 220 + (s.phase === 'shop' ? 190 : 0) + (s.result === 'victory' ? 500 : 0) +
-    s.kills * 18 + r.xp * 12 + k.hp * 25 - (e ? e.hp * 22 : 0) - s.turn * 3 -
-    (e ? (Math.abs(r.x - e.x) + Math.abs(r.y - e.y)) * 2 : 0);
-}
-
-function find(branch) {
-  let beam = [{ s: R.newGame(), log: [] }];
-  const seen = new Set();
-  for (let depth = 0; depth < 90; depth++) {
-    const next = [];
-    for (const { s, log } of beam) {
-      if (s.result === 'victory' && s.highestLevel === 3 && log.some(a => a.actor === branch)) return log;
-      if (s.phase === 'result') continue;
-      if (s.phase === 'shop') {
-        if (s.highestLevel < 2) continue; // 要求首波至少升级到 Lv.2 的路径
-        next.push({ s: R.nextWave(R.buy(s, branch)), log: [...log, { buy: branch }] });
-        continue;
-      }
-      const candidates = [];
-      for (const u of s.units.filter(u => u.side === 'player' && !u.acted))
-        for (const a of R.legalActions(s, u.id)) {
-          const n = R.submit(s, u.id, a.to).state;
-          candidates.push({ s: n, log: [...log, { actor: u.id, to: a.to }] });
-        }
-      candidates.push({ s: R.endTurn(s).state, log: [...log, { end: true }] });
-      for (const c of candidates) {
-        if (score(c.s) < -1e5) continue;
-        const key = JSON.stringify([c.s.wave, c.s.phase, c.s.units, c.s.intents]);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        next.push(c);
-      }
-    }
-    next.sort((a, b) => score(b.s) - score(a.s));
-    beam = next.slice(0, 160);
-    if (depth % 10 === 0) console.log(branch, 'depth', depth, 'beam', beam.length, 'best', beam[0] && score(beam[0].s));
-    if (!beam.length) break;
-  }
-  throw new Error('未找到通关序列: ' + branch);
-}
-
-const outDir = path.join(__dirname, 'replays');
-fs.mkdirSync(outDir, { recursive: true });
-for (const branch of ['horse', 'cannon']) {
-  const log = find(branch);
-  const file = path.join(outDir, branch + '.json');
-  fs.writeFileSync(file, JSON.stringify(log, null, 2) + '\n');
-  const s = log.filter(x => !x.buy);
-  console.log(branch, 'OK  steps:', log.length, '写入', file);
-}
-console.log('两个购买分支均存在完整通关路径（含首波升级与 Lv.3）。');
+// 为 US-001 生成两条确定性正式局回放。运行：node tests/find-playthrough.cjs
+const R=require('../web/js/rules.js'),fs=require('node:fs'),path=require('node:path');
+function distToBoss(s){const b=R.king(s,'enemy');if(!b)return 0;return Math.min(...s.units.filter(u=>u.side==='player').map(u=>Math.abs(u.x-b.x)+Math.abs(u.y-b.y)))}
+function score(n){const s=n.s,k=R.king(s,'player'),b=R.king(s,'enemy');if(!k||s.result==='dead'||s.result==='mate'||s.turn>32)return-1e9;return(s.result==='victory'?1e7:0)+(s.wave-1)*12000+(s.phase==='shop'?9000:0)+n.upgraded*1800+n.allyHit*2500+s.kills*420-s.units.filter(u=>u.side==='enemy').length*55+(b?(2-b.hp)*450:900)+k.hp*120-distToBoss(s)*22-s.turn*18}
+function upgrades(s){const out=[],skills=['fortify','combo','promote-archer','promote-spearman','rook-move','rook-charge','rook-push'];for(const u of s.units.filter(x=>x.side==='player')){for(const skill of skills){const n=R.purchaseUpgrade(s,u.id,skill);if(n!==s)out.push({s:n,step:{upgrade:{actor:u.id,skill}}})}if(u.kind==='archer'||u.kind==='spearman')for(let i=0;i<4;i++){const n=R.purchaseUpgrade(s,u.id,'direction',i);if(n!==s)out.push({s:n,step:{upgrade:{actor:u.id,skill:'direction',index:i}}})}if(u.kind==='cannon')for(let i=0;i<8;i++){const n=R.purchaseUpgrade(s,u.id,'cannon-splash',i);if(n!==s)out.push({s:n,step:{upgrade:{actor:u.id,skill:'cannon-splash',index:i}}})}}return out}
+function signature(n){return JSON.stringify([n.s.wave,n.s.phase,n.s.turn,n.s.gold,n.s.bought,n.s.units,n.s.intents,n.upgraded,n.allyHit])}
+function find(branch){let beam=[{s:R.newGame(),log:[],upgraded:false,allyHit:false}],seen=new Set();for(let depth=0;depth<150;depth++){const next=[];for(const n of beam){const s=n.s;if(s.result==='victory'&&n.upgraded&&n.allyHit)return n.log;if(s.phase==='result')continue;if(s.phase==='shop'){for(const x of upgrades(s))next.push({...n,s:x.s,log:n.log.concat(x.step),upgraded:true});if(n.upgraded){const bought=R.buy(s,branch);if(bought!==s)next.push({...n,s:R.nextWave(bought),log:n.log.concat({buy:branch})})}continue}
+ for(const x of upgrades(s))next.push({...n,s:x.s,log:n.log.concat(x.step),upgraded:n.upgraded||s.wave===1});
+ for(const u of s.units.filter(x=>x.side==='player'))for(const a of R.legalActions(s,u.id)){const r=R.submitAction(s,a);if(!r.effect)continue;next.push({...n,s:r.state,log:n.log.concat({action:{actor:a.actor,type:a.type,to:a.to,direction:a.direction}}),allyHit:n.allyHit||(s.wave===2&&a.actor===branch&&r.effect.damage.length>0)})}
+ const ended=R.endTurn(s).state;if(ended!==s)next.push({...n,s:ended,log:n.log.concat({end:true})});}
+ next.sort((a,b)=>score(b)-score(a));beam=[];for(const n of next){if(score(n)<-1e8)continue;const key=signature(n);if(seen.has(key))continue;seen.add(key);beam.push(n);if(beam.length>=900)break}if(depth%10===0)console.log(branch,'depth',depth,'beam',beam.length,'best',beam[0]&&score(beam[0]));if(!beam.length)break}throw Error('未找到 '+branch)}
+const dir=path.join(__dirname,'replays');fs.mkdirSync(dir,{recursive:true});for(const branch of ['horse','cannon']){const log=find(branch);fs.writeFileSync(path.join(dir,branch+'.json'),JSON.stringify(log,null,2)+'\n');console.log(branch,'OK',log.length)}

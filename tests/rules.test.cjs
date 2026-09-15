@@ -1,314 +1,120 @@
-// 规则测试：对应 docs/design/m0-gdd.md 第 8.1 节“必需规则测试”。
-// 运行：node --test tests/
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const R = require('../web/js/rules.js');
-const U = R.unit;
+// US-001：T01-T60 与士专项。运行：node tests/rules.test.cjs
+const {test}=require('node:test');
+const A=require('node:assert/strict');
+const R=require('../web/js/rules.js'),U=R.unit;
+function F(...xs){const s=R.emptyState([U('king','player','king',3,0),U('boss','enemy','king',3,7),...xs]);standby(s);return s;}
+function G(s,id){return s.units.find(u=>u.id===id)}
+function standby(s){s.intents=s.units.filter(u=>u.side==='enemy').map((u,i)=>({actor:u.id,from:{x:u.x,y:u.y},to:{x:u.x,y:u.y},type:'standby',path:[],order:i+1}));return s}
+function act(s,id,to,mode){return R.submit(s,id,to,mode).state}
+function up(s,id,skill,index){return R.purchaseUpgrade(s,id,skill,index)}
+function grant(s,id,n){G(s,id).sp=n;return s}
+function turn(s){standby(s);return R.endTurn(s).state}
 
-// 测试夹具：仅保留双方将帅 + 附加单位，手动布置意图（不触发生成器）。
-function fixture(...units) {
-  return Object.assign(R.newGame(), {
-    units: [U('king', 'player', 'king', 4, 0), U('boss', 'enemy', 'king', 4, 9)].concat(units),
-    intents: []
-  });
-}
-function intent(s, id, to, type = 'attack', order = 1) {
-  const u = s.units.find(v => v.id === id);
-  return { actor: id, from: { x: u.x, y: u.y }, to, type, path: [], order };
-}
-const noAct = u => ({ ...u, acted: false });
-
-test('主帅越出九宫、跨两步、非米字斜走被拒绝且不消耗行动', () => {
-  const s = R.newGame();
-  for (const p of [{ x: 2, y: 0 }, { x: 4, y: 2 }, { x: 4, y: -1 }, { x: 3, y: 1 }, { x: 5, y: 1 }])
-    assert.equal(R.submit(s, 'king', p).state, s);
-  for (const p of [{ x: 3, y: 0 }, { x: 5, y: 0 }, { x: 4, y: 1 }])
-    assert.equal(R.submit(s, 'king', p).state.units[0].acted, true);
+test('T01-T07 属性、个人成长、强健、非法购买',()=>{
+ const p=U('p','player','pawn',0,0),r=U('r','player','rook',0,0),c=U('c','player','cannon',0,0);
+ A.deepEqual([p.attack,p.hp,p.level,p.sp,p.ap],[1,1,1,0,1]);
+ A.deepEqual([r.rookMoveRange,r.rookChargeRange,r.attack,r.hp,r.ap,r.rookMoveAvailable,r.rookChargeAvailable],[3,1,1,2,1,true,true]);
+ A.deepEqual([c.attack,c.hp,c.ap,c.cannonMask],[2,2,1,0]);
+ let s=F(U('p','player','pawn',2,4),U('e','enemy','pawn',2,5));s=act(s,'p',{x:2,y:5});
+ A.deepEqual([G(s,'p').kills,G(s,'p').level,G(s,'p').sp],[1,2,1]);A.deepEqual([G(s,'king').level,G(s,'king').sp],[1,0]);
+ s=F(U('r','player','rook',1,4),U('e','enemy','rook',2,4));s=act(s,'r',{x:2,y:4},'charge');A.deepEqual([G(s,'r').level,G(s,'r').sp,G(s,'e').hp],[1,0,1]);
+ s=F(U('h','player','horse',1,1),U('r','player','rook',0,1));G(s,'king').sp=1;G(s,'h').sp=1;G(s,'r').sp=1;G(s,'r').hp=1;
+ s=up(up(up(s,'king','fortify'),'h','fortify'),'r','fortify');A.deepEqual([G(s,'king').hp,G(s,'h').maxHp,G(s,'r').hp,G(s,'r').maxHp],[4,2,2,3]);
+ A.strictEqual(up(s,'boss','fortify'),s);A.strictEqual(up(s,'king','rook-push'),s);const ended=R.copy(s);ended.phase='result';A.strictEqual(up(ended,'king','fortify'),ended);
 });
 
-test('双方九宫中心可走八邻点；角点沿米字进中心；边中点不可任意斜走', () => {
-  for (const side of ['player', 'enemy']) {
-    const s = fixture(), k = R.king(s, side), cy = side === 'player' ? 1 : 8;
-    k.x = 4; k.y = cy;
-    assert.equal(R.legalActions(s, k.id).length, 8);
-    k.x = 3; k.y = cy - 1; // 角点
-    assert(R.actionAt(s, k, { x: 4, y: cy }));
-    assert(!R.actionAt(s, k, { x: 5, y: cy + 1 }));
-    k.x = 4; k.y = cy - 1; // 边中点
-    assert(!R.actionAt(s, k, { x: 3, y: cy }));
-    assert(!R.actionAt(s, k, { x: 5, y: cy }));
-    k.x = 5; k.y = cy + 1;
-    assert(!R.actionAt(s, k, { x: 6, y: cy + 1 }));
-    assert(!R.actionAt(s, k, { x: 5, y: cy + 2 }));
-  }
+test('T03-T04 炮一发多杀、友伤不发成长、只扣一次 AP',()=>{
+ let s=F(U('c','player','cannon',4,0),U('screen','player','horse',4,2),U('target','enemy','pawn',4,4),U('north','enemy','pawn',4,5),U('east','enemy','pawn',5,4),U('ally','player','horse',3,4));
+ const c=G(s,'c');c.cannonMask=(1<<0)|(1<<2)|(1<<6);const out=R.submit(s,'c',{x:4,y:4});s=out.state;
+ A.equal(out.effect.victims.length,4);A.deepEqual([G(s,'c').kills,G(s,'c').level,G(s,'c').sp,G(s,'c').ap],[3,4,3,0]);A.equal(G(s,'ally'),undefined);
 });
 
-test('米字斜线可吃敌子；友军占位阻止落子；斜步能解开预告将军', () => {
-  let s = fixture(U('p', 'enemy', 'pawn', 3, 0)); s.units[0].y = 1;
-  let n = R.submit(s, 'king', { x: 3, y: 0 }).state;
-  assert.equal(R.at(n, { x: 3, y: 0 }).id, 'king');
-  assert(!n.units.some(u => u.id === 'p'));
-  s = fixture(U('r', 'player', 'rook', 4, 1)); s.units[0].x = 3;
-  assert.equal(R.submit(s, 'king', { x: 4, y: 1 }).state, s); // 友军占位
-  s = fixture(U('e', 'enemy', 'rook', 4, 4)); s.units[0].y = 1; s.units[0].hp = 1;
-  s.intents = [intent(s, 'e', { x: 4, y: 1 })];
-  n = R.submit(s, 'king', { x: 5, y: 2 }).state;
-  assert(R.analyze(s).safe);
-  assert.equal(R.king(R.enemyPhase(n).state, 'player').hp, 1);
+test('T08-T13 四向早期距离、河界、阻挡、连动延迟且独立',()=>{
+ let s=F(U('a','player','archer',2,3),U('e','enemy','pawn',2,5));grant(s,'a',1);s=up(s,'a','direction',0);
+ A.deepEqual(G(s,'a').directionPaid,[1,0,0,0]);A.equal(G(s,'a').attack,2);A.ok(R.directionalAction(s,'a',0));A.equal(R.directionalAction(s,'a',1),undefined);
+ let q=U('q','player','pawn',1,3);s=F(q);A.equal(R.actionAt(s,q,{x:2,y:3}),undefined);q.y=4;A.ok(R.actionAt(s,q,{x:2,y:4}));
+ s=F(U('a','player','archer',2,4),U('ally','player','horse',2,5),U('far','enemy','pawn',2,6));G(s,'a').directionPaid[0]=3;A.equal(R.directionalAction(s,'a',0),undefined);
+ s=F(U('p','player','pawn',2,4),U('q','player','pawn',4,4));grant(s,'p',1);A.strictEqual(up(s,'p','combo'),s);G(s,'p').sp=4;G(s,'p').ap=0;
+ s=up(s,'p','combo');A.deepEqual([G(s,'p').ap,G(s,'p').combo],[0,1]);s=up(s,'p','combo');s=turn(s);A.deepEqual([G(s,'p').ap,G(s,'p').apLimit],[3,3]);
+ s=act(s,'p',{x:2,y:5});s=act(s,'p',{x:3,y:5});s=act(s,'p',{x:3,y:6});A.equal(G(s,'p').ap,0);A.equal(G(s,'q').ap,1);A.strictEqual(R.submit(s,'p',{x:4,y:6}).state,s);
 });
 
-test('车走空位、普通吃子、友军挡路；每单位每回合仅一次行动', () => {
-  let s = R.submit(R.newGame(), 'rook', { x: 0, y: 3 }).state;
-  assert.equal(s.units.find(u => u.id === 'rook').xp, 1);
-  assert.equal(R.at(s, { x: 0, y: 3 }).id, 'rook');
-  assert.equal(R.submit(s, 'rook', { x: 0, y: 4 }).state, s); // 已行动
-  s = fixture(U('r', 'player', 'rook', 0, 0), U('h', 'player', 'horse', 0, 2));
-  assert.equal(R.submit(s, 'r', { x: 0, y: 3 }).state, s); // 友军挡路
+test('T14-T16 车两种距离独立、封顶、阻挡、震退一次性',()=>{
+ let s=F(U('r','player','rook',0,1),U('block','player','horse',0,3));grant(s,'r',20);s=up(s,'r','rook-move');
+ A.deepEqual([G(s,'r').rookMoveRange,G(s,'r').rookChargeRange],[4,1]);A.equal(R.actionAt(s,G(s,'r'),{x:0,y:4},'rook-move'),undefined);
+ for(let i=0;i<3;i++)s=up(s,'r','rook-move');for(let i=0;i<6;i++)s=up(s,'r','rook-charge');const sp=G(s,'r').sp;
+ A.strictEqual(up(s,'r','rook-move'),s);A.strictEqual(up(s,'r','rook-charge'),s);A.equal(G(s,'r').sp,sp);s=up(s,'r','rook-push');A.equal(G(s,'r').rookPush,true);A.strictEqual(up(s,'r','rook-push'),s);A.equal(G(s,'r').attack,1);
 });
 
-test('三级车贯穿三个普通敌人，击杀三个并停在最远目标；不可穿敌选空位', () => {
-  const s = fixture(U('r', 'player', 'rook', 0, 0), ...[1, 3, 5].map(y => U('p' + y, 'enemy', 'pawn', 0, y)));
-  const r = s.units[2]; r.level = 3; r.xp = 4;
-  assert.equal(R.submit(s, 'r', { x: 0, y: 6 }).state, s); // 空位移动不得穿过敌人
-  const n = R.submit(s, 'r', { x: 0, y: 5 }).state;
-  assert.equal(n.kills, 3);
-  assert.equal(R.at(n, { x: 0, y: 5 }).id, 'r');
+test('T17-T20 车接近、击杀占位、震退、阻挡、强制跨河',()=>{
+ let s=F(U('r','player','rook',1,4),U('e','enemy','rook',4,4));Object.assign(G(s,'r'),{rookChargeRange:3,rookPush:true});s=act(s,'r',{x:4,y:4},'charge');A.deepEqual([G(s,'r').x,G(s,'e').x,G(s,'e').hp],[3,5,1]);
+ s=F(U('r','player','rook',1,4),U('e','enemy','pawn',4,4));Object.assign(G(s,'r'),{rookChargeRange:3,rookPush:true});s=act(s,'r',{x:4,y:4},'charge');A.equal(R.at(s,{x:4,y:4}).id,'r');A.equal(G(s,'r').kills,1);
+ s=F(U('r','player','rook',1,4),U('e','enemy','rook',4,4),U('b','enemy','pawn',5,4));Object.assign(G(s,'r'),{rookChargeRange:3,rookPush:true});let blocked=R.submit(s,'r',{x:4,y:4},'charge');s=blocked.state;A.equal(G(s,'e').x,4);A.equal(G(s,'b').hp,1);A.equal(blocked.effect.pushStatus,'occupied');
+ s=F(U('r','player','rook',1,3),U('p','enemy','rook',3,3));Object.assign(G(s,'r'),{rookChargeRange:2,rookPush:true});s=act(s,'r',{x:3,y:3},'charge');A.equal(G(s,'p').x,4);
+ s=F(U('r','player','rook',2,7),U('a','enemy','advisor',4,7));Object.assign(G(s,'boss'),{x:3,y:6});Object.assign(G(s,'r'),{rookChargeRange:2,rookPush:true});Object.assign(G(s,'a'),{hp:2,maxHp:2});const palace=R.submit(s,'r',{x:4,y:7},'charge');s=palace.state;A.deepEqual([G(s,'a').x,G(s,'a').y],[4,7]);A.equal(palace.effect.pushStatus,'palace');
 });
 
-test('三级车遇“小兵—敌将—小兵”：首兵阵亡、将扣 1、第三兵保留、车留起点', () => {
-  const s = fixture(U('r', 'player', 'rook', 0, 9), U('p', 'enemy', 'pawn', 2, 9), U('last', 'enemy', 'pawn', 6, 9));
-  s.wave = 2;
-  const r = s.units[2]; r.level = 3; r.xp = 4;
-  R.king(s, 'enemy').hp = 1; // 剩 1 HP 的敌将仍阻止贯穿
-  const n = R.submit(s, 'r', { x: 6, y: 9 }).state;
-  assert.equal(n.result, 'victory');
-  assert.equal(R.at(n, { x: 0, y: 9 }).id, 'r');
-  assert(n.units.some(u => u.id === 'last'));
-  assert.equal(n.kills, 2);
+test('T21 被推敌人按新位置重验证旧目标',()=>{
+ let s=F(U('r','player','rook',6,3),U('e','enemy','rook',4,3));Object.assign(G(s,'r'),{rookChargeRange:2,rookPush:true});s.intents=[{actor:'e',from:{x:4,y:3},to:{x:1,y:3},type:'move',path:[],order:1}];s=act(s,'r',{x:4,y:3},'charge');A.equal(G(R.enemyPhase(s).state,'e').x,1);
+ s=F(U('r','player','rook',4,1),U('e','enemy','rook',4,3));Object.assign(G(s,'r'),{rookChargeRange:2,rookPush:true});s.intents=[{actor:'e',from:{x:4,y:3},to:{x:1,y:3},type:'move',path:[],order:1}];s=act(s,'r',{x:4,y:3},'charge');A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
 });
 
-test('XP 越过升级阈值：动作结束后升级，本次范围不变，不返还行动；升级不加 HP', () => {
-  const s = fixture(U('r', 'player', 'rook', 0, 0), U('p', 'enemy', 'pawn', 0, 1), U('q', 'enemy', 'pawn', 0, 2));
-  s.units[2].xp = 1; // 1 XP，击杀 1 个后到 2 → Lv.2
-  assert.equal(R.submit(s, 'r', { x: 0, y: 2 }).state, s); // Lv.1 不能一次接触两个敌人
-  const r = R.submit(s, 'r', { x: 0, y: 1 }).state.units.find(u => u.id === 'r');
-  assert.equal(r.level, 2);
-  assert.equal(r.hp, 1);
-  assert(r.acted);
+test('T22-T27 炮架、远攻、固定 mask、参数、裁边',()=>{
+ let s=F(U('c','player','cannon',0,0),U('target','enemy','rook',0,7));A.equal(R.actionAt(s,G(s,'c'),{x:0,y:7}),undefined);s.units.push(U('screen','player','horse',0,3));A.ok(R.actionAt(s,G(s,'c'),{x:0,y:7}));A.equal(R.actionAt(s,G(s,'c'),{x:4,y:0}),undefined);s.units.push(U('screen2','enemy','pawn',0,5));A.equal(R.actionAt(s,G(s,'c'),{x:0,y:7}),undefined);
+ s=F(U('c','player','cannon',4,0));grant(s,'c',12);s=up(up(s,'c','cannon-splash',0),'c','cannon-splash',2);A.equal(G(s,'c').cannonMask,5);A.strictEqual(up(s,'c','cannon-splash',0),s);for(const bad of [-1,8,1.5])A.strictEqual(up(s,'c','cannon-splash',bad),s);for(const i of [1,3,4,5,6,7])s=up(s,'c','cannon-splash',i);A.equal(G(s,'c').cannonMask,255);A.strictEqual(up(s,'c','cannon-splash',1),s);
+ const cover=(x,y)=>1+R.CONFIG.splash.filter(d=>R.inside({x:x+d.x,y:y+d.y})).length;A.deepEqual([cover(4,4),cover(0,4),cover(0,0)],[9,6,4]);
 });
 
-test('炮架数量 0/1/2：仅恰好 1 个可攻击；移动不能越过炮架', () => {
-  const s = fixture(U('c', 'player', 'cannon', 0, 0), U('p', 'enemy', 'pawn', 0, 5));
-  assert(!R.actionAt(s, s.units[2], { x: 0, y: 5 }));
-  s.units.push(U('screen', 'enemy', 'pawn', 0, 2));
-  assert(R.actionAt(s, s.units[2], { x: 0, y: 5 }));
-  assert(!R.actionAt(s, s.units[2], { x: 0, y: 4 }));
-  s.units.push(U('screen2', 'enemy', 'pawn', 0, 3));
-  assert(!R.actionAt(s, s.units[2], { x: 0, y: 5 }));
+test('T28-T30 炮冻结炮架、同时结算、隔子溅射、不追溯',()=>{
+ let s=F(U('c','player','cannon',4,0),U('screen','enemy','pawn',4,3),U('target','enemy','pawn',4,4),U('side','enemy','pawn',5,4));G(s,'c').cannonMask=(1<<4)|(1<<2);
+ const out=R.submit(s,'c',{x:4,y:4});s=out.state;for(const id of ['screen','target','side'])A.ok(out.effect.victims.includes(id));const dead=out.effect.victims.slice();G(s,'c').sp=1;s=up(s,'c','cannon-splash',0);A.deepEqual(out.effect.victims,dead);
 });
 
-test('马腿被堵阻止相应马步；卒过河后开放横向一步且不能后退', () => {
-  const s = fixture(U('h', 'player', 'horse', 0, 0), U('p', 'enemy', 'pawn', 2, 5));
-  assert(R.actionAt(s, s.units[2], { x: 2, y: 1 }));
-  s.units.push(U('b', 'player', 'rook', 1, 0));
-  assert(!R.actionAt(s, s.units[2], { x: 2, y: 1 }));
-  const pawn = s.units[3];
-  assert(!R.actionAt(s, pawn, { x: 3, y: 5 })); // 未过河不能横走
-  pawn.y = 4;
-  assert(R.actionAt(s, pawn, { x: 3, y: 4 }));
-  assert(!R.actionAt(s, pawn, { x: 2, y: 5 })); // 不能后退
+test('T31-T33 占位、锁定重验证、双方将帅同死己方失败',()=>{
+ let s=F(U('p','player','pawn',2,4),U('e','enemy','pawn',2,5));s=act(s,'p',{x:2,y:5});A.deepEqual([G(s,'p').x,G(s,'p').y],[2,4]);s=F(U('r','player','rook',2,4),U('e','enemy','pawn',2,5));s=act(s,'r',{x:2,y:5},'charge');A.deepEqual([G(s,'r').x,G(s,'r').y],[2,5]);
+ s=F(U('e','enemy','pawn',2,5),U('p','player','pawn',2,4));s.intents=[{actor:'e',from:{x:2,y:5},to:{x:2,y:4},type:'attack',path:[],order:1}];s.units=s.units.filter(u=>u.id!=='p');A.equal(R.enemyPhase(s).effects[0].status,'miss');A.deepEqual([G(R.enemyPhase(s).state,'e').x,G(R.enemyPhase(s).state,'e').y],[2,5]);s.units.push(U('h','player','horse',2,4));A.equal(G(R.enemyPhase(s).state,'h'),undefined);s.units=s.units.filter(u=>u.id!=='h');s.units.push(U('friend','enemy','pawn',2,4));A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
+ s=F(U('c','player','cannon',3,0));s.wave=2;Object.assign(G(s,'king'),{x:3,y:3,hp:1});Object.assign(G(s,'boss'),{x:3,y:4,hp:1});G(s,'c').cannonMask=1<<4;s=act(s,'c',{x:3,y:4});A.equal(s.result,'dead');A.equal(G(s,'king'),undefined);A.equal(G(s,'boss'),undefined);
 });
 
-test('敌车目标移空则移到原预告位置；换单位则攻击新占位者；移动意图不转攻击', () => {
-  const s = fixture(U('e', 'enemy', 'rook', 4, 3));
-  s.intents = [intent(s, 'e', { x: 4, y: 0 })];
-  let n = R.submit(s, 'king', { x: 3, y: 0 }).state;
-  assert.equal(R.at(R.enemyPhase(n).state, { x: 4, y: 0 }).id, 'e');
-  n.units.push(U('replacement', 'player', 'horse', 4, 0));
-  assert(!R.enemyPhase(n).state.units.some(u => u.id === 'replacement'));
-  s.intents[0].type = 'move';
-  assert.equal(R.enemyPhase(s).effects[0].status, 'cancelled'); // 帅在原位，移动目标被占
+test('T34-T38 模拟纯净、升级解围、车双段搜索、unknown、旧预览失效',()=>{
+ let s=R.fixtureState('P6'),before=JSON.stringify(s);R.preview(s,'king',{x:3,y:1});R.enemyPhase(s);R.dangerNow(s);const analysis=R.analyze(s);A.equal(JSON.stringify(s),before);A.equal(analysis.safe,true);A.equal(analysis.plan[0].type,'upgrade');let n=up(s,'king','fortify');A.deepEqual([G(n,'king').hp,G(n,'king').maxHp],[2,4]);A.equal(G(R.enemyPhase(n).state,'king').hp,1);
+ s=F(U('r','player','rook',0,1),U('threat','enemy','pawn',3,1));Object.assign(G(s,'king'),{hp:1,ap:0});G(s,'r').rookChargeRange=1;s.intents=[{actor:'threat',from:{x:3,y:1},to:{x:3,y:0},type:'attack',path:[{x:3,y:0}],order:1}];const a=R.analyze(s);A.equal(a.safe,true);A.ok(a.plan.some(x=>x.type==='rook-move'));A.ok(a.plan.some(x=>x.type==='charge'));
+ s=R.fixtureState('P6');before=JSON.stringify(s);const first=R.escapeAnalysis(s).next();A.equal(first.done,false);A.equal(s.phase,'player');A.equal(JSON.stringify(s),before);
+ s=F(U('r','player','rook',0,1));grant(s,'r',4);const preview=R.preview(s,'r',{x:0,y:2},'rook-move');s=up(s,'r','rook-charge');A.strictEqual(R.submitAction(s,preview.action).state,s);s=up(s,'r','rook-push');const sp=G(s,'r').sp;A.strictEqual(up(s,'r','rook-push'),s);A.equal(G(s,'r').sp,sp);
 });
 
-test('移走炮架则原地取消；炮目标移空且炮架恰好一个则原地打空；均不追踪', () => {
-  const s = fixture(U('c', 'enemy', 'cannon', 4, 4), U('screen', 'player', 'rook', 4, 2));
-  s.intents = [intent(s, 'c', { x: 4, y: 0 })];
-  let n = R.submit(s, 'screen', { x: 3, y: 2 }).state;
-  assert.equal(R.enemyPhase(n).effects[0].status, 'cancelled');
-  n = R.submit(s, 'king', { x: 3, y: 0 }).state;
-  assert.equal(R.enemyPhase(n).effects[0].status, 'miss');
-  assert.equal(R.at(R.enemyPhase(n).state, { x: 4, y: 4 }).id, 'c');
+test('T39-T40 跨波继承、新购干净、奖励一次、重开清零',()=>{
+ let s=F(U('r','player','rook',0,0));Object.assign(G(s,'r'),{level:4,kills:3,sp:3,hp:1,rookChargeRange:3,rookMoveAvailable:false,rookChargeAvailable:false});s.phase='shop';s.gold=2;s=R.buy(s,'horse');A.deepEqual([G(s,'horse').level,G(s,'horse').sp],[1,0]);s=R.nextWave(s);A.deepEqual([G(s,'r').level,G(s,'r').hp,G(s,'r').rookChargeRange,G(s,'r').rookMoveAvailable],[4,1,3,true]);
+ s=F(U('r','player','rook',3,6));G(s,'boss').hp=1;s=act(s,'r',{x:3,y:7},'charge');A.deepEqual([s.phase,s.gold],['shop',2]);A.strictEqual(R.endTurn(s).state,s);
+ for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual([z.wave,z.turn,z.gold,z.kills,z.units.length],[1,1,0,0,10]);}
 });
 
-test('后行动敌人用实际新棋盘取消或执行，与预览一致；模拟与分析不污染真实对局', () => {
-  const s = fixture(U('a', 'enemy', 'rook', 0, 2), U('b', 'enemy', 'rook', 4, 4));
-  s.intents = [intent(s, 'a', { x: 4, y: 2 }, 'move'), intent(s, 'b', { x: 4, y: 0 }, 'attack', 2)];
-  const before = JSON.stringify(s);
-  const predicted = R.enemyPhase(s);
-  assert.equal(predicted.effects[1].status, 'cancelled'); // a 先占 (4,2)，b 的目标 (4,0) 路径被挡
-  const done = R.endTurn(s);
-  assert.deepEqual(done.state.units.map(noAct), predicted.state.units.map(noAct));
-  R.analyze(s); R.enemyPhase(s); R.dangerNow(s); R.preview(s, 'king', { x: 4, y: 1 });
-  assert.equal(JSON.stringify(s), before); // 金币/XP/HP/回合/位置不变
+test('T41-T46 转职赠送一次、继承、总等级无上限、职业隔离',()=>{
+ for(const kind of ['archer','spearman']){let s=F(U('p','player','pawn',2,4));Object.assign(G(s,'p'),{sp:4,level:5,kills:4,maxHp:3,hp:2,combo:1,fortify:2,ap:0});s=up(s,'p','promote-'+kind);const q=G(s,'p');A.deepEqual([q.id,q.kind,q.level,q.kills,q.combo,q.ap],['p',kind,5,4,1,0]);if(kind==='archer')A.deepEqual([q.attack,q.hp,q.maxHp],[2,2,3]);else A.deepEqual([q.attack,q.hp,q.maxHp],[1,3,4]);A.strictEqual(up(s,'p','promote-'+(kind==='archer'?'spearman':'archer')),s);}
+ let s=F(U('a','player','spearman',2,4),U('e1','enemy','pawn',2,5),U('e2','enemy','pawn',2,6),U('e3','enemy','pawn',2,7));Object.assign(G(s,'a'),{level:9,directionPaid:[6,0,0,0]});s=R.submitDirection(s,'a',0).state;A.deepEqual([G(s,'a').level,G(s,'a').sp,G(s,'a').directionPaid[0]],[12,3,6]);A.strictEqual(up(s,'a','direction',0),s);s=up(s,'a','direction',2);A.equal(G(s,'a').directionPaid[2],1);
+ let p=F(U('p','player','pawn',1,4));grant(p,'p',9);A.strictEqual(up(p,'p','direction',0),p);p=up(p,'p','promote-archer');A.strictEqual(up(p,'p','promote-spearman'),p);
 });
 
-test('意图生成优先级：攻帅 > 攻车 > 攻其他 > 移动近帅；y/x 升序平局；无动作待机', () => {
-  let s = fixture(U('e', 'enemy', 'rook', 4, 3), U('r', 'player', 'rook', 4, 5), U('h', 'player', 'horse', 5, 3));
-  s.intents = R.generateIntents(s);
-  // 敌车直线可攻帅(4,0)、己方车(4,5)、马(5,3)：优先帅
-  assert.deepEqual(s.intents.find(i => i.actor === 'e').to, { x: 4, y: 0 });
-  assert.equal(s.intents.find(i => i.actor === 'e').type, 'attack');
-  // 无可攻目标时选距帅曼哈顿距离最小的空位
-  s = fixture(U('e', 'enemy', 'rook', 0, 5));
-  s.intents = R.generateIntents(s);
-  assert.deepEqual(s.intents.find(i => i.actor === 'e').to, { x: 0, y: 0 });
-  // 距离平局按目标 y、x 升序：(2,0) 与 (3,1) 距帅同为 2，取 y 更小的 (2,0)
-  s = fixture(U('e', 'enemy', 'rook', 2, 1), U('blocker', 'enemy', 'pawn', 4, 1));
-  s.intents = R.generateIntents(s);
-  assert.deepEqual(s.intents.find(i => i.actor === 'e').to, { x: 2, y: 0 });
-  assert.equal(s.intents.find(i => i.actor === 'e').type, 'move');
-  // 完全无路可走 → 待机，仍占公开序号
-  s = fixture(U('e', 'enemy', 'pawn', 0, 0), U('wall', 'enemy', 'rook', 1, 0));
-  s.intents = R.generateIntents(s);
-  const st = s.intents.find(i => i.actor === 'e');
-  assert.equal(st.type, 'standby');
-  assert.equal(R.enemyPhase(s).effects.find(e => e.actor === 'e').status, 'standby');
+test('T47-T50 方向参数、枪贯穿、友军截断、多杀成长',()=>{
+ for(const kind of ['archer','spearman']){const s=grant(F(U('u','player',kind,2,4)),'u',10);for(const bad of [-1,4,1.5])A.strictEqual(up(s,'u','direction',bad),s);}
+ let s=F(U('u','player','spearman',2,4),U('e1','enemy','pawn',2,5),U('e2','enemy','pawn',2,7),U('other','enemy','pawn',3,4));G(s,'u').directionPaid[0]=2;s=R.submitDirection(s,'u',0).state;A.equal(G(s,'e1'),undefined);A.equal(G(s,'e2'),undefined);A.ok(G(s,'other'));A.deepEqual([G(s,'u').kills,G(s,'u').level,G(s,'u').sp],[2,3,2]);
+ s=F(U('u','player','spearman',2,4),U('e1','enemy','pawn',2,5),U('ally','player','horse',2,6),U('e2','enemy','pawn',2,7));G(s,'u').directionPaid[0]=2;s=R.submitDirection(s,'u',0).state;A.equal(G(s,'e1'),undefined);A.ok(G(s,'ally'));A.ok(G(s,'e2'));A.strictEqual(R.submitDirection(s,'u',1).state,s);
 });
 
-test('波次执行序号与配置一致；敌方车固定一级不贯穿', () => {
-  const s = R.newGame();
-  const ids = s.intents.map(i => i.actor);
-  assert.deepEqual(ids, ['w1-0', 'w1-1', 'w1-2', 'w1-3']);
-  assert.deepEqual(s.intents.map(i => i.order), [1, 2, 3, 4]);
-  const f = fixture(U('e', 'enemy', 'rook', 0, 0), U('a', 'player', 'rook', 0, 3), U('b', 'player', 'horse', 0, 5));
-  assert(!R.actionAt(f, f.units[2], { x: 0, y: 5 })); // 敌车不可隔着己方车打马
-  assert(R.actionAt(f, f.units[2], { x: 0, y: 3 })); // 只能吃最近的车
+test('T51-T56 车空冲、先移后冲、封额、独立升级、非法条件和杀将',()=>{
+ let s=F(U('r','player','rook',1,1));s=act(s,'r',{x:1,y:2},'charge');A.deepEqual([G(s,'r').x,G(s,'r').rookMoveAvailable,G(s,'r').rookChargeAvailable],[1,false,false]);A.strictEqual(R.submit(s,'r',{x:2,y:2},'rook-move').state,s);
+ s=F(U('r','player','rook',1,1),U('e','enemy','rook',4,4));Object.assign(G(s,'r'),{sp:1,rookChargeRange:2});s=act(s,'r',{x:1,y:4},'rook-move');A.deepEqual([G(s,'r').ap,G(s,'r').rookMoveAvailable,G(s,'r').rookChargeAvailable],[1,false,true]);s=up(s,'r','rook-charge');A.equal(G(s,'r').rookChargeRange,3);s=act(s,'r',{x:4,y:4},'charge');A.equal(G(s,'r').x,3);
+ s=F(U('r','player','rook',2,6),U('friend','player','horse',3,6));A.strictEqual(R.submit(s,'r',{x:2,y:6},'charge').state,s);A.strictEqual(R.submit(s,'r',{x:3,y:6},'charge').state,s);G(s,'r').rookChargeRange=2;Object.assign(G(s,'boss'),{x:2,y:7,hp:1});s.wave=2;s=act(s,'r',{x:2,y:7},'charge');A.equal(R.at(s,{x:2,y:7}).id,'r');A.equal(s.result,'victory');
 });
 
-test('主帅必受 1 点伤害但仍可存活：仅将军提示，不判将死', () => {
-  const s = fixture(U('e', 'enemy', 'rook', 4, 3));
-  s.units[0].acted = true;
-  s.intents = [intent(s, 'e', { x: 4, y: 0 })];
-  assert(R.dangerNow(s));
-  assert(R.analyze(s).safe); // 3 HP，受 1 伤存活
-  assert.equal(R.checkmate(s).phase, 'player');
+test('T57-T60 四向封顶、direction 命令、8×8、两波、炮 NE',()=>{
+ let s=F(U('a','player','archer',3,3),U('e','enemy','pawn',3,4));grant(s,'a',30);for(let d=0;d<4;d++)for(let i=0;i<6;i++)s=up(s,'a','direction',d);A.deepEqual(G(s,'a').directionPaid,[6,6,6,6]);for(let d=0;d<4;d++)A.strictEqual(up(s,'a','direction',d),s);A.equal(R.directionalAction(s,'a',undefined),undefined);A.equal(R.directionalAction(s,'a',4),undefined);A.ok(R.directionalAction(s,'a',0));
+ s=R.newGame();A.deepEqual([R.CONFIG.width,R.CONFIG.height,R.CONFIG.river],[8,8,3.5]);A.equal(s.units.filter(u=>u.side==='enemy').length,8);A.equal(R.inside({x:8,y:7}),false);A.equal(R.inside({x:7,y:8}),false);const shop=R.copy(s);shop.phase='shop';shop.units=shop.units.filter(u=>u.side==='player');const w2=R.nextWave(shop);A.equal(w2.units.filter(u=>u.side==='enemy').length,8);A.deepEqual(w2.units.filter(u=>u.side==='enemy').map(u=>[u.kind,u.x,u.y]),R.CONFIG.waves[1]);
+ s=F(U('c','player','cannon',2,0),U('screen','player','horse',2,2),U('target','enemy','rook',2,4),U('ne','enemy','pawn',3,5));grant(s,'c',8);s=up(s,'c','cannon-splash',1);s=act(s,'c',{x:2,y:4});A.equal(G(s,'ne'),undefined);s=grant(F(U('c','player','cannon',2,0)),'c',8);for(let i=0;i<8;i++)s=up(s,'c','cannon-splash',i);A.equal(G(s,'c').cannonMask,255);A.equal(G(s,'c').directionPaid.length,4);
 });
 
-test('穷尽所有剩余动作均致死：判将死；直接结束回合则主帅阵亡，两者失败类型不同', () => {
-  const s = fixture(U('e', 'enemy', 'rook', 4, 3));
-  s.units[0].acted = true; s.units[0].hp = 1;
-  s.intents = [intent(s, 'e', { x: 4, y: 0 })];
-  assert(R.dangerNow(s));
-  assert(!R.analyze(s).safe);
-  const m = R.checkmate(s);
-  assert.equal(m.result, 'mate');
-  assert.equal(R.endTurn(s).state.result, 'dead');
-});
-
-test('主帅没安全落点（已行动）但队友能清掉攻击者：不判将死', () => {
-  const s = fixture(U('e', 'enemy', 'rook', 4, 2), U('r', 'player', 'rook', 4, 5));
-  s.units[0].hp = 1; s.units[0].acted = true; // 主帅 1 HP 且已行动，无任何落点可用
-  s.intents = [intent(s, 'e', { x: 4, y: 0 })];
-  assert(R.dangerNow(s));
-  assert.equal(R.endTurn(s).state.result, 'dead'); // 不解围则阵亡
-  const a = R.analyze(s);
-  assert(a.safe);
-  assert.equal(a.plan.length, 1);
-  assert.equal(a.plan[0].actor, 'r'); // 车吃掉攻击者解围
-  assert.deepEqual(a.plan[0].to, { x: 4, y: 2 });
-});
-
-test('必须两枚队友按特定顺序配合才能解围：搜索能找到方案，不误判失败', () => {
-  const s = fixture(U('h', 'player', 'horse', 2, 3), U('r', 'player', 'rook', 0, 3),
-    U('e', 'enemy', 'rook', 4, 2), U('c', 'enemy', 'cannon', 4, 4));
-  s.units[0].hp = 1; s.units[0].acted = true; // 主帅已行动且 1 HP
-  s.intents = R.generateIntents(s);
-  // 任何单步都无法解围
-  for (const u of s.units.filter(u => u.side === 'player' && !u.acted))
-    for (const mv of R.legalActions(s, u.id))
-      assert.equal(R.enemyPhase(R.submit(s, u.id, mv.to).state).state.result, 'dead');
-  const a = R.analyze(s);
-  assert(a.safe);
-  assert.equal(a.plan.length, 2);
-  assert.equal(a.plan[0].actor, 'h');
-  assert.equal(a.plan[1].actor, 'r');
-  let n = s;
-  for (const mv of a.plan) n = R.submit(n, mv.actor, mv.to).state;
-  assert.notEqual(R.enemyPhase(n).state.result, 'dead');
-});
-
-test('先斩将即可免于致死的敌方阶段：不判将死，波次立即结束', () => {
-  const s = fixture(U('r', 'player', 'rook', 4, 8), U('e', 'enemy', 'rook', 4, 2));
-  s.units[0].hp = 1; s.units[0].acted = true;
-  R.king(s, 'enemy').hp = 1;
-  s.intents = [intent(s, 'e', { x: 4, y: 0 })];
-  assert(R.dangerNow(s));
-  assert(R.analyze(s).safe);
-  const n = R.submit(s, 'r', { x: 4, y: 9 }).state;
-  assert.equal(n.phase, 'shop');
-  assert.equal(n.gold, 2);
-  assert.equal(n.kills, 1); // 退场敌车不算击杀
-  assert.equal(R.endTurn(n).state.gold, 2); // 仅一次奖励
-  assert.equal(R.submit(n, 'r', { x: 4, y: 9 }).state, n); // 商店阶段不能行动
-});
-
-test('购买连点不重复生成、金币不足不产生单位、可跳过购买直接进第二波', () => {
-  let s = fixture(U('rook', 'player', 'rook', 5, 3));
-  s.phase = 'shop'; s.gold = 2;
-  s.units = s.units.filter(u => u.side === 'player');
-  s.units[0].hp = 2; s.units[1].xp = 3; s.units[1].level = 2;
-  const n = R.buy(s, 'horse');
-  assert.equal(n.gold, 0);
-  assert.equal(R.buy(n, 'cannon'), n); // 已买过
-  assert.equal(n.units.length, 3);
-  assert.equal(R.buy(s, 'unknown'), s); // 非法商品
-  const w = R.nextWave(n);
-  assert.equal(w.wave, 2);
-  assert.equal(w.phase, 'player');
-  assert.equal(w.intents.length, 5);
-  assert.equal(R.king(w, 'player').hp, 2); // 血量继承
-  assert.equal(R.at(w, { x: 0, y: 0 }).xp, 3); // XP/等级继承
-  assert.equal(R.at(w, { x: 2, y: 0 }).kind, 'horse');
-  assert(!R.at(w, { x: 5, y: 3 })); // 位置重置
-  s.gold = 1;
-  assert.equal(R.buy(s, 'horse'), s); // 余额不足
-  const skip = R.nextWave(s); // 跳过购买（金币不足时等价）
-  assert.equal(skip.units.filter(u => u.side === 'player').length, 2);
-});
-
-test('死亡车不复活、不能补买；跨波意图与行动重置', () => {
-  let s = fixture();
-  s.phase = 'shop'; s.gold = 2;
-  s.units = [U('king', 'player', 'king', 4, 0)]; // 车已阵亡
-  const w = R.nextWave(R.buy(s, 'cannon'));
-  assert(!w.units.some(u => u.side === 'player' && u.kind === 'rook'));
-  assert.equal(R.at(w, { x: 1, y: 2 }).kind, 'cannon');
-  assert.equal(w.units.filter(u => u.side === 'player').every(u => !u.acted), true);
-  assert.equal(w.intents.length, 5);
-});
-
-test('newGame 确定性：连续重开状态完全一致；初始意图已生成且公开', () => {
-  const a = R.newGame(), b = R.newGame();
-  assert.deepEqual(a, b);
-  assert.equal(a.intents.length, 4);
-  assert.equal(a.phase, 'player');
-  assert.equal(a.turn, 1);
-  assert.equal(R.at(a, { x: 4, y: 0 }).kind, 'king');
-  assert.equal(R.at(a, { x: 0, y: 0 }).kind, 'rook');
-});
-
-test('第二波斩将胜利；结果携带波次/回合/击杀/最高等级', () => {
-  let f = R.newGame();
-  f.wave = 2;
-  f.units = f.units.filter(u => u.side === 'player');
-  const r = U('rook2', 'player', 'rook', 4, 7); r.xp = 4; r.level = 3;
-  const boss = U('boss', 'enemy', 'king', 4, 9); boss.hp = 1;
-  f.units = f.units.filter(u => u.id !== 'rook').concat([r, boss]);
-  f.intents = [];
-  const v = R.submit(f, 'rook2', { x: 4, y: 9 }).state;
-  assert.equal(v.result, 'victory');
-  assert.equal(v.phase, 'result');
-  assert.equal(v.wave, 2);
-  assert.equal(v.highestLevel, 3);
-  assert.equal(v.kills, 1);
+test('士专项：宫内米字、意图、炮架、马腿、禁止推出宫',()=>{
+ let s=F(U('a','enemy','advisor',3,6));let a=G(s,'a');A.ok(R.actionAt(s,a,{x:2,y:7}));A.ok(R.actionAt(s,a,{x:4,y:5}));A.equal(R.actionAt(s,a,{x:3,y:7}),undefined);A.equal(R.actionAt(s,a,{x:1,y:6}),undefined);s.intents=R.generateIntents(s);A.ok(s.intents.find(i=>i.actor==='a'));
+ s=F(U('h','player','horse',0,5),U('a','enemy','advisor',1,5));A.equal(R.actionAt(s,G(s,'h'),{x:2,y:6}),undefined);s=F(U('c','player','cannon',2,4),U('a','enemy','advisor',2,6),U('target','enemy','rook',2,7));A.ok(R.actionAt(s,G(s,'c'),{x:2,y:7}));
+ s=F(U('r','player','rook',2,7),U('a','enemy','advisor',4,7));Object.assign(G(s,'boss'),{x:3,y:6});Object.assign(G(s,'r'),{rookChargeRange:2,rookPush:true});Object.assign(G(s,'a'),{hp:2,maxHp:2});s=act(s,'r',{x:4,y:7},'charge');A.deepEqual([G(s,'a').x,G(s,'a').y],[4,7]);
 });

@@ -1,359 +1,61 @@
-// M0 象棋战术游戏 —— 纯规则引擎（无 DOM、无渲染、无随机、无 IO）。
-// 规则语义对齐 docs/design/m0-gdd.md；预测、将死分析与实际结算复用同一套函数。
-// 浏览器中挂载全局 M0；Node 中以 CommonJS 导出（module.exports）。
-(function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.M0 = factory();
-})(typeof self !== 'undefined' ? self : this, function () {
-  'use strict';
-
-  var CONFIG = {
-    width: 9, height: 10,
-    kingHP: 3, enemyKingHP: 2,
-    upgradeXP: [0, 2, 4], // 各等级累计 XP 门槛：Lv1=0, Lv2=2, Lv3=4
-    reward: 2, price: 2,
-    spawns: { king: { x: 4, y: 0 }, rook: { x: 0, y: 0 }, horse: { x: 2, y: 0 }, cannon: { x: 1, y: 2 } },
-    // 波次配置：[棋种, x, y]，数组顺序即敌方公开执行顺序（GDD 6.1）
-    waves: [
-      [['pawn', 0, 3], ['pawn', 2, 5], ['cannon', 4, 6], ['king', 4, 9]],
-      [['pawn', 4, 4], ['horse', 2, 6], ['cannon', 6, 6], ['rook', 0, 7], ['king', 4, 9]]
-    ]
-  };
-
-  function unit(id, side, kind, x, y) {
-    return {
-      id: id, side: side, kind: kind, x: x, y: y,
-      hp: kind === 'king' ? (side === 'player' ? CONFIG.kingHP : CONFIG.enemyKingHP) : 1,
-      xp: 0, level: 1, acted: false
-    };
-  }
-
-  function copy(s) { return JSON.parse(JSON.stringify(s)); }
-  function same(a, b) { return a.x === b.x && a.y === b.y; }
-  function at(s, p) {
-    for (var i = 0; i < s.units.length; i++) if (same(s.units[i], p)) return s.units[i];
-  }
-  function king(s, side) {
-    for (var i = 0; i < s.units.length; i++) {
-      var u = s.units[i];
-      if (u.side === side && u.kind === 'king') return u;
-    }
-  }
-  function inside(p) {
-    return Number.isInteger(p.x) && Number.isInteger(p.y) &&
-      p.x >= 0 && p.x < CONFIG.width && p.y >= 0 && p.y < CONFIG.height;
-  }
-
-  // 同一行/列上从 a（不含）到 b（含）的棋位序列；不同行列返回空。
-  function line(a, b) {
-    if (a.x !== b.x && a.y !== b.y) return [];
-    var dx = Math.sign(b.x - a.x), dy = Math.sign(b.y - a.y), out = [];
-    for (var x = a.x + dx, y = a.y + dy; x !== b.x || y !== b.y; x += dx, y += dy) out.push({ x: x, y: y });
-    out.push({ x: b.x, y: b.y });
-    return out;
-  }
-
-  // 几何合法性：不检查行动次数。玩家操作、意图执行、将死分析共用（GDD 4.3）。
-  function actionAt(s, u, to) {
-    if (!inside(to) || same(u, to)) return;
-    var target = at(s, to);
-    if (target && target.side === u.side) return; // 不能落在友军位置、不能攻击友军
-    var dx = to.x - u.x, dy = to.y - u.y, ax = Math.abs(dx), ay = Math.abs(dy);
-    var path = [{ x: to.x, y: to.y }], valid = false;
-    if (u.kind === 'king') {
-      var cy = u.side === 'player' ? 1 : 8;
-      var inPalace = function (p) { return p.x >= 3 && p.x <= 5 && Math.abs(p.y - cy) <= 1; };
-      // 自定义九宫：横竖一步；斜步仅限中心与四角之间的米字连线（GDD 3.1）
-      var diagonal = ax === 1 && ay === 1 && ((u.x === 4 && u.y === cy) || (to.x === 4 && to.y === cy));
-      valid = inPalace(u) && inPalace(to) && (ax + ay === 1 || diagonal);
-    } else if (u.kind === 'pawn') {
-      // 仅敌方有卒：向 y 减小前进；过河（y<=4）后可横向一步，不能后退
-      valid = (dx === 0 && dy === -1) || (u.y <= 4 && ax === 1 && dy === 0);
-    } else if (u.kind === 'horse') {
-      var leg = { x: u.x + (ax === 2 ? Math.sign(dx) : 0), y: u.y + (ay === 2 ? Math.sign(dy) : 0) };
-      valid = ax * ay === 2 && !at(s, leg);
-    } else if (u.kind === 'rook' || u.kind === 'cannon') {
-      if (dx === 0 || dy === 0) {
-        path = line(u, to);
-        var blockers = path.slice(0, -1).map(function (p) { return at(s, p); }).filter(Boolean);
-        if (u.kind === 'cannon') {
-          // 炮：移动要求路径无阻挡；攻击要求恰好一个任意阵营炮架（GDD 3.2）
-          valid = target ? blockers.length === 1 : blockers.length === 0;
-        } else if (target) {
-          // 车：普通移动不能越子。攻击时路径上不能有友军，且途中敌人+目标总数
-          // 不超过等级上限（敌方车固定 Lv.1，等价于普通车吃子）。
-          var enemies = blockers.every(function (v) { return v.side !== u.side; });
-          valid = enemies && blockers.length + 1 <= u.level;
-        } else {
-          valid = blockers.length === 0;
-        }
-      }
-    }
-    if (valid) return {
-      actor: u.id, from: { x: u.x, y: u.y }, to: { x: to.x, y: to.y },
-      type: target ? 'attack' : 'move', path: path
-    };
-  }
-
-  function legalActions(s, id) {
-    var u = s.units.find(function (v) { return v.id === id; });
-    if (!u) return [];
-    var out = [];
-    for (var y = 0; y < CONFIG.height; y++) for (var x = 0; x < CONFIG.width; x++) {
-      var a = actionAt(s, u, { x: x, y: y });
-      if (a) out.push(a);
-    }
-    return out;
-  }
-
-  // 敌方意图：基于同一棋盘快照独立决策，不模拟其他敌人（GDD 4.4）。
-  // 无合法动作的敌人记为 standby（待机），仍占用公开序号。
-  function generateIntents(s) {
-    var commander = king(s, 'player');
-    if (!commander) return [];
-    var intents = [], order = 0;
-    s.units.forEach(function (u) {
-      if (u.side !== 'enemy') return;
-      order++; // 公开执行序号按敌方在配置中的固定顺序分配（GDD 6.1）
-      var actions = legalActions(s, u.id);
-      var choice;
-      if (actions.length) {
-        var priority = function (a) {
-          var t = at(s, a.to);
-          return t ? (t.kind === 'king' ? 0 : t.kind === 'rook' ? 1 : 2) : 3;
-        };
-        var distance = function (a) {
-          return Math.abs(a.to.x - commander.x) + Math.abs(a.to.y - commander.y);
-        };
-        actions.sort(function (a, b) {
-          return priority(a) - priority(b) ||
-            (a.type === 'move' && b.type === 'move' ? distance(a) - distance(b) : 0) ||
-            a.to.y - b.to.y || a.to.x - b.to.x;
-        });
-        choice = Object.assign({}, actions[0], { order: order });
-      } else {
-        choice = {
-          actor: u.id, from: { x: u.x, y: u.y }, to: { x: u.x, y: u.y },
-          type: 'standby', path: [], order: order
-        };
-      }
-      intents.push(choice);
-    });
-    return intents;
-  }
-
-  // 终局优先级：先判主帅阵亡（失败），再判敌将阵亡（当前波胜利）（GDD 5.3）。
-  function terminal(s) {
-    if (!king(s, 'player')) { s.phase = 'result'; s.result = 'dead'; }
-    else if (!king(s, 'enemy')) {
-      if (s.wave === 1) {
-        s.phase = 'shop'; s.gold += CONFIG.reward;
-        s.units = s.units.filter(function (u) { return u.side === 'player'; }); // 退场不算击杀
-      } else { s.phase = 'result'; s.result = 'victory'; }
-    }
-    if (s.phase !== 'player') s.intents = [];
-  }
-
-  // 在状态 s 上原子结算动作 a（调用方保证 s 为可变副本）。
-  function apply(s, a) {
-    var u = s.units.find(function (v) { return v.id === a.actor; });
-    var effect = { actor: u.id, to: { x: a.to.x, y: a.to.y }, victims: [], damage: [], status: 'success' };
-    var targets;
-    if (a.type === 'attack' && u.kind === 'rook') {
-      // 车攻击沿路径由近到远结算（敌方车 Lv.1 时路径上仅有目标本身）
-      targets = a.path.map(function (p) { return at(s, p); }).filter(Boolean);
-    } else if (a.type === 'attack') {
-      targets = [at(s, a.to)];
-    } else {
-      targets = [];
-    }
-    var stopped = false;
-    for (var i = 0; i < targets.length; i++) {
-      var t = targets[i];
-      t.hp--;
-      effect.damage.push(t.id);
-      if (t.hp <= 0) {
-        s.units = s.units.filter(function (v) { return v.id !== t.id; });
-        effect.victims.push(t.id);
-        if (u.side === 'player') s.kills++;
-      }
-      if (t.kind === 'king') { stopped = true; break; } // 主帅/敌将受击即止，攻击者不前进
-    }
-    if (!stopped) { u.x = a.to.x; u.y = a.to.y; }
-    effect.to = { x: u.x, y: u.y };
-    if (u.side === 'player' && u.kind === 'rook') {
-      u.xp += effect.victims.length; // 只有亲手击杀计入 XP
-      u.level = 1 + CONFIG.upgradeXP.slice(1).filter(function (xp) { return u.xp >= xp; }).length;
-      s.highestLevel = Math.max(s.highestLevel, u.level);
-    }
-    u.acted = true;
-    // 行动者阵亡则删除其待执行意图
-    s.intents = s.intents.filter(function (it) {
-      return s.units.some(function (v) { return v.id === it.actor; });
-    });
-    terminal(s);
-    return effect;
-  }
-
-  // 玩家提交动作：非法指令不消耗行动，返回原状态（GDD 3.3）。
-  function submit(s, id, to) {
-    var u = s.units.find(function (v) { return v.id === id; });
-    if (s.phase !== 'player' || !u || u.side !== 'player' || u.acted) return { state: s };
-    var a = actionAt(s, u, to);
-    if (!a) return { state: s };
-    var next = copy(s);
-    return { state: next, effect: apply(next, a), action: a };
-  }
-
-  // 敌方阶段：按公开顺序逐条用实际棋盘复检并结算（GDD 4.2/4.3）。
-  // 预测、将死分析叶节点与真实执行共用本函数。
-  function enemyPhase(s) {
-    var next = copy(s), effects = [];
-    if (s.phase !== 'player') return { state: next, effects: effects };
-    s.intents.forEach(function (intent) {
-      if (next.phase !== 'player') return; // 波次结束/失败后停止剩余动作
-      var u = next.units.find(function (v) { return v.id === intent.actor; });
-      var failure = {
-        actor: intent.actor, to: { x: intent.from.x, y: intent.from.y },
-        victims: [], damage: [], status: u ? 'cancelled' : 'removed'
-      };
-      if (intent.type === 'standby') {
-        effects.push({ actor: intent.actor, to: { x: intent.from.x, y: intent.from.y }, victims: [], damage: [], status: 'standby' });
-        return;
-      }
-      if (!u || !same(u, intent.from)) { effects.push(failure); return; }
-      var occupant = at(next, intent.to);
-      if (intent.type === 'move' && occupant) { effects.push(failure); return; } // 目标被占则取消，不改攻击
-      if (intent.type === 'attack' && u.kind === 'cannon' && !occupant) {
-        // 炮目标变空：炮架恰好一个则原地打空，否则取消；均不移动、不换目标
-        var blockers = line(u, intent.to).slice(0, -1).filter(function (p) { return at(next, p); });
-        effects.push(Object.assign({}, failure, { status: blockers.length === 1 ? 'miss' : 'cancelled' }));
-        return;
-      }
-      var a = actionAt(next, u, intent.to);
-      if (!a) { effects.push(failure); return; }
-      var effect = apply(next, a);
-      if (intent.type === 'attack' && !occupant) effect.status = 'miss'; // 移到原目标位置 = 落空
-      effects.push(effect);
-    });
-    return { state: next, effects: effects };
-  }
-
-  function endTurn(s) {
-    if (s.phase !== 'player') return { state: s, effects: [] };
-    var r = enemyPhase(s);
-    var next = r.state;
-    if (next.phase === 'player') {
-      next.turn++;
-      next.units.forEach(function (u) { u.acted = false; });
-      next.intents = generateIntents(next);
-    }
-    return { state: next, effects: r.effects };
-  }
-
-  function buy(s, kind) {
-    if (s.phase !== 'shop' || s.bought || s.gold < CONFIG.price ||
-      (kind !== 'horse' && kind !== 'cannon')) return s;
-    var next = copy(s), spawn = CONFIG.spawns[kind];
-    next.gold -= CONFIG.price;
-    next.bought = true;
-    next.units.push(unit(kind, 'player', kind, spawn.x, spawn.y));
-    return next;
-  }
-
-  function nextWave(s) {
-    if (s.phase !== 'shop') return s;
-    var next = copy(s);
-    next.wave = 2;
-    next.phase = 'player';
-    next.units.forEach(function (u) {
-      var p = CONFIG.spawns[u.kind];
-      u.x = p.x; u.y = p.y; u.acted = false;
-    });
-    addWave(next);
-    return next;
-  }
-
-  function newGame() {
-    var s = {
-      units: [unit('king', 'player', 'king', 4, 0), unit('rook', 'player', 'rook', 0, 0)],
-      intents: [], phase: 'player', wave: 1, turn: 1,
-      gold: 0, bought: false, kills: 0, highestLevel: 1, result: undefined
-    };
-    addWave(s);
-    return s;
-  }
-  function addWave(s) {
-    CONFIG.waves[s.wave - 1].forEach(function (w, i) {
-      s.units.push(unit('w' + s.wave + '-' + i, 'enemy', w[0], w[1], w[2]));
-    });
-    s.intents = generateIntents(s);
-  }
-
-  // 将军提示：立即结束回合会使主帅受到至少 1 点伤害（GDD 5.1）。
-  function dangerNow(s) {
-    if (s.phase !== 'player') return false;
-    var k = king(s, 'player');
-    if (!k) return true;
-    var r = enemyPhase(s);
-    return r.effects.some(function (e) { return e.damage.indexOf(k.id) >= 0; });
-  }
-
-  // 预告将死分析：穷尽剩余己方行动的组合与顺序（GDD 5.1/5.2）。
-  // 每节点 yield 一次，供浏览器按时间片运行；超时从不返回将死。
-  // 调用方丢弃旧 generator 即可取消（重开后旧分析自然失效）。
-  function* escapeAnalysis(s) {
-    var visited = new Set(), nodes = 0;
-    function* search(current, plan) {
-      nodes++; yield;
-      if (current.phase === 'shop' || current.result === 'victory') return plan; // 提前斩将结束当前波
-      if (current.phase === 'result') return undefined;
-      var resolved = enemyPhase(current).state; // 现在结束回合的敌方阶段
-      if (king(resolved, 'player') && resolved.result !== 'dead') return plan; // 主帅可存活
-      var key = JSON.stringify(current.units);
-      if (visited.has(key)) return undefined;
-      visited.add(key);
-      var actors = current.units.filter(function (v) { return v.side === 'player' && !v.acted; });
-      for (var i = 0; i < actors.length; i++) {
-        var actions = legalActions(current, actors[i].id);
-        for (var j = 0; j < actions.length; j++) {
-          var a = actions[j];
-          var found = yield* search(submit(current, a.actor, a.to).state, plan.concat([a]));
-          if (found) return found;
-        }
-      }
-      return undefined;
-    }
-    var plan = yield* search(s, []);
-    return { safe: plan !== undefined, plan: plan || [], nodes: nodes };
-  }
-
-  function analyze(s) {
-    var it = escapeAnalysis(s), step = it.next();
-    while (!step.done) step = it.next();
-    return step.value;
-  }
-
-  // 将死判定：穷尽后无存活/斩将方案才判负（GDD 5.1/5.2）。
-  function checkmate(s) {
-    if (s.phase !== 'player' || analyze(s).safe) return s;
-    var next = copy(s);
-    next.phase = 'result'; next.result = 'mate'; next.intents = [];
-    return next;
-  }
-
-  // UI 预览：一次调用拿到动作、结算效果、后续敌方阶段预测，均不改动真实局面。
-  function preview(s, id, to) {
-    var r = submit(s, id, to);
-    if (!r.effect) return null;
-    return { action: r.action, effect: r.effect, state: r.state, prediction: enemyPhase(r.state) };
-  }
-
-  return {
-    CONFIG: CONFIG, newGame: newGame, copy: copy, same: same, at: at, king: king, unit: unit,
-    line: line, actionAt: actionAt, legalActions: legalActions, generateIntents: generateIntents,
-    submit: submit, enemyPhase: enemyPhase, endTurn: endTurn, buy: buy, nextWave: nextWave,
-    dangerNow: dangerNow, escapeAnalysis: escapeAnalysis, analyze: analyze, checkmate: checkmate,
-    preview: preview
-  };
+// US-001 纯规则引擎：8×8、确定性、无 DOM / 渲染 / IO。
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.M0=factory();})(typeof self!=='undefined'?self:this,function(){
+'use strict';
+var C={width:8,height:8,river:3.5,reward:2,price:2,
+ playerPalace:{minX:2,maxX:4,minY:0,maxY:2,cx:3,cy:1},enemyPalace:{minX:2,maxX:4,minY:5,maxY:7,cx:3,cy:6},
+ spawns:{king:{x:3,y:0},rook:{x:0,y:0},horse:{x:2,y:0},cannon:{x:1,y:2}},
+ waves:[
+  [['pawn',0,4],['pawn',3,4],['pawn',6,4],['rook',7,6],['cannon',0,6],['advisor',2,7],['advisor',4,7],['king',3,7]],
+  [['pawn',1,4],['pawn',4,4],['pawn',7,4],['rook',0,6],['cannon',6,6],['advisor',2,7],['advisor',4,7],['king',3,7]]],
+ directions:[{x:0,y:1,name:'前'},{x:1,y:0,name:'右'},{x:0,y:-1,name:'后'},{x:-1,y:0,name:'左'}],
+ splash:[{x:0,y:1,name:'N'},{x:1,y:1,name:'NE'},{x:1,y:0,name:'E'},{x:1,y:-1,name:'SE'},{x:0,y:-1,name:'S'},{x:-1,y:-1,name:'SW'},{x:-1,y:0,name:'W'},{x:-1,y:1,name:'NW'}]};
+function cp(v){return JSON.parse(JSON.stringify(v));}function same(a,b){return a.x===b.x&&a.y===b.y;}function inside(p){return Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=0&&p.x<8&&p.y>=0&&p.y<8;}
+function at(s,p){return s.units.find(function(u){return same(u,p);});}function king(s,side){return s.units.find(function(u){return u.side===side&&u.kind==='king';});}function pawnish(u){return u.kind==='pawn'||u.kind==='archer'||u.kind==='spearman';}
+function palace(side){return side==='player'?C.playerPalace:C.enemyPalace;}function inPalace(side,p){var q=palace(side);return p.x>=q.minX&&p.x<=q.maxX&&p.y>=q.minY&&p.y<=q.maxY;}
+function palaceDiag(side,a,b){var q=palace(side);return Math.abs(a.x-b.x)===1&&Math.abs(a.y-b.y)===1&&((a.x===q.cx&&a.y===q.cy)||(b.x===q.cx&&b.y===q.cy));}
+function line(a,b){if(a.x!==b.x&&a.y!==b.y)return[];var dx=Math.sign(b.x-a.x),dy=Math.sign(b.y-a.y),o=[];for(var x=a.x+dx,y=a.y+dy;x!==b.x||y!==b.y;x+=dx,y+=dy)o.push({x:x,y:y});o.push({x:b.x,y:b.y});return o;}
+function hp(kind,side){if(kind==='king')return side==='player'?3:2;if(kind==='rook'||kind==='cannon')return 2;return 1;}function attack(kind){return kind==='archer'||kind==='cannon'?2:1;}
+function unit(id,side,kind,x,y){var h=hp(kind,side),p=side==='player';return{id:id,side:side,kind:kind,x:x,y:y,hp:h,maxHp:h,attack:attack(kind),level:1,kills:0,sp:0,ap:p?1:0,apLimit:p?1:0,combo:0,fortify:0,directionPaid:[0,0,0,0],cannonMask:0,rookMoveRange:3,rookChargeRange:1,rookPush:false,rookMoveAvailable:p&&kind==='rook',rookChargeAvailable:p&&kind==='rook',acted:false};}
+function acted(u){u.acted=u.kind==='rook'?!u.rookMoveAvailable&&!u.rookChargeAvailable:u.ap<=0;}function resetTurn(u){if(u.side!=='player')return;if(u.kind==='rook'){u.ap=u.apLimit=1;u.rookMoveAvailable=u.rookChargeAvailable=true;}else{u.apLimit=pawnish(u)?1+u.combo:1;u.ap=u.apLimit;}acted(u);}
+function emptyState(units){return{units:units||[],intents:[],phase:'player',wave:1,turn:1,gold:0,bought:false,kills:0,highestLevel:1,result:undefined,revision:0};}
+function addWave(s){C.waves[s.wave-1].forEach(function(w,i){s.units.push(unit('w'+s.wave+'-'+i,'enemy',w[0],w[1],w[2]));});s.intents=generateIntents(s);}function newGame(){var s=emptyState([unit('king','player','king',3,0),unit('rook','player','rook',0,0)]);addWave(s);return s;}
+function pawnMove(u,dx,dy){var f=u.side==='player'?1:-1,cross=u.side==='player'?u.y>=4:u.y<=3;return dx===0&&dy===f||cross&&Math.abs(dx)===1&&dy===0;}
+function ordinary(s,u,to){if(!inside(to)||same(u,to))return;var t=at(s,to);if(t&&t.side===u.side)return;var dx=to.x-u.x,dy=to.y-u.y,ax=Math.abs(dx),ay=Math.abs(dy),ok=false,path=[cp(to)];
+ if(u.kind==='king')ok=inPalace(u.side,u)&&inPalace(u.side,to)&&(ax+ay===1||palaceDiag(u.side,u,to));
+ else if(u.kind==='advisor')ok=inPalace(u.side,u)&&inPalace(u.side,to)&&palaceDiag(u.side,u,to);
+ else if(pawnish(u))ok=u.kind==='pawn'||!t?pawnMove(u,dx,dy):false;
+ else if(u.kind==='horse'){var leg={x:u.x+(ax===2?Math.sign(dx):0),y:u.y+(ay===2?Math.sign(dy):0)};ok=ax*ay===2&&!at(s,leg);}
+ else if(u.kind==='cannon'&&(dx===0||dy===0)){path=line(u,to);var screens=path.slice(0,-1).filter(function(p){return at(s,p);}).length;ok=t?screens===1:screens===0&&path.length<=3;}
+ if(ok)return{actor:u.id,from:{x:u.x,y:u.y},to:cp(to),type:t?'attack':'move',path:path};}
+function rookAction(s,u,to,mode){if(!inside(to)||same(u,to)||(u.x!==to.x&&u.y!==to.y))return;var t=at(s,to);if(t&&t.side===u.side)return;var path=line(u,to);if(path.slice(0,-1).some(function(p){return at(s,p);}))return;
+ if(mode==='rook-move'&&!t&&u.rookMoveAvailable&&u.rookChargeAvailable&&path.length<=u.rookMoveRange)return{actor:u.id,from:{x:u.x,y:u.y},to:cp(to),type:mode,path:path};
+ if(mode==='charge'&&u.rookChargeAvailable&&path.length<=u.rookChargeRange)return{actor:u.id,from:{x:u.x,y:u.y},to:cp(to),type:mode,path:path};}
+function enemyRookActions(s,u){var o=[];for(var y=0;y<8;y++)for(var x=0;x<8;x++){var to={x:x,y:y},t=at(s,to),p=line(u,to);if(!p.length||p.slice(0,-1).some(function(q){return at(s,q);})||t&&t.side===u.side)continue;if(!t&&p.length<=3)o.push({actor:u.id,from:{x:u.x,y:u.y},to:to,type:'move',path:p});if(t&&p.length<=1)o.push({actor:u.id,from:{x:u.x,y:u.y},to:to,type:'charge',path:p});}return o;}
+function actionAt(s,u,to,mode){if(!u)return;if(u.kind==='rook'){if(u.side==='enemy')return enemyRookActions(s,u).find(function(a){return same(a.to,to)&&(!mode||a.type===mode);});return rookAction(s,u,to,mode||(at(s,to)?'charge':'rook-move'));}return ordinary(s,u,to);}
+function directionalAction(s,id,d){var u=s.units.find(function(v){return v.id===id;});if(!u||u.side!=='player'||u.kind!=='archer'&&u.kind!=='spearman'||!Number.isInteger(d)||d<0||d>3||u.ap<=0)return;var v=C.directions[d],range=1+u.directionPaid[d],targets=[],path=[];for(var i=1;i<=range;i++){var p={x:u.x+v.x*i,y:u.y+v.y*i};if(!inside(p))break;path.push(p);var t=at(s,p);if(!t)continue;if(t.side===u.side)break;targets.push(t.id);if(u.kind==='archer')break;}if(targets.length)return{actor:u.id,from:{x:u.x,y:u.y},to:cp(path[path.length-1]),type:'directional',direction:d,path:path,targets:targets};}
+function legalActions(s,id){var u=s.units.find(function(v){return v.id===id;});if(!u)return[];if(u.side==='enemy'&&u.kind==='rook')return enemyRookActions(s,u);var o=[];for(var y=0;y<8;y++)for(var x=0;x<8;x++){var p={x:x,y:y};if(u.side==='player'&&u.kind==='rook'){var m=rookAction(s,u,p,'rook-move'),c=rookAction(s,u,p,'charge');if(m)o.push(m);if(c)o.push(c);}else{var a=ordinary(s,u,p);if(a)o.push(a);}}if(u.side==='player'&&(u.kind==='archer'||u.kind==='spearman'))for(var d=0;d<4;d++){var q=directionalAction(s,id,d);if(q)o.push(q);}return o;}
+function award(s,u,ids){if(!u||u.side!=='player'||!ids.length)return;u.kills+=ids.length;u.level+=ids.length;u.sp+=ids.length;s.kills+=ids.length;s.highestLevel=Math.max(s.highestLevel,u.level);}
+function removeDead(s,targets,u){var dead=targets.filter(function(t){return t.hp<=0;});s.units=s.units.filter(function(v){return dead.indexOf(v)<0;});award(s,u,dead.filter(function(v){return v.side==='enemy';}).map(function(v){return v.id;}));return dead.map(function(v){return v.id;});}
+function canPush(u,p){return inside(p)&&(u.kind!=='king'&&u.kind!=='advisor'||inPalace(u.side,p));}
+function terminal(s){if(!king(s,'player')){s.phase='result';s.result='dead';}else if(!king(s,'enemy')){if(s.wave===1){s.phase='shop';s.gold+=2;s.units=s.units.filter(function(u){return u.side==='player';});}else{s.phase='result';s.result='victory';}}if(s.phase!=='player')s.intents=[];}
+function apply(s,a,consume){var u=s.units.find(function(v){return v.id===a.actor;}),e={actor:a.actor,to:cp(a.from),actorTo:cp(a.from),path:cp(a.path||[]),approachCell:null,victims:[],damage:[],hits:[],pushed:null,pushStatus:null,status:'success'};if(!u){e.status='removed';return e;}
+ if(a.type==='move'||a.type==='rook-move'){u.x=a.to.x;u.y=a.to.y;e.to=cp(a.to);}
+ else if(a.type==='charge'){var t=at(s,a.to),dx=Math.sign(a.to.x-u.x),dy=Math.sign(a.to.y-u.y);if(!t){u.x=a.to.x;u.y=a.to.y;}else{var near={x:a.to.x-dx,y:a.to.y-dy},before=t.hp;u.x=near.x;u.y=near.y;e.approachCell=cp(near);t.hp-=u.attack;e.damage.push(t.id);e.hits.push({id:t.id,damage:Math.min(before,u.attack)});if(t.hp<=0){e.victims=removeDead(s,[t],u);u.x=a.to.x;u.y=a.to.y;}else if(u.rookPush){var push={x:t.x+dx,y:t.y+dy};if(!inside(push))e.pushStatus='outside';else if(!canPush(t,push))e.pushStatus='palace';else if(at(s,push))e.pushStatus='occupied';else{t.x=push.x;t.y=push.y;e.pushed={id:t.id,to:push};e.pushStatus='pushed';}}}e.to=e.actorTo={x:u.x,y:u.y};}
+ else{var targets=[];if(a.type==='directional')targets=a.targets.map(function(id){return s.units.find(function(v){return v.id===id;});}).filter(Boolean);else if(u.kind==='cannon'){var cells=[cp(a.to)];C.splash.forEach(function(d,i){if(u.cannonMask&1<<i){var p={x:a.to.x+d.x,y:a.to.y+d.y};if(inside(p))cells.push(p);}});targets=cells.map(function(p){return at(s,p);}).filter(Boolean);}else{var one=at(s,a.to);if(one)targets=[one];}targets.sort(function(a,b){return a.id.localeCompare(b.id);});targets.forEach(function(t){var before=t.hp;t.hp-=u.attack;e.damage.push(t.id);e.hits.push({id:t.id,damage:Math.min(before,u.attack)});});e.victims=removeDead(s,targets,u);e.to=e.actorTo={x:u.x,y:u.y};}
+ e.actorTo={x:u.x,y:u.y};if(consume&&u.side==='player'){if(a.type==='rook-move')u.rookMoveAvailable=false;else if(u.kind==='rook'){u.ap=0;u.rookMoveAvailable=u.rookChargeAvailable=false;}else u.ap=Math.max(0,u.ap-1);acted(u);}terminal(s);return e;}
+function submitAction(s,a){var u=s.units.find(function(v){return v.id===a.actor;});if(Number.isInteger(a.revision)&&a.revision!==s.revision||s.phase!=='player'||!u||u.side!=='player'||(u.kind==='rook'?!u.rookMoveAvailable&&!u.rookChargeAvailable:u.ap<=0))return{state:s};var legal=a.type==='directional'?directionalAction(s,u.id,a.direction):actionAt(s,u,a.to,a.type);if(!legal)return{state:s};var n=cp(s),effect=apply(n,legal,true);n.revision=(s.revision||0)+1;legal.revision=s.revision||0;return{state:n,effect:effect,action:legal};}
+function submit(s,id,to,mode){var u=s.units.find(function(v){return v.id===id;});if(s.phase!=='player'||!u||u.side!=='player'||u.kind!=='rook'&&u.ap<=0||u.kind==='rook'&&!u.rookMoveAvailable&&!u.rookChargeAvailable)return{state:s};var a=actionAt(s,u,to,mode);return a?submitAction(s,a):{state:s};}function submitDirection(s,id,d){var a=directionalAction(s,id,d);return a?submitAction(s,a):{state:s};}
+function generateIntents(s){var k=king(s,'player');if(!k)return[];var out=[],order=0;s.units.forEach(function(u){if(u.side!=='enemy')return;order++;var as=legalActions(s,u.id);function pri(a){var t=at(s,a.to);return t?(t.kind==='king'?0:t.kind==='rook'?1:2):3;}as.sort(function(a,b){return pri(a)-pri(b)||(pri(a)===3?Math.abs(a.to.x-k.x)+Math.abs(a.to.y-k.y)-Math.abs(b.to.x-k.x)-Math.abs(b.to.y-k.y):0)||a.to.y-b.to.y||a.to.x-b.to.x||a.type.localeCompare(b.type);});out.push(as.length?Object.assign(cp(as[0]),{order:order}):{actor:u.id,from:{x:u.x,y:u.y},to:{x:u.x,y:u.y},type:'standby',path:[],order:order});});return out;}
+function revalidate(s,i){var u=s.units.find(function(v){return v.id===i.actor;});if(!u)return;if(i.type==='standby')return cp(i);var occ=at(s,i.to);if(occ&&occ.side===u.side||i.type==='move'&&occ)return;if(i.type==='attack'&&!occ){if(u.kind!=='cannon')return{missOnly:true};var cannonPath=line(u,i.to),screens=cannonPath.slice(0,-1).filter(function(p){return at(s,p);}).length;if(screens!==1)return;return{actor:u.id,from:{x:u.x,y:u.y},to:cp(i.to),type:'attack',path:cannonPath};}if(u.kind==='rook')return actionAt(s,u,i.to,i.type==='charge'?'charge':'move');return actionAt(s,u,i.to);}
+function enemyPhase(s){var n=cp(s),effects=[];if(s.phase!=='player')return{state:n,effects:effects};s.intents.forEach(function(i){if(n.phase!=='player')return;var u=n.units.find(function(v){return v.id===i.actor;});if(!u){effects.push({actor:i.actor,to:cp(i.from),victims:[],damage:[],hits:[],status:'removed'});return;}if(i.type==='standby'){effects.push({actor:i.actor,to:cp(i.from),victims:[],damage:[],hits:[],status:'standby'});return;}var a=revalidate(n,i);if(!a){effects.push({actor:i.actor,to:cp(i.from),victims:[],damage:[],hits:[],status:'cancelled'});return;}if(a.missOnly){effects.push({actor:i.actor,to:cp(i.from),victims:[],damage:[],hits:[],status:'miss'});return;}var empty=!at(n,i.to),was=i.type==='attack'||i.type==='charge',e=apply(n,a,false);if(was&&empty)e.status='miss';effects.push(e);});return{state:n,effects:effects};}
+function endTurn(s){if(s.phase!=='player')return{state:s,effects:[]};var r=enemyPhase(s),n=r.state;n.revision=(s.revision||0)+1;if(n.phase==='player'){n.turn++;n.units.forEach(resetTurn);n.intents=generateIntents(n);}return{state:n,effects:r.effects};}
+function purchaseUpgrade(s,id,skill,index){if(s.phase!=='player'&&s.phase!=='shop')return s;var src=s.units.find(function(u){return u.id===id&&u.side==='player';});if(!src)return s;var cost=skill==='promote-archer'||skill==='promote-spearman'||skill==='combo'||skill==='rook-push'?2:1;if(src.sp<cost)return s;var ok=skill==='fortify'||((skill==='promote-archer'||skill==='promote-spearman')&&src.kind==='pawn')||(skill==='combo'&&pawnish(src))||(skill==='direction'&&(src.kind==='archer'||src.kind==='spearman')&&Number.isInteger(index)&&index>=0&&index<4&&src.directionPaid[index]<6)||(skill==='rook-move'&&src.kind==='rook'&&src.rookMoveRange<7)||(skill==='rook-charge'&&src.kind==='rook'&&src.rookChargeRange<7)||(skill==='rook-push'&&src.kind==='rook'&&!src.rookPush)||(skill==='cannon-splash'&&src.kind==='cannon'&&Number.isInteger(index)&&index>=0&&index<8&&!(src.cannonMask&1<<index));if(!ok)return s;var n=cp(s),u=n.units.find(function(v){return v.id===id;});n.revision=(s.revision||0)+1;u.sp-=cost;if(skill==='fortify'){u.fortify++;u.maxHp++;u.hp++;}else if(skill==='promote-archer'){u.kind='archer';u.attack=2;}else if(skill==='promote-spearman'){u.kind='spearman';u.maxHp++;u.hp++;}else if(skill==='combo')u.combo++;else if(skill==='direction')u.directionPaid[index]++;else if(skill==='rook-move')u.rookMoveRange++;else if(skill==='rook-charge')u.rookChargeRange++;else if(skill==='rook-push')u.rookPush=true;else if(skill==='cannon-splash')u.cannonMask|=1<<index;return n;}
+function buy(s,kind){if(s.phase!=='shop'||s.bought||s.gold<2||kind!=='horse'&&kind!=='cannon')return s;var n=cp(s),p=C.spawns[kind];n.revision=(s.revision||0)+1;n.gold-=2;n.bought=true;n.units.push(unit(kind,'player',kind,p.x,p.y));return n;}
+function nextWave(s){if(s.phase!=='shop')return s;var n=cp(s);n.revision=(s.revision||0)+1;n.wave=2;n.phase='player';n.result=undefined;n.units.forEach(function(u){var p=u.id==='king'?C.spawns.king:u.id==='rook'?C.spawns.rook:C.spawns[u.kind];if(p){u.x=p.x;u.y=p.y;}resetTurn(u);});addWave(n);return n;}
+function upgradeChoices(s){var o=[];s.units.filter(function(u){return u.side==='player'&&u.sp>0;}).forEach(function(u){function add(skill,i){var n=purchaseUpgrade(s,u.id,skill,i);if(n!==s)o.push({unit:u.id,skill:skill,index:i,state:n});}add('fortify');if(pawnish(u))add('combo');if(u.kind==='pawn'){add('promote-archer');add('promote-spearman');}if(u.kind==='archer'||u.kind==='spearman')for(var d=0;d<4;d++)add('direction',d);if(u.kind==='rook'){add('rook-move');add('rook-charge');add('rook-push');}if(u.kind==='cannon')for(var i=0;i<8;i++)add('cannon-splash',i);});return o;}
+function* escapeAnalysis(s){var seen=new Set(),nodes=0;function* search(cur,plan){nodes++;yield;if(cur.phase==='shop'||cur.result==='victory')return plan;if(cur.phase==='result')return;var resolved=enemyPhase(cur).state;if(king(resolved,'player')&&resolved.result!=='dead')return plan;var key=JSON.stringify([cur.units,cur.intents]);if(seen.has(key))return;seen.add(key);var ps=cur.units.filter(function(u){return u.side==='player';});for(var i=0;i<ps.length;i++){var as=legalActions(cur,ps[i].id);for(var j=0;j<as.length;j++){var r=submitAction(cur,as[j]);if(!r.effect)continue;var found=yield* search(r.state,plan.concat([as[j]]));if(found)return found;}}var ups=upgradeChoices(cur);for(var q=0;q<ups.length;q++){var step={type:'upgrade',actor:ups[q].unit,skill:ups[q].skill,index:ups[q].index};var safe=yield* search(ups[q].state,plan.concat([step]));if(safe)return safe;}}var plan=yield* search(cp(s),[]);return{safe:!!plan,plan:plan||[],nodes:nodes};}
+function analyze(s){var it=escapeAnalysis(s),v=it.next();while(!v.done)v=it.next();return v.value;}function dangerNow(s){var k=king(s,'player');return!k||enemyPhase(s).effects.some(function(e){return e.damage.indexOf(k.id)>=0;});}function checkmate(s){if(s.phase!=='player'||analyze(s).safe)return s;var n=cp(s);n.phase='result';n.result='mate';n.intents=[];return n;}
+function preview(s,id,to,mode){var r=submit(s,id,to,mode);return r.effect?{action:r.action,effect:r.effect,state:r.state,prediction:enemyPhase(r.state)}:null;}function previewDirection(s,id,d){var r=submitDirection(s,id,d);return r.effect?{action:r.action,effect:r.effect,state:r.state,prediction:enemyPhase(r.state)}:null;}
+function fixtureState(name,variant){var s=emptyState([unit('king','player','king',3,0),unit('boss','enemy','king',3,7)]);function add(u){s.units.push(u);return u;}if(name==='P1'){add(unit('pawn','player','pawn',2,5));add(unit('e1','enemy','pawn',2,6));add(unit('e2','enemy','pawn',3,5));}else if(name==='P2'){var r=add(unit('rook','player','rook',1,4));r.rookChargeRange=3;r.rookPush=true;add(unit('target','enemy','rook',4,4));if(variant==='blocked')add(unit('block','enemy','pawn',5,4));}else if(name==='P3'){var c=add(unit('cannon','player','cannon',4,1));c.sp=2;add(unit('screen','enemy','pawn',4,3));add(unit('target','enemy','rook',4,5));add(unit('north','enemy','rook',4,6));add(unit('east','enemy','rook',5,5));}else if(name==='P4'){var c4=add(unit('cannon','player','cannon',4,1));c4.sp=1;add(unit('screen','player','horse',4,3));add(unit('target','enemy','rook',4,4));}else if(name==='P5'){var c5=add(unit('cannon','player','cannon',2,1));c5.sp=8;add(unit('screen','enemy','pawn',2,3));add(unit('target','enemy','rook',2,5));}else if(name==='P6'){var k=king(s,'player');k.hp=1;k.sp=1;k.ap=0;acted(k);var er=add(unit('threat','enemy','rook',3,1));s.intents=[{actor:er.id,from:{x:3,y:1},to:{x:3,y:0},type:'charge',path:[{x:3,y:0}],order:1}];return s;}else if(name==='P7'){var p=add(unit('pawn','player',variant==='spearman'?'spearman':'archer',2,4));p.directionPaid[0]=2;p.attack=p.kind==='archer'?2:1;add(unit('near','enemy','pawn',2,5));add(unit('far','enemy','pawn',2,7));if(variant==='blocked')add(unit('block','player','horse',2,6));}else if(name==='P8'){var r8=add(unit('rook','player','rook',1,1));r8.rookChargeRange=3;if(variant==='kill')add(unit('target','enemy','pawn',4,4));else if(variant==='survive')add(unit('target','enemy','rook',4,4));}s.intents=s.units.filter(function(u){return u.side==='enemy';}).map(function(u,i){return{actor:u.id,from:{x:u.x,y:u.y},to:{x:u.x,y:u.y},type:'standby',path:[],order:i+1};});return s;}
+return{CONFIG:C,copy:cp,same:same,at:at,king:king,unit:unit,emptyState:emptyState,newGame:newGame,inside:inside,inPalace:inPalace,line:line,actionAt:actionAt,directionalAction:directionalAction,legalActions:legalActions,submit:submit,submitDirection:submitDirection,submitAction:submitAction,generateIntents:generateIntents,enemyPhase:enemyPhase,endTurn:endTurn,purchaseUpgrade:purchaseUpgrade,buy:buy,nextWave:nextWave,dangerNow:dangerNow,escapeAnalysis:escapeAnalysis,analyze:analyze,checkmate:checkmate,preview:preview,previewDirection:previewDirection,fixtureState:fixtureState,resetTurn:resetTurn};
 });

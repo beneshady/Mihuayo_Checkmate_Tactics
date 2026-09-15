@@ -1,76 +1,93 @@
 [
   {
-    "actor": "rook",
-    "to": {
-      "x": 0,
-      "y": 3
+    "action": {
+      "actor": "rook",
+      "type": "rook-move",
+      "to": {
+        "x": 0,
+        "y": 3
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "charge",
+      "to": {
+        "x": 0,
+        "y": 4
+      }
+    }
+  },
+  {
+    "upgrade": {
+      "actor": "rook",
+      "skill": "rook-charge"
     }
   },
   {
     "end": true
   },
   {
-    "actor": "rook",
-    "to": {
-      "x": 0,
-      "y": 7
+    "end": true
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "rook-move",
+      "to": {
+        "x": 0,
+        "y": 7
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "charge",
+      "to": {
+        "x": 2,
+        "y": 7
+      }
     }
   },
   {
     "end": true
   },
   {
-    "actor": "rook",
-    "to": {
-      "x": 4,
-      "y": 7
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "actor": "rook",
-    "to": {
-      "x": 3,
-      "y": 7
+    "action": {
+      "actor": "rook",
+      "type": "charge",
+      "to": {
+        "x": 2,
+        "y": 7
+      }
     }
   },
   {
     "buy": "cannon"
   },
   {
-    "actor": "rook",
-    "to": {
-      "x": 0,
-      "y": 7
-    }
-  },
-  {
-    "actor": "cannon",
-    "to": {
-      "x": 4,
-      "y": 2
+    "action": {
+      "actor": "cannon",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 2
+      }
     }
   },
   {
     "end": true
   },
   {
-    "actor": "cannon",
-    "to": {
-      "x": 4,
-      "y": 8
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "actor": "rook",
-    "to": {
-      "x": 4,
-      "y": 7
+    "action": {
+      "actor": "cannon",
+      "type": "attack",
+      "to": {
+        "x": 3,
+        "y": 7
+      }
     }
   }
 ]
