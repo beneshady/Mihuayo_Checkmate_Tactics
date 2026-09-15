@@ -21,6 +21,6 @@ test('UI 桩加载 P2 blocked，显示 8×8 夹具并可连续重开',()=>{
  const start=d.getEpoch();for(let i=0;i<3;i++)d.restart();A.equal(d.getEpoch(),start+3);s=d.getState();A.equal(s.revision,0);A.equal(s.units.some(u=>u.id==='block'),true);
 });
 
-test('页面含响应式窄屏、河界、九宫、技能与 P1-P8 入口',()=>{
- A.match(html,/@media\(max-width:700px\)/);A.match(html,/河界/);A.match(html,/九宫/);A.match(html,/技能/);for(let i=1;i<=8;i++)A.match(html,new RegExp(`fixture=P${i}`));
+test('页面含独立窄屏棋盘/操作/面板区、河界、九宫、技能与 P1-P8 入口',()=>{
+ A.match(html,/@media\(max-width:700px\)/);A.match(html,/#scene\{height:52vh/);A.match(html,/#actions\{top:52vh/);A.match(html,/#panel\{top:57vh/);A.match(html,/河界/);A.match(html,/九宫/);A.match(html,/技能/);for(let i=1;i<=8;i++)A.match(html,new RegExp(`fixture=P${i}`));
 });
