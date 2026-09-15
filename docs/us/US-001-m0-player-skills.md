@@ -1,7 +1,7 @@
 # US-001：M0 我方技能与八格棋盘
 
 版本：implementation-v1.0｜2026-09-15｜优先级：P0。
-状态：Ready for development（派发和接手结果见末尾审计）。
+状态：Development complete，等待测试验收（冻结实现与交接见末尾审计）。
 父需求：[兵、车、炮技能提案 v1.2](../design/unit-skills-v1.md)；流程基线：[M0 Gameplay](../design/m0-gdd.md)。
 工作目录：`D:\Projects\mihuayou\gamehack2026`；分支：`codex/web-gameplay-validation`。
 读取时基线提交：`02684a5f22eb81cf19f7c6aaf9f1429f838a7bb0`；旧网页已有单独交付，但无真实浏览器通过证据。
@@ -109,10 +109,11 @@
 ## 4. 实现记录（开发填写）
 
 - 接手版本 / 时间：工作区 `implementation-v1.0`（HEAD `02684a5`）/ 2026-09-15T08:28:00+08:00；已核对项目、角色会话与版本更正。
-- 实现提交及变更文件：待开发。
-- 实际敌方出生坐标：先使用第 2.4 节，调整仅限出生坐标并记录原因。
-- 自测命令、结果、证据路径、已知风险：待开发。
-- 测试交接：开发完成后先冻结代码提交，再唤醒本项目测试；不得边测边另改版本。
+- 实现提交及变更文件：`35ecfd2090e92e67fafb71766b383bdb6bd717f4`；修改 `web/index.html`、`web/js/app.js`、`web/js/rules.js`、`tests/` 下规则 / 回放 / UI 桩与两条回放，以及 `docs/web-m0-delivery.md`。
+- 实际敌方出生坐标：未调整，完整采用第 2.4 节两波种子。正式马 / 炮回放均从零资源初始局通关。
+- 自测：`node tests/rules.test.cjs` 16/16；`node tests/replay.test.cjs` 2/2；`node tests/static-check.cjs` 通过；`node tests/ui-headless.test.cjs` 2/2；`git diff --check` 通过。`node --test tests` 因沙箱禁止 test runner 创建子进程报 `spawn EPERM`，逐文件执行无失败。
+- 浏览器：Codex 内置 Chromium 实测 1280×800、390×844、P1–P8、P6 强健与 P7 枪兵前向，控制台无 error / warning；详细证据与启动方式见 `docs/web-m0-delivery.md`。
+- 已知风险：敌方阶段即时刷新，无逐棋子播片动画；平衡仍为 TBD。测试需按冻结版本完整浏览器复现两条正式通关、失败 / 将死、暂停和连续重开。
 
 ## 5. 测试记录（测试填写）
 
@@ -137,3 +138,4 @@
 | H-US-001-003 | 2026-09-15T08:28:00+08:00 | HANDOFF_ACK | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | US-001 开发接手 | 已核对项目 ID、工作目录、分支、HEAD 与工作区 implementation-v1.0；按 AC01–AC11 开始实现 | 本文；`docs/codex/AGENT_REGISTRY.md` | 已接手；开发 Goal 已开启 |
 | H-US-001-004 | 2026-09-15T08:29:00+08:00 | AUDIT_CORRECTION | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 本 US 审计 | 并发追加编号说明 | 两次交接记录并发追加造成 H-US-001-003 重号；保留原行，分别以时间 08:27:21 的 COORDINATION 和 08:28:00 的 HANDOFF_ACK 唯一区分。开发接手事实已确认，后续编号从 005 继续 | 5ae4174；本文两条 003 原始记录 | 仅修正审计引用方式，不重发任务、不改变需求或接手结果 |
 | H-US-001-PM-001 | 2026-09-15T08:27:44+08:00 | HANDOFF_ACK | 项目管理 / 01a06bbb-6fa7-7cd0-a5a8-34d0f3c4c853 | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 协调接手确认｜US-001 | 已读取开发 active 状态及开发 ACK，更新登记并成功回执策划；等待冻结实现，无重复派发。历史 H-US-001-003 存在并发重号，以事件及角色区分，保留原行；本行使用 PM 前缀区分 | 本文；b746b80；角色登记 | 协调已接手；新功能尚未送测或验收 |
+| H-US-001-005 | 2026-09-15T15:02:32+08:00 | DEV_COMPLETE | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 测试 / 01a07039-3d52-70a1-96f7-5a8bcbaffbef | US-001 开发完成，准备冻结交接 | 已实现 8×8、士、全部我方技能、P1–P8、正式马 / 炮两分支；未改变两波出生坐标。规则、回放、静态与 UI 桩全绿；真实 Chromium 已检查桌面 / 窄屏和关键夹具 | `35ecfd2`；`docs/web-m0-delivery.md` | 开发完成；待测试交接消息成功与接手确认 |
