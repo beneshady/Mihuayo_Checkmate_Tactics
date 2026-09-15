@@ -73,6 +73,7 @@ test('T28-T30 炮冻结炮架、同时结算、隔子溅射、不追溯',()=>{
 test('T31-T33 占位、锁定重验证、双方将帅同死己方失败',()=>{
  let s=F(U('p','player','pawn',2,4),U('e','enemy','pawn',2,5));s=act(s,'p',{x:2,y:5});A.deepEqual([G(s,'p').x,G(s,'p').y],[2,4]);s=F(U('r','player','rook',2,4),U('e','enemy','pawn',2,5));s=act(s,'r',{x:2,y:5},'charge');A.deepEqual([G(s,'r').x,G(s,'r').y],[2,5]);
  s=F(U('e','enemy','pawn',2,5),U('p','player','pawn',2,4));s.intents=[{actor:'e',from:{x:2,y:5},to:{x:2,y:4},type:'attack',path:[],order:1}];s.units=s.units.filter(u=>u.id!=='p');A.equal(R.enemyPhase(s).effects[0].status,'miss');A.deepEqual([G(R.enemyPhase(s).state,'e').x,G(R.enemyPhase(s).state,'e').y],[2,5]);s.units.push(U('h','player','horse',2,4));A.equal(G(R.enemyPhase(s).state,'h'),undefined);s.units=s.units.filter(u=>u.id!=='h');s.units.push(U('friend','enemy','pawn',2,4));A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
+ s=F(U('er','enemy','rook',0,4));s.intents=[{actor:'er',from:{x:0,y:4},to:{x:0,y:3},type:'charge',path:[{x:0,y:3}],order:1}];const emptyCharge=R.enemyPhase(s);A.deepEqual([G(emptyCharge.state,'er').x,G(emptyCharge.state,'er').y,emptyCharge.effects[0].status,emptyCharge.effects[0].hits.length],[0,3,'success',0]);
  s=F(U('c','player','cannon',3,0));s.wave=2;Object.assign(G(s,'king'),{x:3,y:3,hp:1});Object.assign(G(s,'boss'),{x:3,y:4,hp:1});G(s,'c').cannonMask=1<<4;s=act(s,'c',{x:3,y:4});A.equal(s.result,'dead');A.equal(G(s,'king'),undefined);A.equal(G(s,'boss'),undefined);
 });
 
