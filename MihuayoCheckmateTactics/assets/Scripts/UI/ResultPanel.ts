@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, director, Label } from 'cc';
+import { _decorator, AudioClip, AudioSource, Button, Component, director, Label } from 'cc';
 
 const { ccclass, property } = _decorator;
 
@@ -7,9 +7,15 @@ const { ccclass, property } = _decorator;
  * 奖励发放与存档由 GameManager 在弹面板前完成，本组件只做展示与导航（不碰 Core）。
  * 替代旧"结束后 2 秒自动刷新场景"占位（docs/design/main-menu-plan.md §2/§4）。
  * 子节点按名称约定自发现（TitleLabel / DetailLabel / BackButton），无需拖拽引用。
+ * 返回按钮带点击音（backSfx），短暂停留让音效收尾再切场景。
  */
 @ccclass('ResultPanel')
 export class ResultPanel extends Component {
+    @property({ type: AudioClip, tooltip: '返回按钮点击音；空则静默' })
+    public backSfx: AudioClip | null = null;
+
+    private sfxSource: AudioSource | null = null;
+
     start(): void {
         // 本节点在场景里默认隐藏（active=false），start() 会推迟到首次 show() 激活时才执行；
         // 绝不能在这里再把自己 active=false，否则首次弹出会被自己立刻藏回去。
@@ -17,6 +23,10 @@ export class ResultPanel extends Component {
         const backButton = this.node.getChildByName('BackButton')?.getComponent(Button) ?? null;
         if (backButton) {
             backButton.node.on(Button.EventType.CLICK, this.onBackClicked, this);
+        }
+        if (this.backSfx) {
+            this.sfxSource = this.addComponent(AudioSource);
+            this.sfxSource.playOnAwake = false;
         }
     }
 
@@ -34,6 +44,12 @@ export class ResultPanel extends Component {
     }
 
     private onBackClicked(): void {
+        // 先播音效再短暂停留（音效约 0.2s），避免切场景立刻掐断声音
+        if (this.backSfx && this.sfxSource) {
+            this.sfxSource.playOneShot(this.backSfx, 1);
+            this.scheduleOnce(() => director.loadScene('Home'), 0.2);
+            return;
+        }
         director.loadScene('Home');
     }
 }

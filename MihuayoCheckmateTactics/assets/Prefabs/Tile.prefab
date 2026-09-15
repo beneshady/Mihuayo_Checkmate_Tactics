@@ -175,7 +175,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "plain",
     "spriteFrame": {
-      "__uuid__": "d5ff3383-fe0b-43a0-bc55-20cced2f503f@f9941",
+      "__uuid__": "a83b0ea9-f96f-4fea-9be6-cb3816328a10@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -183,7 +183,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "water",
     "spriteFrame": {
-      "__uuid__": "8c437980-22d4-486c-a28f-ac781773c89b@f9941",
+      "__uuid__": "fad366b0-e27a-4e15-a932-bc6922394b35@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -191,7 +191,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "forest",
     "spriteFrame": {
-      "__uuid__": "daaacf4f-2850-4f7b-96ef-91a339698096@f9941",
+      "__uuid__": "5b96f781-20b3-4a15-ba92-a4f4561acd4c@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -199,7 +199,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "hill",
     "spriteFrame": {
-      "__uuid__": "9c3d5d46-7a65-4c03-8df2-a54f49c914dd@f9941",
+      "__uuid__": "b9247150-8568-4af9-bd1c-47463863edaa@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -207,7 +207,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "road",
     "spriteFrame": {
-      "__uuid__": "6baf1a05-1f09-43c6-90ed-a200a2a44ccc@f9941",
+      "__uuid__": "55ab3cd7-c640-4c53-974b-f79cb932ea8e@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },

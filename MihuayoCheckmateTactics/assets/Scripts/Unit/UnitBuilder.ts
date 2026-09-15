@@ -1,6 +1,6 @@
 import { _decorator, Color, Component, Graphics, Node, Prefab, Sprite, Tween, UITransform, Vec3, error, instantiate, tween, warn } from 'cc';
 import { BattleState, BattleUnit, gridToIso } from '../Core/BattleState';
-import { IsoLayout, topFaceOffsetY } from '../Map/IsoLayout';
+import { IsoLayout } from '../Map/IsoLayout';
 import { Unit } from './Unit';
 
 const { ccclass, property } = _decorator;
@@ -91,7 +91,7 @@ export class UnitBuilder extends Component {
             return;
         }
         const { isoX, isoY } = gridToIso(x, y, layout);
-        const target = new Vec3(isoX, isoY + topFaceOffsetY(layout), 0);
+        const target = new Vec3(isoX, isoY, 0);
         Tween.stopAllByTarget(node); // 打断进行中的抖动/移动，防 tween 叠加冲突
         tween(node)
             .to(this.unitMoveDuration, { position: target }, { easing: 'quadOut' })
@@ -146,9 +146,6 @@ export class UnitBuilder extends Component {
             (a, b) => (a.pos.x + a.pos.y) - (b.pos.x + b.pos.y),
         );
 
-        // 顶面中心：让棋子底座底边(y=0，锚点底边)落在顶面中心。
-        const offsetY = topFaceOffsetY(layout);
-
         // 重建注册表：buildUnits 可能在重开局时再次调用
         this.unitNodes.clear();
 
@@ -158,7 +155,7 @@ export class UnitBuilder extends Component {
             this.node.addChild(node);
             node.name = `unit_${unit.id}_${unit.owner}`;
             const { isoX, isoY } = gridToIso(unit.pos.x, unit.pos.y, layout);
-            const finalY = isoY + offsetY;
+            const finalY = isoY;
             node.getComponent(Unit)!.setUnit(unit.id, unit.owner, unit.defId);
 
             // 底边中心锚点：棋子底座底边顶在顶面中心
@@ -168,7 +165,7 @@ export class UnitBuilder extends Component {
             const sprite = node.getComponent(Sprite);
             const frame = sprite?.spriteFrame ?? null;
             const contentH = frame ? frame.rect.height : 0;
-            const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : layout.scale;
+            const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : 1;
             node.setScale(unitScale, unitScale, 1);
 
             // 阵营标记：玩家(controller=human)金、敌方红

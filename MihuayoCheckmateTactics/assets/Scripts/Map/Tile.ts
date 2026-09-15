@@ -1,4 +1,4 @@
-import { _decorator, Component, Sprite, SpriteFrame, error, warn } from 'cc';
+import { _decorator, Component, SpriteFrame, warn } from 'cc';
 
 const { ccclass, property } = _decorator;
 
@@ -19,9 +19,10 @@ export class TerrainSpriteEntry {
 }
 
 /**
- * 地块视图：持有地形类型，并按自带映射设置顶面贴图。
- * 地块的外观调整（映射表、子节点、动画等）都在 Tile.prefab 上维护；
- * 布局（位置 / 排序 / 缩放）由 MapBuilder 负责，本组件只管自己的表现。
+ * 地块视图：持有地形类型与地形→贴图映射。
+ * 正方形贴图管线中，本节点只做承载与落下动画（纵向压缩在 MapBuilder 设置），
+ * 顶面正方形 Sprite（旋转 45° 的 Face 子节点）由 MapBuilder 创建；
+ * 本组件提供地形→SpriteFrame 的查找（含兜底），不直接操作渲染组件。
  */
 @ccclass('Tile')
 export class Tile extends Component {
@@ -32,23 +33,18 @@ export class Tile extends Component {
     @property
     public terrainId = '';
 
-    /**
-     * 设置地形并刷新顶面贴图。
-     * 映射中不存在的地形回退 FALLBACK_TERRAIN_ID 并警告（不中断地图生成）。
-     */
+    /** 记录地形；贴图由 MapBuilder 通过 getSpriteFrame 取用 */
     public setTerrain(terrainId: string): void {
         this.terrainId = terrainId;
+    }
 
-        const sprite = this.getComponent(Sprite);
-        if (!sprite) {
-            error('[Tile] 地块节点上缺少 Sprite 组件');
-            return;
-        }
-
+    /**
+     * 查询地形贴图。映射中不存在的地形回退 FALLBACK_TERRAIN_ID 并警告（不中断地图生成）。
+     */
+    public getSpriteFrame(terrainId: string): SpriteFrame | null {
         const entry = this.terrainSprites.find((candidate) => candidate.terrainId === terrainId);
         if (entry && entry.spriteFrame) {
-            sprite.spriteFrame = entry.spriteFrame;
-            return;
+            return entry.spriteFrame;
         }
 
         if (!warnedTerrains.has(terrainId)) {
@@ -56,6 +52,6 @@ export class Tile extends Component {
             warnedTerrains.add(terrainId);
         }
         const fallback = this.terrainSprites.find((candidate) => candidate.terrainId === FALLBACK_TERRAIN_ID);
-        sprite.spriteFrame = fallback ? fallback.spriteFrame : null;
+        return fallback ? fallback.spriteFrame : null;
     }
 }

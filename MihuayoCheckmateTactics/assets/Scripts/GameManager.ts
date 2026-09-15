@@ -1,4 +1,4 @@
-import { _decorator, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Node, resources, Vec3, error, log, warn } from 'cc';
+import { _decorator, AudioClip, AudioSource, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Node, resources, Vec3, error, log, warn } from 'cc';
 import { BattlePlayer, BattleState, isoToGrid, parseBattleState } from './Core/BattleState';
 import { advanceTurn, attackUnit, checkOutcome, getCurrentPlayer, isHumanTurn, moveUnitTo, resetTurn } from './Core/Rules';
 import { decideAiAction } from './Core/EnemyAI';
@@ -8,7 +8,7 @@ import { computeReachableCells, ReachableCell } from './Core/movement';
 import { UnitDef, getUnitDef, parseUnitDefs } from './Core/UnitDefs';
 import { getUnitInfo } from './Core/UnitInfo';
 import { BoardCamera } from './Map/BoardCamera';
-import { IsoLayout, topFaceOffsetY } from './Map/IsoLayout';
+import { IsoLayout } from './Map/IsoLayout';
 import { MapBuilder } from './Map/MapBuilder';
 import { MoveHighlighter } from './Map/MoveHighlighter';
 import { UnitBuilder } from './Unit/UnitBuilder';
@@ -74,6 +74,15 @@ export class GameManager extends Component {
     @property({ type: UnitInfoPanel, tooltip: '棋子信息面板（点击任意棋子显示信息；M0 占位 UI）' })
     public unitInfoPanel: UnitInfoPanel | null = null;
 
+    @property({ type: AudioClip, tooltip: '操作按钮点击音（行动/攻击/结束回合）；空则静默' })
+    public actionClickSfx: AudioClip | null = null;
+
+    @property({ type: AudioClip, tooltip: '取消按钮点击音；空则静默' })
+    public cancelClickSfx: AudioClip | null = null;
+
+    /** UI 点击音播放源（挂在本节点；未配置任何点击音时不创建） */
+    private sfxSource: AudioSource | null = null;
+
     @property({ type: Button, tooltip: '攻击按钮（选中我方棋子后显示；点击进入攻击目标选择）' })
     public attackButton: Button | null = null;
 
@@ -130,6 +139,8 @@ export class GameManager extends Component {
     }
 
     start(): void {
+        // 开局保证操作面板收起（不依赖场景初始显隐）；点击棋子时由 syncOperationPanel 弹出
+        this.syncOperationPanel();
         if (!this.levelListAsset) {
             error('[GameManager] 未配置 levelListAsset：请把 resources/Levels 下的 level-list.json 拖到该属性');
             return;
@@ -142,11 +153,17 @@ export class GameManager extends Component {
             error('[GameManager] 未配置 unitBuilder：请把 UnitRoot 拖到该属性');
             return;
         }
+        // UI 点击音播放源（短音效 playOneShot，不打断 BGM）
+        if (this.actionClickSfx || this.cancelClickSfx) {
+            this.sfxSource = this.node.addComponent(AudioSource);
+            this.sfxSource.playOnAwake = false;
+        }
+
         // turnEndButton 为可选：未配置时我方回合自动快过（调试兜底），不阻止地图生成
         if (!this.turnEndButton) {
             warn('[GameManager] 未配置 turnEndButton：我方回合将自动快过（调试模式）。请把结束回合按钮拖到该属性后点按才生效');
         } else {
-            this.turnEndButton.node.on(Button.EventType.CLICK, this.endCurrentTurn, this);
+            this.turnEndButton.node.on(Button.EventType.CLICK, this.onTurnEndClicked, this);
         }
 
         // 棋子定义表：交互的前置数据，缺失则中止（走法无从计算）
@@ -332,6 +349,19 @@ export class GameManager extends Component {
     }
 
     /** 结束当前行动方回合，推进到下一方（结束按钮 / 敌方快过调用） */
+    /** 点「结束回合」按钮：点击音 + 推进回合（AI 自动快过走 scheduleOnce 直调，不播音） */
+    private onTurnEndClicked(): void {
+        this.playSfx(this.actionClickSfx);
+        this.endCurrentTurn();
+    }
+
+    /** 播放 UI 点击音（playOneShot 短音效；未配置音效/播放源时静默降级） */
+    private playSfx(clip: AudioClip | null): void {
+        if (clip && this.sfxSource) {
+            this.sfxSource.playOneShot(clip, 1);
+        }
+    }
+
     public endCurrentTurn(): void {
         if (!this.state || this.flowStage === 'ended') return;
         this.cancelSelection(); // 回合切换不残留选中 / 高亮 / 交互按钮
@@ -358,6 +388,7 @@ export class GameManager extends Component {
         if (this.cancelButton) {
             this.cancelButton.node.active = this.interactStage === 'targeting';
         }
+        this.syncOperationPanel();
         if (!selected) {
             // 非 selected 态按钮隐藏；恢复可点，避免下次显示时残留置灰
             if (this.actionButton) this.actionButton.interactable = true;
@@ -409,7 +440,7 @@ export class GameManager extends Component {
         const local = this.worldToMapLocal(world);
         // 触点在「顶面中心空间」（可见菱形），isoToGrid 锚在「画布中心空间」：
         // 先减去顶面偏移换算回画布空间再逆映射，否则 ~72% 菱形面积会解析到后方邻格（实测踩坑）。
-        const grid = isoToGrid(local.x, local.y - topFaceOffsetY(this.layout), this.layout, this.state.map.width, this.state.map.height);
+        const grid = isoToGrid(local.x, local.y, this.layout, this.state.map.width, this.state.map.height);
         if (this.debugPick) {
             const where = grid ? `格(${grid.x},${grid.y})` : '界外';
             log(`[拾取] 屏幕(${screen.x.toFixed(0)},${screen.y.toFixed(0)}) → 世界(${world.x.toFixed(0)},${world.y.toFixed(0)}) → 本地(${local.x.toFixed(0)},${local.y.toFixed(0)}) → ${where}`);
@@ -460,7 +491,8 @@ export class GameManager extends Component {
 
     /** 命中节点或其祖先落在交互按钮上时不算棋盘点击（按钮自身逻辑照常触发） */
     private isUiTap(target: Node | null): boolean {
-        const uiNodes = [this.turnEndButton?.node, this.actionButton?.node, this.attackButton?.node, this.cancelButton?.node];
+        // 操作面板容器（背板）也算 UI：点面板空白/信息区不透传到棋盘
+        const uiNodes = [this.turnEndButton?.node, this.actionButton?.node, this.attackButton?.node, this.cancelButton?.node, this.unitInfoPanel?.node.parent ?? null];
         let node: Node | null = target;
         while (node) {
             if (uiNodes.indexOf(node) !== -1) return true;
@@ -492,11 +524,26 @@ export class GameManager extends Component {
         } else {
             this.unitInfoPanel.hide();
         }
+        this.syncOperationPanel();
     }
 
     /** 收起信息面板 */
     private hideUnitInfo(): void {
         this.unitInfoPanel?.hide();
+        this.syncOperationPanel();
+    }
+
+    /**
+     * 操作面板容器显隐：选中 / 瞄准 / 查看信息任一状态弹出，idle 收起。
+     * 容器 = 信息面板的父节点（场景结构约定：UnitInfoPanel 在 UnitOperationPanel 内），
+     * 弹出动画由容器上挂的 PanelPopIn 负责，本方法只做 active 切换。
+     */
+    private syncOperationPanel(): void {
+        const panel = this.unitInfoPanel?.node.parent;
+        if (!panel) return;
+        panel.active = this.interactStage === 'selected'
+            || this.interactStage === 'targeting'
+            || this.unitInfoPanel!.node.active;
     }
 
     // ---------- 交互子状态转移 ----------
@@ -518,6 +565,7 @@ export class GameManager extends Component {
 
     /** 点「行动」：按 defs 计算可走格 → 高亮，进入目标选择 */
     private onActionClicked(): void {
+        this.playSfx(this.actionClickSfx);
         if (!this.state || !this.layout || this.interactStage !== 'selected' || !this.selectedUnitId) return;
         const unit = this.state.units.find((u) => u.id === this.selectedUnitId);
         const def = unit ? getUnitDef(this.defs, unit.defId) : undefined;
@@ -543,6 +591,7 @@ export class GameManager extends Component {
      * 完全没有可达格（被己方围死）才保持 selected 并提示。
      */
     private onAttackClicked(): void {
+        this.playSfx(this.actionClickSfx);
         if (!this.state || !this.layout || this.interactStage !== 'selected' || !this.selectedUnitId) return;
         const unit = this.state.units.find((u) => u.id === this.selectedUnitId);
         const def = unit ? getUnitDef(this.defs, unit.defId) : undefined;
@@ -571,6 +620,7 @@ export class GameManager extends Component {
 
     /** 点「取消」：放弃移动，回到选中态（可再点行动 / 改选 / 点空白取消） */
     private onCancelClicked(): void {
+        this.playSfx(this.cancelClickSfx);
         if (this.interactStage !== 'targeting') return;
         this.highlighter?.clear();
         this.targetingCells = [];
