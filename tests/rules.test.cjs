@@ -79,6 +79,7 @@ test('T31-T33 占位、锁定重验证、双方将帅同死己方失败',()=>{
 
 test('T34-T38 模拟纯净、升级解围、车双段搜索、unknown、旧预览失效',()=>{
  let s=R.fixtureState('P6'),before=JSON.stringify(s);R.preview(s,'king',{x:3,y:1});R.enemyPhase(s);R.dangerNow(s);const analysis=R.analyze(s);A.equal(JSON.stringify(s),before);A.equal(analysis.safe,true);A.equal(analysis.plan[0].type,'upgrade');let n=up(s,'king','fortify');A.deepEqual([G(n,'king').hp,G(n,'king').maxHp],[2,4]);A.equal(G(R.enemyPhase(n).state,'king').hp,1);
+ const mate=R.fixtureState('P6','mate');A.equal(R.dangerNow(mate),true);A.equal(R.analyze(mate).safe,false);const ended=R.checkmate(mate);A.deepEqual([ended.phase,ended.result,ended.intents.length],['result','mate',0]);
  s=F(U('r','player','rook',0,1),U('threat','enemy','pawn',3,1));Object.assign(G(s,'king'),{hp:1,ap:0});G(s,'r').rookChargeRange=1;s.intents=[{actor:'threat',from:{x:3,y:1},to:{x:3,y:0},type:'attack',path:[{x:3,y:0}],order:1}];const a=R.analyze(s);A.equal(a.safe,true);A.ok(a.plan.some(x=>x.type==='rook-move'));A.ok(a.plan.some(x=>x.type==='charge'));
  s=R.fixtureState('P6');before=JSON.stringify(s);const first=R.escapeAnalysis(s).next();A.equal(first.done,false);A.equal(s.phase,'player');A.equal(JSON.stringify(s),before);
  s=F(U('r','player','rook',0,1));grant(s,'r',4);const preview=R.preview(s,'r',{x:0,y:2},'rook-move');s=up(s,'r','rook-charge');A.strictEqual(R.submitAction(s,preview.action).state,s);s=up(s,'r','rook-push');const sp=G(s,'r').sp;A.strictEqual(up(s,'r','rook-push'),s);A.equal(G(s,'r').sp,sp);

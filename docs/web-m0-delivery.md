@@ -8,7 +8,7 @@
 
 - 直接打开 `web/index.html`。
 - 或在仓库根目录运行 `python -m http.server 8765 --directory web`，访问 `http://127.0.0.1:8765/`。
-- 夹具入口：`?fixture=P1` 至 `?fixture=P8`；变体使用 `&variant=blocked`、`spearman`、`kill`、`survive` 或 `enemy-empty`。正式局 URL 不带 fixture 参数，不注入兵、SP 或升级。
+- 夹具入口：`?fixture=P1` 至 `?fixture=P8`；变体使用 `&variant=blocked`、`spearman`、`kill`、`survive`、`enemy-empty` 或 `mate`。其中 `?fixture=P6&variant=mate` 是无行动、无 SP 解围手段的正向将死入口，加载后应直接显示“将死” Result。正式局 URL 不带 fixture 参数，不注入兵、SP 或升级。
 
 ## 文件
 

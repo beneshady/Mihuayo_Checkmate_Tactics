@@ -24,6 +24,7 @@ test('UI 桩加载 P2 blocked，显示 8×8 夹具并可连续重开',()=>{
  d.setState(M0.fixtureState('P8','survive'));d.select('rook');d.setRookMode('charge');d.target({x:4,y:1});A.match(els['preview-box'].innerHTML,/接近点 \(3,1\).*我车最终落点 \(3,1\)/);A.match(els['preview-box'].innerHTML,/敌军车.*HP 2→1/);
  d.setState(M0.fixtureState('P4'));d.select('cannon');d.upgrade('cannon','cannon-splash',4);d.target({x:4,y:4});A.match(els['preview-box'].innerHTML,/友军马.*\(4,3\).*HP 1→0（阵亡）/);A.match(els['preview-box'].innerHTML,/友军误伤风险/);
  d.setState(M0.fixtureState('P8','enemy-empty'));A.match(els['intent-list'].innerHTML,/车 · 冲击.*起点 \(0,4\) → 目标 \(0,3\) · <b>可执行<\/b>/);d.endTurn();A.deepEqual([d.getState().units.find(u=>u.id==='enemy-rook').x,d.getState().units.find(u=>u.id==='enemy-rook').y],[0,3]);
+ d.setState(M0.fixtureState('P6','mate'));A.deepEqual([d.getState().phase,d.getState().result],['result','mate']);A.equal(els['result-title'].textContent,'将死');A.equal(els['ov-result'].classList.contains('show'),true);
  els['btn-intents'].onclick();A.equal(els['intent-list'].classList.contains('show'),true);A.equal(els['btn-intents'].attributes['aria-expanded'],'true');
  const start=d.getEpoch();for(let i=0;i<3;i++)d.restart();A.equal(d.getEpoch(),start+3);s=d.getState();A.equal(s.revision,0);A.equal(s.units.some(u=>u.id==='block'),true);
 });
