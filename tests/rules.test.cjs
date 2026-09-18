@@ -65,6 +65,30 @@ test('T22-T27 炮架、远攻、固定 mask、参数、裁边',()=>{
  const cover=(x,y)=>1+R.CONFIG.splash.filter(d=>R.inside({x:x+d.x,y:y+d.y})).length;A.deepEqual([cover(4,4),cover(0,4),cover(0,0)],[9,6,4]);
 });
 
+test('炮基础攻击零 SP 可用、AP 门控、成长后下回合扩散',()=>{
+ let s=R.fixtureState('P3','basic-growth'),c=G(s,'cannon');
+ A.deepEqual([c.level,c.sp,c.ap,c.cannonMask,c.attack],[1,0,1,0,2]);
+ let shot=R.actionAt(s,c,{x:2,y:4});A.ok(shot);A.equal(shot.type,'attack');
+ let out=R.submitAction(s,shot);s=out.state;
+ A.equal(G(s,'target-a'),undefined);A.deepEqual([G(s,'cannon').level,G(s,'cannon').sp,G(s,'cannon').ap],[2,1,0]);
+ A.equal(R.legalActions(s,'cannon').length,0);A.equal(R.actionReason(s,'cannon',{x:5,y:1}),'本回合已行动，下回合可攻击');
+ A.strictEqual(R.submit(s,'cannon',{x:5,y:1}).state,s);
+ s=R.purchaseUpgrade(s,'cannon','cannon-splash',2);A.deepEqual([G(s,'cannon').sp,G(s,'cannon').cannonMask],[0,4]);
+ s=R.endTurn(s).state;A.equal(G(s,'cannon').ap,1);
+ out=R.submit(s,'cannon',{x:5,y:1});s=out.state;
+ A.ok(out.effect);A.equal(G(s,'target-b'),undefined);A.equal(G(s,'splash-b'),undefined);A.ok(G(s,'boss'));
+});
+
+test('炮架边界与失败原因不消耗 AP',()=>{
+ let s=F(U('c','player','cannon',0,0),U('target','enemy','rook',0,5));
+ for(const [to,reason] of [[{x:0,y:5},'目标与炮之间没有炮架'],[{x:2,y:2},'炮只能攻击横竖同线目标']]){
+  const before=JSON.stringify(s);A.strictEqual(R.submit(s,'c',to).state,s);A.equal(R.actionReason(s,'c',to),reason);A.equal(JSON.stringify(s),before);A.equal(G(s,'c').ap,1);
+ }
+ s.units.push(U('screen-enemy','enemy','pawn',0,2));A.ok(R.actionAt(s,G(s,'c'),{x:0,y:5}));
+ s.units.push(U('screen-friend','player','horse',0,3));A.equal(R.actionAt(s,G(s,'c'),{x:0,y:5}),undefined);A.equal(R.actionReason(s,'c',{x:0,y:5}),'目标与炮之间有多个炮架');A.equal(G(s,'c').ap,1);
+ s=F(U('c','player','cannon',0,0),U('screen-friend','player','horse',0,2),U('target','enemy','rook',0,5));A.ok(R.actionAt(s,G(s,'c'),{x:0,y:5}));
+});
+
 test('T28-T30 炮冻结炮架、同时结算、隔子溅射、不追溯',()=>{
  let s=F(U('c','player','cannon',4,0),U('screen','enemy','pawn',4,3),U('target','enemy','pawn',4,4),U('side','enemy','pawn',5,4));G(s,'c').cannonMask=(1<<4)|(1<<2);
  const out=R.submit(s,'c',{x:4,y:4});s=out.state;for(const id of ['screen','target','side'])A.ok(out.effect.victims.includes(id));const dead=out.effect.victims.slice();G(s,'c').sp=1;s=up(s,'c','cannon-splash',0);A.deepEqual(out.effect.victims,dead);

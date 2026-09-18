@@ -8,7 +8,7 @@
 
 - 直接打开 `web/index.html`。
 - 或在仓库根目录运行 `python -m http.server 8765 --directory web`，访问 `http://127.0.0.1:8765/`。
-- 夹具入口：`?fixture=P1` 至 `?fixture=P8`；变体使用 `&variant=blocked`、`spearman`、`kill`、`survive`、`enemy-empty` 或 `mate`。其中 `?fixture=P6&variant=mate` 是无行动、无 SP 解围手段的正向将死入口，加载后应直接显示“将死” Result。正式局 URL 不带 fixture 参数，不注入兵、SP 或升级。
+- 夹具入口：`?fixture=P1` 至 `?fixture=P8`；变体使用 `&variant=blocked`、`spearman`、`kill`、`survive`、`enemy-empty`、`mate` 或 `basic-growth`。其中 `?fixture=P6&variant=mate` 是正向将死入口；`?fixture=P3&variant=basic-growth` 是炮零 SP 成长入口。正式局 URL 不带 fixture 参数，不注入兵、SP 或升级。
 
 ## 文件
 
@@ -46,6 +46,14 @@ node tests/ui-headless.test.cjs
 | 静态检查 | 38 个 DOM ID、18 个规则 API 对齐 |
 | UI 桩测试 | 2/2 通过 |
 | `git diff --check` | 通过；仅有仓库既有 LF/CRLF 提示 |
+
+### 炮基础攻击补充修复（2026-09-19）
+
+- 零 SP、零扩散的炮仍可横竖隔恰好一个炮架，对单个主目标造成 2 伤害；友军或敌军都可作为炮架。
+- 炮选择卡明确显示“基础攻击：单格 / 伤害 2 / 隔一子攻击”、本回合行动状态，以及“扩散 0/8 不影响基础攻击”。合法攻击预览会列出炮架、攻击连线、主目标和预期伤害。
+- 非车单位 AP 耗尽后，`legalActions` 不再返回伪可执行动作。炮会提示“本回合已行动，下回合可攻击”；无炮架、多个炮架和不在同一直线分别提示原因。
+- 独立入口：`http://127.0.0.1:8766/?fixture=P3&variant=basic-growth`。炮初始 Lv.1、SP 0、扩散 0/8、AP 1；先攻击 `(2,4)`，以 `(2,2)` 友军马为炮架。击杀后得到 1 SP，购买 `扩散 E`，结束回合；再攻击 `(5,1)`，以 `(3,1)` 友军马为炮架，同时命中 `(6,1)` 扩散格。敌将保留，过程不会首次击杀即结束。
+- 本轮自动检查：规则 18/18、正式马/炮回放 2/2、静态检查 38 个 DOM ID / 19 个规则 API、UI 桩 2/2、语法和 `git diff --check` 均通过。开发未操作用户现有浏览器标签；真实浏览器结果由策划在独立标签追加。
 
 本轮针对策划验收 PA-01～PA-05 增加了直接回归：桌面棋盘区与左右控件区分离；窄屏意图展开入口包含顺序、起点、目标和预测状态；车预览覆盖空冲、击杀占位、存活停在接近点和震退受阻；炮预览列出阵营、受害格、HP 前后、阵亡及友军误伤警告；敌车锁定冲击的目标变空后仍移动到原目标格且状态为 `success`。`P8&variant=enemy-empty` 可在页面复现最后一项。
 
