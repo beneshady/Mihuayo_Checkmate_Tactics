@@ -73,3 +73,4 @@
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| H-US-002-001 | 2026-09-20T22:24:12+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接：US-002 9×9棋盘与中央河道 | 用户确认81格、中央可通行河道双方均未过河、宫居中；技能和数量不变；合同含迁移部署、8项验收、旧局保护；开发后直接交策划 | 本文；4e89da4；开发会话直接消息 | 已成功派发，待接手与实现 |
