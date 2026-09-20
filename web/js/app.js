@@ -1,4 +1,4 @@
-/* US-001 浏览器层：只负责 Three.js 展示、点选、预览和命令提交。 */
+/* US-002 浏览器层：只负责 Three.js 展示、点选、预览和命令提交。 */
 (function(){'use strict';
 const R=window.M0,$=id=>document.getElementById(id);
 const names={king:'帅',rook:'车',horse:'马',cannon:'炮',pawn:'兵',archer:'弓',spearman:'枪兵',advisor:'士'};
@@ -14,18 +14,18 @@ const camera=new THREE.OrthographicCamera(-5,5,5,-5,.1,60);camera.position.set(7
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.shadowMap.enabled=true;$('scene').appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xcfe2ff,0x4b3424,1.45));const sun=new THREE.DirectionalLight(0xffffff,1.1);sun.position.set(-5,12,7);sun.castShadow=true;scene.add(sun);
 const boardGroup=new THREE.Group(),pieceGroup=new THREE.Group(),markGroup=new THREE.Group();scene.add(boardGroup,pieceGroup,markGroup);
-const boardMat=new THREE.MeshStandardMaterial({map:boardTexture(),roughness:.72,metalness:.03});const board=new THREE.Mesh(new THREE.BoxGeometry(8.35,.22,8.35),boardMat);board.position.y=-.13;board.receiveShadow=true;boardGroup.add(board);
-const rim=new THREE.Mesh(new THREE.BoxGeometry(8.65,.12,8.65),new THREE.MeshStandardMaterial({color:0x62492e,roughness:.85}));rim.position.y=-.25;boardGroup.add(rim);
+const boardMat=new THREE.MeshStandardMaterial({map:boardTexture(),roughness:.72,metalness:.03}),boardSize=Math.max(R.CONFIG.width,R.CONFIG.height);const board=new THREE.Mesh(new THREE.BoxGeometry(boardSize+.35,.22,boardSize+.35),boardMat);board.position.y=-.13;board.receiveShadow=true;boardGroup.add(board);
+const rim=new THREE.Mesh(new THREE.BoxGeometry(boardSize+.65,.12,boardSize+.65),new THREE.MeshStandardMaterial({color:0x62492e,roughness:.85}));rim.position.y=-.25;boardGroup.add(rim);
 const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
 
-function boardTexture(){const c=document.createElement('canvas');c.width=c.height=1024;const x=c.getContext('2d'),m=56,cell=(1024-m*2)/8;x.fillStyle='#d8bd83';x.fillRect(0,0,1024,1024);
- for(let y=0;y<8;y++)for(let col=0;col<8;col++){x.fillStyle=(col+y)%2?'#cfae70':'#dfc58d';x.fillRect(m+col*cell,m+(7-y)*cell,cell,cell)}
- x.strokeStyle='#5b4329';x.lineWidth=4;for(let i=0;i<=8;i++){x.beginPath();x.moveTo(m+i*cell,m);x.lineTo(m+i*cell,1024-m);x.stroke();x.beginPath();x.moveTo(m,m+i*cell);x.lineTo(1024-m,m+i*cell);x.stroke()}
- x.fillStyle='#809ab055';x.fillRect(m,m+4*cell,8*cell,10);x.fillStyle='#31465a';x.font='bold 28px sans-serif';x.textAlign='center';x.fillText('河  界',512,m+4*cell-12);
- function palace(minY){const x0=m+2*cell,x1=m+5*cell,y0=m+(7-(minY+2))*cell,y1=m+(8-minY)*cell;x.strokeStyle='#7a372d';x.lineWidth=5;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.moveTo(x1,y0);x.lineTo(x0,y1);x.stroke()}
- palace(0);palace(5);x.fillStyle='#4a3726';x.font='18px sans-serif';for(let y=0;y<8;y++)for(let col=0;col<8;col++)x.fillText(col+','+y,m+(col+.5)*cell,m+(7-y+.56)*cell);return new THREE.CanvasTexture(c)}
-function world(x,y){return{x:x-3.5,z:3.5-y}}
-function cellFromPoint(p){const x=Math.floor(p.x+4),y=Math.floor(4-p.z);return R.inside({x,y})?{x,y}:null}
+function boardTexture(){const c=document.createElement('canvas');c.width=c.height=1024;const x=c.getContext('2d'),m=56,w=R.CONFIG.width,h=R.CONFIG.height,cell=(1024-m*2)/w;x.fillStyle='#d8bd83';x.fillRect(0,0,1024,1024);
+ for(let y=0;y<h;y++)for(let col=0;col<w;col++){x.fillStyle=(col+y)%2?'#cfae70':'#dfc58d';x.fillRect(m+col*cell,m+(h-1-y)*cell,cell,cell)}
+ x.fillStyle='#809ab077';x.fillRect(m,m+(h-1-R.CONFIG.river)*cell,w*cell,cell);x.strokeStyle='#5b4329';x.lineWidth=4;for(let i=0;i<=w;i++){x.beginPath();x.moveTo(m+i*cell,m);x.lineTo(m+i*cell,1024-m);x.stroke();x.beginPath();x.moveTo(m,m+i*cell);x.lineTo(1024-m,m+i*cell);x.stroke()}
+ x.fillStyle='#31465a';x.font='bold 24px sans-serif';x.textAlign='center';x.fillText('河  道',512,m+(h-R.CONFIG.river-.38)*cell);
+ function palace(q){const x0=m+q.minX*cell,x1=m+(q.maxX+1)*cell,y0=m+(h-1-q.maxY)*cell,y1=m+(h-q.minY)*cell;x.strokeStyle='#7a372d';x.lineWidth=5;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.moveTo(x1,y0);x.lineTo(x0,y1);x.stroke()}
+ palace(R.CONFIG.playerPalace);palace(R.CONFIG.enemyPalace);x.fillStyle='#4a3726';x.font='18px sans-serif';for(let y=0;y<h;y++)for(let col=0;col<w;col++)x.fillText(col+','+y,m+(col+.5)*cell,m+(h-1-y+.56)*cell);return new THREE.CanvasTexture(c)}
+function world(x,y){return{x:x-(R.CONFIG.width-1)/2,z:(R.CONFIG.height-1)/2-y}}
+function cellFromPoint(p){const x=Math.floor(p.x+R.CONFIG.width/2),y=Math.floor(R.CONFIG.height/2-p.z);return R.inside({x,y})?{x,y}:null}
 function labelSprite(text,color){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle=color;x.font='bold 66px Microsoft YaHei,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(text,64,66);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:true}));s.scale.set(.62,.62,.62);s.position.y=.43;return s}
 function pieceMesh(u){const ally=u.side==='player',mat=new THREE.MeshStandardMaterial({color:ally?0x8f3228:0x315e8d,roughness:.5,metalness:.12});const geo=ally?new THREE.CylinderGeometry(.36,.39,.24,32):new THREE.BoxGeometry(.7,.24,.7);const g=new THREE.Group(),base=new THREE.Mesh(geo,mat);base.castShadow=true;base.position.y=.16;g.add(base,labelSprite(unitGlyph(u)||'?',ally?'#ffd9b9':'#d9edff'));g.userData.unitId=u.id;g.traverse(o=>o.userData.unitId=u.id);const p=world(u.x,u.y);g.position.set(p.x,0,p.z);return g}
 function clear(g){while(g.children.length)g.remove(g.children[0])}
@@ -78,7 +78,7 @@ $('btn-pause').onclick=()=>{paused=true;$('ov-pause').classList.add('show')};$('
 $('btn-intents').onclick=()=>{intentOpen=!intentOpen;renderIntents()};
 for(const kind of ['horse','cannon'])$('btn-buy-'+kind).onclick=()=>{const n=R.buy(state,kind);if(n===state)return;state=n;render();toast(`已购买${names[kind]}`)};$('btn-shop-upgrades').onclick=()=>{$('ov-shop').classList.remove('show');toast('选择单位购买技能；“打开商店”可返回')};$('btn-next-wave').onclick=()=>{state=R.nextWave(state);selected=null;postState()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.phase==='player'){paused=true;$('ov-pause').classList.add('show')}});
-function resize(){const w=window.innerWidth||1280,mobile=w<=900,rect=$('scene').getBoundingClientRect(),sceneW=Math.max(1,Math.round(rect.width||w)),sceneH=Math.max(1,Math.round(rect.height||(window.innerHeight||800)*(mobile ? .52 : 1)));renderer.setSize(sceneW,sceneH);camera.position.set(0,12.5,8);camera.lookAt(0,0,0);const aspect=sceneW/sceneH,size=Math.max(5.4,4.7/aspect);camera.left=-size*aspect;camera.right=size*aspect;camera.top=size;camera.bottom=-size;camera.updateProjectionMatrix()}window.addEventListener('resize',resize);resize();
+function resize(){const w=window.innerWidth||1280,mobile=w<=900,rect=$('scene').getBoundingClientRect(),sceneW=Math.max(1,Math.round(rect.width||w)),sceneH=Math.max(1,Math.round(rect.height||(window.innerHeight||800)*(mobile ? .52 : 1)));renderer.setSize(sceneW,sceneH);camera.position.set(0,12.5,8);camera.lookAt(0,0,0);const aspect=sceneW/sceneH,half=boardSize/2+.65,size=Math.max(half,half/aspect);camera.left=-size*aspect;camera.right=size*aspect;camera.top=size;camera.bottom=-size;camera.updateProjectionMatrix()}window.addEventListener('resize',resize);resize();
 function loop(){requestAnimationFrame(loop);if(!paused){pieceGroup.rotation.y=Math.sin(performance.now()/1700)*.005;renderer.render(scene,camera)}}loop();postState();
 window.__M0_DEBUG__={getState:()=>R.copy(state),setState:s=>{state=R.copy(s);selected=preview=directionGhost=null;postState()},select,target,execute,setRookMode:m=>{rookMode=m},upgrade:(id,skill,index)=>{selected=id;buySkill(skill,index)},endTurn:()=>{state=R.endTurn(state).state;postState()},restart,getEpoch:()=>epoch};
 })();

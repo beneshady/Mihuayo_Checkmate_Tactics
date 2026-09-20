@@ -1,14 +1,14 @@
 # US-001 网页原型交付说明
 
-版本：web-us001-v1.1｜日期：2026-09-16｜分支：`codex/web-gameplay-validation`
+版本：web-us002-v1.2｜日期：2026-09-20｜分支：`codex/web-gameplay-validation`
 
-本版按 [US-001](us/US-001-m0-player-skills.md) 实现 8×8 棋盘、双方九宫和河界、士、我方成长与技能、兵转职、车双段动作、炮八邻扩散、两波正式流程及 P1–P8 夹具。技术仅用 HTML、JavaScript 和仓库内 three.js r128 UMD 文件，无构建步骤、外部素材或网络依赖。
+本版按 [US-002](us/US-002-board-9x9.md) 将原型迁移为 9×9 棋盘、中央可通行河道、居中双方九宫，保留士、我方成长与技能、兵转职、车双段动作、炮八邻扩散、两波正式流程及 P1–P8 夹具。技术仅用 HTML、JavaScript 和仓库内 three.js r128 UMD 文件，无构建步骤、外部素材或网络依赖。
 
 ## 启动
 
 - 直接打开 `web/index.html`。
 - 或在仓库根目录运行 `python -m http.server 8765 --directory web`，访问 `http://127.0.0.1:8765/`。
-- 夹具入口：`?fixture=P1` 至 `?fixture=P8`；变体使用 `&variant=blocked`、`spearman`、`kill`、`survive`、`enemy-empty`、`mate` 或 `basic-growth`。其中 `?fixture=P6&variant=mate` 是正向将死入口；`?fixture=P3&variant=basic-growth` 是炮零 SP 成长入口。正式局 URL 不带 fixture 参数，不注入兵、SP 或升级。
+- 夹具入口：`?fixture=P1` 至 `?fixture=P8`；变体使用 `&variant=river-edge`、`blocked`、`spearman`、`kill`、`survive`、`enemy-empty`、`mate` 或 `basic-growth`。其中 `?fixture=P1&variant=river-edge` 用于河道与外缘点选，`?fixture=P6&variant=mate` 是正向将死入口，`?fixture=P3&variant=basic-growth` 是炮零 SP 成长入口。正式局 URL 不带 fixture 参数，不注入兵、SP 或升级。
 
 ## 文件
 
@@ -46,6 +46,13 @@ node tests/ui-headless.test.cjs
 | 静态检查 | 38 个 DOM ID、18 个规则 API 对齐 |
 | UI 桩测试 | 2/2 通过 |
 | `git diff --check` | 通过；仅有仓库既有 LF/CRLF 提示 |
+
+### US-002：9×9 棋盘与中央河道（2026-09-20）
+
+- 全部空间配置、绘制、点选换算、AI、搜索、波次重部署、夹具及溅射裁边统一为 9×9。坐标为 `0..8`，`y=4` 是可正常落子与攻击的河道。
+- 我方兵系在 `y>=5` 才过河，敌方在 `y<=3` 才过河；河道按动作起点仍未过河。双方九宫迁至 `x=3..5`，我方 `y=0..2`、敌方 `y=6..8`。
+- 正式部署迁至合同坐标；马/炮两条零资源两波回放已重新生成并通过。炮仍可隔恰好一子跨 8 步攻击，车/弓/枪的 7 格数值上限未改变。
+- 自动验证：规则 19/19、正式回放 2/2、UI 桩 2/2、静态检查 38 DOM / 19 API、语法和 `git diff --check` 通过。真实浏览器尚待策划使用独立标签检查第九行/列、四角、河道和预览点选。
 
 ### 炮基础攻击补充修复（2026-09-19）
 

@@ -1,6 +1,6 @@
 # US-002：9×9 棋盘与中央河道
 
-状态：Ready for development。优先级：P0。基线：`c648659`。
+状态：Ready for product acceptance。优先级：P0。基线：`c648659`。
 工作目录：`D:\Projects\mihuayou\gamehack2026`；分支：`codex/web-gameplay-validation`。
 父需求：[M0 Gameplay](../design/m0-gdd.md) 与 [US-001](US-001-m0-player-skills.md)。
 本次流程：策划 → 开发 → 策划验收；不设独立测试交接。
@@ -67,10 +67,13 @@
 
 ## 实现与验证记录
 
-待开发接手、实现并记录；当前没有9×9运行证据。
+- 接手：已核对基线 `c648659`、合同与工作区保护约束；仅修改 `web/`、相关测试、两条正式回放和本 US / 交付说明，未触碰已有浏览器标签、服务、viewport 或存储。
+- 实现：配置迁为 9×9 / 河道 `y=4` / 居中九宫；所有边界循环引用尺寸配置。棋盘纹理、棋子世界坐标、射线落格换算和相机取景同步按 9 格计算。迁移 P1–P8，并新增 `P1&variant=river-edge`。
+- 回归：规则 19/19；正式马 / 炮两波回放 2/2（新生成，零资源注入）；UI 桩 2/2；静态 38 DOM / 19 API；`node --check` 与 `git diff --check` 通过。真实浏览器尚未由开发执行，按合同交策划在独立新标签验收。
 
 ## Agent Handoff Audit
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | H-US-002-001 | 2026-09-20T22:24:12+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接：US-002 9×9棋盘与中央河道 | 用户确认81格、中央可通行河道双方均未过河、宫居中；技能和数量不变；合同含迁移部署、8项验收、旧局保护；开发后直接交策划 | 本文；4e89da4；开发会话直接消息 | 已成功派发，待接手与实现 |
+| H-US-002-002 | 2026-09-20T22:25:00+08:00 | HANDOFF_ACK | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | ACK：开始 US-002 | 已核对合同、基线与保护旧局约束；开始配置化迁移与自动验证 | 本文；开发会话消息 | 已接手并实施 |

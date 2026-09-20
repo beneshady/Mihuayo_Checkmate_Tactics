@@ -11,22 +11,35 @@
   },
   {
     "action": {
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 0
+      }
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "end": true
+  },
+  {
+    "action": {
       "actor": "rook",
       "type": "charge",
       "to": {
-        "x": 0,
-        "y": 4
+        "x": 1,
+        "y": 3
       }
     }
   },
   {
     "upgrade": {
       "actor": "rook",
-      "skill": "rook-charge"
+      "skill": "rook-move"
     }
-  },
-  {
-    "end": true
   },
   {
     "end": true
@@ -36,17 +49,7 @@
       "actor": "rook",
       "type": "rook-move",
       "to": {
-        "x": 0,
-        "y": 7
-      }
-    }
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "charge",
-      "to": {
-        "x": 2,
+        "x": 1,
         "y": 7
       }
     }
@@ -59,8 +62,18 @@
       "actor": "king",
       "type": "attack",
       "to": {
-        "x": 3,
+        "x": 4,
         "y": 1
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "rook-move",
+      "to": {
+        "x": 3,
+        "y": 7
       }
     }
   },
@@ -69,8 +82,21 @@
       "actor": "rook",
       "type": "charge",
       "to": {
-        "x": 2,
-        "y": 7
+        "x": 3,
+        "y": 8
+      }
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "charge",
+      "to": {
+        "x": 3,
+        "y": 8
       }
     }
   },
@@ -82,7 +108,7 @@
       "actor": "horse",
       "type": "move",
       "to": {
-        "x": 3,
+        "x": 4,
         "y": 2
       }
     }
@@ -93,7 +119,7 @@
       "type": "rook-move",
       "to": {
         "x": 0,
-        "y": 3
+        "y": 4
       }
     }
   },
@@ -105,7 +131,30 @@
       "actor": "horse",
       "type": "attack",
       "to": {
-        "x": 1,
+        "x": 5,
+        "y": 4
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "rook-move",
+      "to": {
+        "x": 0,
+        "y": 8
+      }
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "action": {
+      "actor": "horse",
+      "type": "attack",
+      "to": {
+        "x": 2,
         "y": 3
       }
     }
@@ -116,7 +165,17 @@
       "type": "rook-move",
       "to": {
         "x": 2,
-        "y": 3
+        "y": 8
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "rook",
+      "type": "charge",
+      "to": {
+        "x": 3,
+        "y": 8
       }
     }
   },
@@ -128,34 +187,8 @@
       "actor": "rook",
       "type": "charge",
       "to": {
-        "x": 2,
-        "y": 5
-      }
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "charge",
-      "to": {
-        "x": 2,
-        "y": 7
-      }
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "charge",
-      "to": {
-        "x": 2,
-        "y": 7
+        "x": 3,
+        "y": 8
       }
     }
   }

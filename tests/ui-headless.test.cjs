@@ -15,7 +15,7 @@ THREE.WebGLRenderer=function(){this.domElement=canvas();this.shadowMap={};this.s
 global.M0=require(path.join(WEB,'js/rules.js'));
 require(path.join(WEB,'js/app.js'));
 
-test('UI 桩加载 P2 blocked，显示 8×8 夹具并可连续重开',()=>{
+test('UI 桩加载 P2 blocked，显示 9×9 夹具并可连续重开',()=>{
  const d=window.__M0_DEBUG__;A.ok(d);let s=d.getState();A.equal(s.units.some(u=>u.id==='block'),true);A.equal(els['fixture-badge'].textContent,'测试夹具 P2 · blocked');A.equal(els.wave.textContent,'1/2');A.equal(els['king-hp'].textContent,'3/3');
  d.select('rook');A.match(els['selected-card'].innerHTML,/冲击 3 格/);A.match(els.skills.innerHTML,/解锁震退/);
  d.setRookMode('charge');d.target({x:4,y:4});A.match(els['preview-box'].innerHTML,/原起点 \(1,4\).*冲击目标 \(4,4\)/);A.match(els['preview-box'].innerHTML,/接近点 \(3,4\).*我车最终落点 \(3,4\)/);A.match(els['preview-box'].innerHTML,/震退：失败：目标格被占/);
@@ -33,6 +33,6 @@ test('UI 桩加载 P2 blocked，显示 8×8 夹具并可连续重开',()=>{
  const start=d.getEpoch();for(let i=0;i<3;i++)d.restart();A.equal(d.getEpoch(),start+3);s=d.getState();A.equal(s.revision,0);A.equal(s.units.some(u=>u.id==='block'),true);
 });
 
-test('页面含独立窄屏棋盘/操作/面板区、河界、九宫、技能与 P1-P8 入口',()=>{
- A.match(html,/#scene\{position:absolute;left:306px;right:160px/);A.match(html,/@media\(max-width:900px\)/);A.match(html,/#scene\{left:0;right:0;height:52vh/);A.match(html,/#actions\{top:52vh/);A.match(html,/#panel\{top:57vh/);A.match(html,/id="btn-intents"/);A.match(html,/河界/);A.match(html,/九宫/);A.match(html,/技能/);for(let i=1;i<=8;i++)A.match(html,new RegExp(`fixture=P${i}`));
+test('页面含独立窄屏棋盘/操作/面板区、河道、九宫、技能与 P1-P8 入口',()=>{
+ A.match(html,/#scene\{position:absolute;left:306px;right:160px/);A.match(html,/@media\(max-width:900px\)/);A.match(html,/#scene\{left:0;right:0;height:52vh/);A.match(html,/#actions\{top:52vh/);A.match(html,/#panel\{top:57vh/);A.match(html,/id="btn-intents"/);A.match(html,/9×9/);A.match(html,/河道为 y=4/);A.match(html,/九宫/);A.match(html,/技能/);A.match(html,/variant=river-edge/);for(let i=1;i<=8;i++)A.match(html,new RegExp(`fixture=P${i}`));
 });
