@@ -37,3 +37,13 @@ test('UI 桩加载 P2 blocked，显示 9×9 夹具并可连续重开',()=>{
 test('页面含独立窄屏棋盘/操作/面板区、河道、九宫、技能与 P1-P8 入口',()=>{
  A.match(html,/#scene\{position:absolute;left:306px;right:160px/);A.match(html,/@media\(max-width:900px\)/);A.match(html,/#scene\{left:0;right:0;height:52vh/);A.match(html,/#actions\{top:52vh/);A.match(html,/#panel\{top:57vh/);A.match(html,/id="btn-intents"/);A.match(html,/9×9/);A.match(html,/河道为 y=4/);A.match(html,/九宫/);A.match(html,/技能/);A.match(html,/variant=river-edge/);for(let i=1;i<=8;i++)A.match(html,new RegExp(`fixture=P${i}`));
 });
+
+test('PA-9-01 格盘纹理、棋子中心与点选换算共用内缩9×9区域',()=>{
+ const g=window.__M0_DEBUG__.grid,near=g.cellSize*.45;
+ A.equal(g.gridSize,g.boardSize*(1-112/1024));A.equal(g.cellSize*9,g.gridSize);A.ok(g.gridSize<g.boardSize);
+ for(let y=0;y<9;y++)for(let x=0;x<9;x++){
+  const p=g.world(x,y);A.deepEqual(g.cellFromPoint(p),{x,y},`中心 ${x},${y}`);
+  for(const dx of [-near,near])for(const dz of [-near,near])A.deepEqual(g.cellFromPoint({x:p.x+dx,z:p.z+dz}),{x,y},`内缩 ${x},${y}`);
+ }
+ A.equal(g.cellFromPoint({x:-g.gridSize/2-.01,z:0}),null);A.equal(g.cellFromPoint({x:g.gridSize/2+.01,z:0}),null);A.equal(g.cellFromPoint({x:0,z:g.gridSize/2+.01}),null);A.equal(g.cellFromPoint({x:0,z:-g.gridSize/2-.01}),null);
+});
