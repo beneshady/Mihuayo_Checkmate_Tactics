@@ -1,4 +1,4 @@
-/* US-002 浏览器层：只负责 Three.js 展示、点选、预览和命令提交。 */
+/* US-003 浏览器层：只负责 Three.js 展示、点选、预览和命令提交。 */
 (function(){'use strict';
 const R=window.M0,$=id=>document.getElementById(id);
 const names={king:'帅',rook:'车',horse:'马',cannon:'炮',pawn:'兵',archer:'弓',spearman:'枪兵',advisor:'士'};

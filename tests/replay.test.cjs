@@ -2,7 +2,7 @@
 const {test}=require('node:test'),A=require('node:assert/strict'),R=require('../web/js/rules.js');
 for(const branch of ['horse','cannon'])test(`${branch} 分支：未注入资源的完整两波胜利`,()=>{
  let s=R.newGame(),wave1Upgrade=false,allyDamage=false,maxAnalysisMs=0;const log=require(`./replays/${branch}.json`);
- A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook']);A.equal(s.units.reduce((n,u)=>n+u.sp,0),0);A.equal(s.gold,0);
+ A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon']);A.equal(s.units.reduce((n,u)=>n+u.sp,0),0);A.equal(s.gold,0);
  for(const [i,step] of log.entries()){
   if(s.phase==='player'){const before=JSON.stringify(s),t=performance.now(),a=R.analyze(s);maxAnalysisMs=Math.max(maxAnalysisMs,performance.now()-t);A.equal(a.safe,true,`步骤 ${i} 被判无解`);A.equal(JSON.stringify(s),before,'分析污染状态')}
   if(step.buy){A.equal(s.phase,'shop');A.equal(wave1Upgrade,true);const bought=R.buy(s,step.buy);A.notStrictEqual(bought,s);s=R.nextWave(bought);continue}

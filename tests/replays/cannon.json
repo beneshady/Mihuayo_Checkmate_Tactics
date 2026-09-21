@@ -1,21 +1,11 @@
 [
   {
     "action": {
-      "actor": "rook",
-      "type": "rook-move",
-      "to": {
-        "x": 0,
-        "y": 3
-      }
-    }
-  },
-  {
-    "action": {
-      "actor": "king",
+      "actor": "starting-cannon",
       "type": "move",
       "to": {
         "x": 3,
-        "y": 0
+        "y": 2
       }
     }
   },
@@ -27,77 +17,18 @@
   },
   {
     "action": {
-      "actor": "rook",
-      "type": "charge",
+      "actor": "starting-cannon",
+      "type": "attack",
       "to": {
-        "x": 1,
-        "y": 3
+        "x": 3,
+        "y": 8
       }
     }
   },
   {
     "upgrade": {
-      "actor": "rook",
-      "skill": "rook-move"
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "rook-move",
-      "to": {
-        "x": 1,
-        "y": 7
-      }
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "action": {
-      "actor": "king",
-      "type": "attack",
-      "to": {
-        "x": 4,
-        "y": 1
-      }
-    }
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "rook-move",
-      "to": {
-        "x": 3,
-        "y": 7
-      }
-    }
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "charge",
-      "to": {
-        "x": 3,
-        "y": 8
-      }
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "action": {
-      "actor": "rook",
-      "type": "charge",
-      "to": {
-        "x": 3,
-        "y": 8
-      }
+      "actor": "starting-cannon",
+      "skill": "fortify"
     }
   },
   {

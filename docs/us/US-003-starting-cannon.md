@@ -1,6 +1,6 @@
 # US-003：初始队伍增加炮
 
-状态：Ready for development。基线：`46e0052`（US-002 已开发交付，尚未策划验收）。
+状态：Ready for product acceptance。基线：`46e0052`（US-002 已开发交付，尚未策划验收）。
 工作目录：`D:\Projects\mihuayou\gamehack2026`；分支：`codex/web-gameplay-validation`。
 流程：策划 → 开发 → 策划验收；开发角色实现，策划不写功能代码。
 
@@ -43,10 +43,13 @@ US-002 仍为 Ready for product acceptance，尚未验收通过。本次新增�
 
 ## 实现与验证记录
 
-待开发接手。基线9×9开发自测为规则19/19、回放2/2、UI桩2/2、静态通过；不是本US的新实现证据，也不代表9×9策划验收通过。
+开发已接手并实现：`starting-cannon` 以专属出生配置 `(1,2)` 加入 `newGame()`；跨波按专属 ID 回到自己的出生格，商店 `cannon` 继续使用 `(2,2)`。规则测试覆盖初始直攻、SP 扩散、双炮、跨波继承、阵亡购买与重开；UI 桩覆盖默认局选择、预览及执行。正式马/炮分支回放已重新生成。
+
+2026-09-21 开发自测：`node --check web/js/rules.js`、`node --check web/js/app.js`、规则20/20、回放2/2、UI桩2/2、静态检查和 `git diff --check` 通过。真实浏览器仍由策划以新标签验收；US-002 的验收结论不因本次代码交付改变。
 
 ## Agent Handoff Audit
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | H-US-003-001 | 2026-09-21T22:28:06+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接：US-003 初始我方增加炮 | 用户指定开发写代码；默认新局三枚我军，炮(1,2)零升级可借敌兵直接攻击；保留商店及双炮独立性、跨波/重开/旧局保护。US002仍未策划验收，待新版分别核验 | 本文；cf98b54；46e0052；开发会话直接消息 | 已成功派发，待开发ACK及实现 |
+| H-US-003-002 | 2026-09-21T22:31:00+08:00 | DEV_ACK | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | US-003 接手确认 | 确认基线、范围、旧局保护和策划验收职责 | 本文；开发会话消息 | 已接手 |

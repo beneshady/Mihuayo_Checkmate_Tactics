@@ -112,7 +112,7 @@ test('T34-T38 模拟纯净、升级解围、车双段搜索、unknown、旧预�
 test('T39-T40 跨波继承、新购干净、奖励一次、重开清零',()=>{
  let s=F(U('r','player','rook',0,0));Object.assign(G(s,'r'),{level:4,kills:3,sp:3,hp:1,rookChargeRange:3,rookMoveAvailable:false,rookChargeAvailable:false});s.phase='shop';s.gold=2;s=R.buy(s,'horse');A.deepEqual([G(s,'horse').level,G(s,'horse').sp],[1,0]);s=R.nextWave(s);A.deepEqual([G(s,'r').level,G(s,'r').hp,G(s,'r').rookChargeRange,G(s,'r').rookMoveAvailable],[4,1,3,true]);
  s=F(U('r','player','rook',4,7));G(s,'boss').hp=1;s=act(s,'r',{x:4,y:8},'charge');A.deepEqual([s.phase,s.gold],['shop',2]);A.strictEqual(R.endTurn(s).state,s);
- for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual([z.wave,z.turn,z.gold,z.kills,z.units.length],[1,1,0,0,10]);}
+ for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual([z.wave,z.turn,z.gold,z.kills,z.units.length],[1,1,0,0,11]);}
 });
 
 test('T41-T46 转职赠送一次、继承、总等级无上限、职业隔离',()=>{
@@ -151,4 +151,17 @@ test('US-002 河道、宫、外缘与炮跨8步',()=>{
  s=R.emptyState([U('king','player','king',4,0),U('boss','enemy','king',8,8),U('r','player','rook',4,8),U('p','enemy','pawn',4,5)]);G(s,'p').hp=G(s,'p').maxHp=2;G(s,'r').rookChargeRange=3;G(s,'r').rookPush=true;standby(s);s=act(s,'r',{x:4,y:5},'charge');A.deepEqual([G(s,'p').x,G(s,'p').y],[4,4]);A.equal(R.actionAt(s,G(s,'p'),{x:3,y:4}),undefined);
  s=F(U('c','player','cannon',0,0),U('screen','player','horse',0,4),U('target','enemy','rook',0,8));const shot=R.actionAt(s,G(s,'c'),{x:0,y:8});A.ok(shot);A.equal(shot.path.length,8);
  for(let i=1;i<=8;i++)for(const u of R.fixtureState('P'+i).units)A.equal(R.inside(u),true,`P${i}:${u.id}`);const river=R.fixtureState('P1','river-edge');A.ok(R.actionAt(river,G(river,'pawn'),{x:4,y:4}));A.ok(R.actionAt(river,G(river,'rook'),{x:0,y:3},'rook-move'));
+});
+
+test('US-003 默认初始炮、双炮、继承、阵亡购买与重开',()=>{
+ let s=R.newGame(),c=G(s,'starting-cannon');
+ A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon']);A.equal(s.units.filter(u=>u.side==='enemy').length,8);A.equal(s.gold,0);
+ A.deepEqual([c.kind,c.x,c.y,c.level,c.sp,c.hp,c.maxHp,c.attack,c.ap,c.cannonMask],['cannon',1,2,1,0,2,2,2,1,0]);
+ const shot=R.actionAt(s,c,{x:1,y:7});A.ok(shot);A.deepEqual(shot.path,[{x:1,y:3},{x:1,y:4},{x:1,y:5},{x:1,y:6},{x:1,y:7}]);s=R.submitAction(s,shot).state;
+ A.equal(G(s,'w1-4'),undefined);A.ok(G(s,'w1-0'));A.deepEqual([G(s,'starting-cannon').level,G(s,'starting-cannon').sp,G(s,'starting-cannon').ap],[2,1,0]);
+ s=up(s,'starting-cannon','cannon-splash',2);A.deepEqual([G(s,'starting-cannon').sp,G(s,'starting-cannon').cannonMask],[0,4]);s=turn(s);A.equal(G(s,'starting-cannon').ap,1);
+ s.phase='shop';s.gold=2;s.bought=false;const bought=R.buy(s,'cannon');A.notStrictEqual(bought,s);s=bought;A.deepEqual([G(s,'starting-cannon').id,G(s,'starting-cannon').x,G(s,'starting-cannon').y,G(s,'cannon').id,G(s,'cannon').x,G(s,'cannon').y],['starting-cannon',1,2,'cannon',2,2]);
+ s=R.nextWave(s);A.deepEqual([G(s,'starting-cannon').level,G(s,'starting-cannon').sp,G(s,'starting-cannon').hp,G(s,'starting-cannon').cannonMask,G(s,'starting-cannon').x,G(s,'starting-cannon').y,G(s,'starting-cannon').ap],[2,0,2,4,1,2,1]);A.deepEqual([G(s,'cannon').level,G(s,'cannon').sp,G(s,'cannon').x,G(s,'cannon').y],[1,0,2,2]);
+ s=R.newGame();s.units=s.units.filter(u=>u.id!=='starting-cannon');s.phase='shop';s.gold=2;const replacement=R.buy(s,'cannon');A.notStrictEqual(replacement,s);A.equal(G(replacement,'starting-cannon'),undefined);A.deepEqual([G(replacement,'cannon').level,G(replacement,'cannon').sp,G(replacement,'cannon').x,G(replacement,'cannon').y],[1,0,2,2]);
+ for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual(z.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon']);A.equal(G(z,'cannon'),undefined);}
 });
