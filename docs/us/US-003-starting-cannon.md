@@ -49,3 +49,4 @@ US-002 仍为 Ready for product acceptance，尚未验收通过。本次新增�
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| H-US-003-001 | 2026-09-21T22:28:06+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接：US-003 初始我方增加炮 | 用户指定开发写代码；默认新局三枚我军，炮(1,2)零升级可借敌兵直接攻击；保留商店及双炮独立性、跨波/重开/旧局保护。US002仍未策划验收，待新版分别核验 | 本文；cf98b54；46e0052；开发会话直接消息 | 已成功派发，待开发ACK及实现 |
