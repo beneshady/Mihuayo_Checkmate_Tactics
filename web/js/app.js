@@ -5,7 +5,7 @@ const names={king:'帅',rook:'车',horse:'马',cannon:'炮',pawn:'兵',archer:'�
 const glyph={king:'帅',rook:'车',horse:'马',cannon:'炮',pawn:'兵',archer:'弓',spearman:'枪',advisor:'士'};
 const unitName=u=>u.kind==='king'&&u.side==='enemy'?'将':names[u.kind],unitGlyph=u=>u.kind==='king'&&u.side==='enemy'?'将':glyph[u.kind];
 const params=new URLSearchParams(window.location?window.location.search:''),fixture=/^P[1-8]$/.test(params.get('fixture')||'')?params.get('fixture'):null,variant=params.get('variant')||undefined;
-let state,selected=null,preview=null,rookMode='rook-move',directionGhost=null,paused=false,intentOpen=false,epoch=0;
+let state,selected=null,preview=null,rookMode='rook-move',directionGhost=null,paused=false,backgroundPaused=false,intentOpen=false,epoch=0;
 function initial(){epoch++;selected=preview=directionGhost=null;state=fixture?R.fixtureState(fixture,variant):R.newGame();}
 initial();
 
@@ -78,8 +78,8 @@ $('btn-execute').onclick=execute;$('btn-cancel').onclick=()=>{selected=null;canc
 $('btn-pause').onclick=()=>{paused=true;$('ov-pause').classList.add('show')};$('btn-resume').onclick=()=>{paused=false;$('ov-pause').classList.remove('show')};$('btn-restart-1').onclick=$('btn-restart-2').onclick=restart;
 $('btn-intents').onclick=()=>{intentOpen=!intentOpen;renderIntents()};
 for(const kind of ['horse','cannon'])$('btn-buy-'+kind).onclick=()=>{const n=R.buy(state,kind);if(n===state)return;state=n;render();toast(`已购买${names[kind]}`)};$('btn-shop-upgrades').onclick=()=>{$('ov-shop').classList.remove('show');toast('选择单位购买技能；“打开商店”可返回')};$('btn-next-wave').onclick=()=>{state=R.nextWave(state);selected=null;postState()};
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.phase==='player'){paused=true;$('ov-pause').classList.add('show')}});
+document.addEventListener('visibilitychange',()=>{backgroundPaused=document.hidden});
 function resize(){const w=window.innerWidth||1280,mobile=w<=900,rect=$('scene').getBoundingClientRect(),sceneW=Math.max(1,Math.round(rect.width||w)),sceneH=Math.max(1,Math.round(rect.height||(window.innerHeight||800)*(mobile ? .52 : 1)));renderer.setSize(sceneW,sceneH);camera.position.set(0,12.5,8);camera.lookAt(0,0,0);const aspect=sceneW/sceneH,half=boardSize/2+.65,size=Math.max(half,half/aspect);camera.left=-size*aspect;camera.right=size*aspect;camera.top=size;camera.bottom=-size;camera.updateProjectionMatrix()}window.addEventListener('resize',resize);resize();
-function loop(){requestAnimationFrame(loop);if(!paused){pieceGroup.rotation.y=Math.sin(performance.now()/1700)*.005;renderer.render(scene,camera)}}loop();postState();
+function loop(){requestAnimationFrame(loop);if(!paused&&!backgroundPaused){pieceGroup.rotation.y=Math.sin(performance.now()/1700)*.005;renderer.render(scene,camera)}}loop();postState();
 window.__M0_DEBUG__={getState:()=>R.copy(state),setState:s=>{state=R.copy(s);selected=preview=directionGhost=null;postState()},select,target,execute,setRookMode:m=>{rookMode=m},upgrade:(id,skill,index)=>{selected=id;buySkill(skill,index)},endTurn:()=>{state=R.endTurn(state).state;postState()},restart,getEpoch:()=>epoch,grid:{boardSize,gridSize,cellSize,world,cellFromPoint}};
 })();
