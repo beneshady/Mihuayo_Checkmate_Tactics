@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "target": "ES2020", "module": "commonjs", "strict": true, "outDir": ".test/rules", "skipLibCheck": true },
+  "include": ["assets/scripts/rules/**/*.ts"]
+}

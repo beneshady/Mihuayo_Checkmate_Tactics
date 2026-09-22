@@ -1,0 +1,76 @@
+[
+  {
+    "actor": "rook",
+    "to": {
+      "x": 0,
+      "y": 3
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "actor": "rook",
+    "to": {
+      "x": 0,
+      "y": 7
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "actor": "rook",
+    "to": {
+      "x": 4,
+      "y": 7
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "actor": "rook",
+    "to": {
+      "x": 3,
+      "y": 7
+    }
+  },
+  {
+    "buy": "cannon"
+  },
+  {
+    "actor": "rook",
+    "to": {
+      "x": 0,
+      "y": 7
+    }
+  },
+  {
+    "actor": "ally",
+    "to": {
+      "x": 4,
+      "y": 2
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "actor": "ally",
+    "to": {
+      "x": 4,
+      "y": 8
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "actor": "rook",
+    "to": {
+      "x": 4,
+      "y": 7
+    }
+  }
+]

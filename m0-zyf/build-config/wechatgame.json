@@ -1,0 +1,22 @@
+{
+  "taskName": "wechatgame",
+  "platform": "wechatgame",
+  "buildPath": "project://build",
+  "outputName": "wechatgame",
+  "name": "符阵尸棋 M0",
+  "debug": false,
+  "md5Cache": false,
+  "packages": {
+    "wechatgame": {
+      "appid": "",
+      "orientation": "portrait"
+    }
+  },
+  "designResolution": {
+    "width": 720,
+    "height": 1280,
+    "fitWidth": true,
+    "fitHeight": false
+  },
+  "startScene": "d814641f-f5d5-4a73-a0d1-214f3ba517d5"
+}
