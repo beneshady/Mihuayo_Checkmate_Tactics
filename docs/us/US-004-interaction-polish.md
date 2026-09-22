@@ -67,3 +67,4 @@
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| H-US-004-001 | 2026-09-22T23:43:20+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接：US-004 操作体验优化 | 用户确认不改行动经济及全队LIFO撤销锁定边界；派发直接移动、敌棋悬停意图、整格预览及8项AC；保护旧局与无关美术输出 | 365bbed；本文；开发直接消息 | 发送成功，待开发接手 |
