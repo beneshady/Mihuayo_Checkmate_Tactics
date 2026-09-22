@@ -47,3 +47,18 @@ test('PA-9-01 格盘纹理、棋子中心与点选换算共用内缩9×9区域',
  }
  A.equal(g.cellFromPoint({x:-g.gridSize/2-.01,z:0}),null);A.equal(g.cellFromPoint({x:g.gridSize/2+.01,z:0}),null);A.equal(g.cellFromPoint({x:0,z:g.gridSize/2+.01}),null);A.equal(g.cellFromPoint({x:0,z:-g.gridSize/2-.01}),null);
 });
+
+test('US-004 纯移动直执行、LIFO 撤销与攻击锁定',()=>{
+ const d=window.__M0_DEBUG__;
+ d.setState(M0.fixtureState('P1','river-edge'));d.select('rook');d.target({x:0,y:2});let s=d.getState();A.deepEqual([s.units.find(u=>u.id==='rook').x,s.units.find(u=>u.id==='rook').y],[0,2]);A.equal(d.getHistory(),1);A.equal(els['btn-execute'].disabled,true);d.select('pawn');d.target({x:4,y:4});A.equal(d.getHistory(),2);d.undo();A.deepEqual([d.getState().units.find(u=>u.id==='pawn').x,d.getState().units.find(u=>u.id==='pawn').y],[4,3]);d.undo();s=d.getState();A.deepEqual([s.units.find(u=>u.id==='rook').x,s.units.find(u=>u.id==='rook').y,s.units.find(u=>u.id==='rook').rookMoveAvailable],[0,0,true]);A.equal(d.getHistory(),0);
+ s=M0.emptyState([M0.unit('king','player','king',4,0),M0.unit('rook','player','rook',0,0),M0.unit('pawn','player','pawn',4,4),M0.unit('boss','enemy','king',4,8),M0.unit('enemy','enemy','pawn',4,5)]);d.setState(s);d.select('rook');d.target({x:0,y:2});d.select('pawn');d.target({x:4,y:5});A.match(els['preview-box'].innerHTML,/攻击/);A.equal(d.getHistory(),1);d.undo();d.execute();A.ok(d.getState().units.find(u=>u.id==='enemy'));
+ d.setState(s);d.select('rook');d.target({x:0,y:2});d.select('pawn');d.target({x:4,y:5});d.execute();A.equal(d.getHistory(),0);A.equal(d.getState().units.some(u=>u.id==='enemy'),false);
+ s=M0.fixtureState('P1','river-edge');s.units.find(u=>u.id==='rook').sp=1;d.setState(s);d.select('rook');d.target({x:0,y:2});A.equal(d.getHistory(),1);d.upgrade('rook','fortify');A.equal(d.getHistory(),0);d.select('pawn');d.target({x:4,y:4});A.equal(d.getHistory(),1);d.endTurn();A.equal(d.getHistory(),0);
+ s=M0.emptyState([M0.unit('king','player','king',4,0),M0.unit('rook','player','rook',1,1),M0.unit('boss','enemy','king',4,8)]);d.setState(s);d.select('rook');d.setRookMode('charge');d.target({x:1,y:2});A.match(els['preview-box'].innerHTML,/冲击/);A.equal(d.getHistory(),0);
+});
+
+test('US-004 危险纯移动可撤销、意图悬停只读且整格覆盖',()=>{
+ const d=window.__M0_DEBUG__,U=M0.unit;
+ let s=M0.emptyState([U('king','player','king',4,0),U('blocker','player','rook',4,1),U('boss','enemy','king',4,8),U('threat','enemy','rook',4,3)]);s.units.find(u=>u.id==='threat').rookChargeRange=3;s.intents=[{actor:'threat',from:{x:4,y:3},to:{x:4,y:0},type:'charge',path:[{x:4,y:2},{x:4,y:1},{x:4,y:0}],order:1}];d.setState(s);d.select('blocker');d.target({x:3,y:1});A.equal(d.getState().phase,'player');A.equal(d.getHistory(),1);d.undo();A.deepEqual([d.getState().units.find(u=>u.id==='blocker').x,d.getState().units.find(u=>u.id==='blocker').y],[4,1]);
+ s=M0.fixtureState('P8','enemy-empty');const before=JSON.stringify(s);d.setState(s);d.hoverEnemy('enemy-rook');const marks=d.getMarks();A.equal(JSON.stringify(d.getState()),before);A.match(els['hover-intent'].innerHTML,/冲击.*可执行/);A.ok(marks.some(m=>m.layer==='intent-origin'));A.ok(marks.some(m=>m.layer==='intent-target'));A.ok(marks.filter(m=>m.layer!=='intent-line').every(m=>m.type==='PlaneGeometry'));d.hoverEnemy(null);A.equal(d.getMarks().length,0);A.equal(els['hover-intent'].classList.contains('show'),false);
+});
