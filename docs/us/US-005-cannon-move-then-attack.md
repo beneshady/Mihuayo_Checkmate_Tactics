@@ -45,3 +45,4 @@
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| H-US-005-001 | 2026-09-23T00:30:22+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接：我方炮可移动后攻击 | 用户要求初始炮和商店炮支持一次移动后再攻击；合同冻结双额度、撤销/锁定、双炮独立、UI与8项AC，敌方炮不变 | 2032247；本文；开发直接消息 | 发送成功，待开发接手 |
