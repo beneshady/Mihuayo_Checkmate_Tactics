@@ -4,23 +4,17 @@
       "actor": "starting-cannon",
       "type": "move",
       "to": {
-        "x": 3,
+        "x": 4,
         "y": 2
       }
     }
-  },
-  {
-    "end": true
-  },
-  {
-    "end": true
   },
   {
     "action": {
       "actor": "starting-cannon",
       "type": "attack",
       "to": {
-        "x": 3,
+        "x": 4,
         "y": 8
       }
     }

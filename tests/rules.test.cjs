@@ -71,7 +71,7 @@ test('炮基础攻击零 SP 可用、AP 门控、成长后下回合扩散',()=>{
  let shot=R.actionAt(s,c,{x:2,y:4});A.ok(shot);A.equal(shot.type,'attack');
  let out=R.submitAction(s,shot);s=out.state;
  A.equal(G(s,'target-a'),undefined);A.deepEqual([G(s,'cannon').level,G(s,'cannon').sp,G(s,'cannon').ap],[2,1,0]);
- A.equal(R.legalActions(s,'cannon').length,0);A.equal(R.actionReason(s,'cannon',{x:5,y:1}),'本回合已行动，下回合可攻击');
+ A.equal(R.legalActions(s,'cannon').length,0);A.equal(R.actionReason(s,'cannon',{x:5,y:1}),'炮本回合已攻击，不能再移动或攻击');
  A.strictEqual(R.submit(s,'cannon',{x:5,y:1}).state,s);
  s=R.purchaseUpgrade(s,'cannon','cannon-splash',2);A.deepEqual([G(s,'cannon').sp,G(s,'cannon').cannonMask],[0,4]);
  s=R.endTurn(s).state;A.equal(G(s,'cannon').ap,1);
@@ -164,4 +164,13 @@ test('US-003 默认初始炮、双炮、继承、阵亡购买与重开',()=>{
  s=R.nextWave(s);A.deepEqual([G(s,'starting-cannon').level,G(s,'starting-cannon').sp,G(s,'starting-cannon').hp,G(s,'starting-cannon').cannonMask,G(s,'starting-cannon').x,G(s,'starting-cannon').y,G(s,'starting-cannon').ap],[2,0,2,4,1,2,1]);A.deepEqual([G(s,'cannon').level,G(s,'cannon').sp,G(s,'cannon').x,G(s,'cannon').y],[1,0,2,2]);
  s=R.newGame();s.units=s.units.filter(u=>u.id!=='starting-cannon');s.phase='shop';s.gold=2;const replacement=R.buy(s,'cannon');A.notStrictEqual(replacement,s);A.equal(G(replacement,'starting-cannon'),undefined);A.deepEqual([G(replacement,'cannon').level,G(replacement,'cannon').sp,G(replacement,'cannon').x,G(replacement,'cannon').y],[1,0,2,2]);
  for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual(z.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon']);A.equal(G(z,'cannon'),undefined);}
+});
+
+test('US-005 我方炮可移动后攻击，额度独立且敌炮不变',()=>{
+ let s=R.fixtureState('P3','basic-growth'),c=G(s,'cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable,c.ap],[true,true,1]);
+ s=R.submit(s,'cannon',{x:2,y:0}).state;c=G(s,'cannon');A.deepEqual([c.x,c.y,c.cannonMoveAvailable,c.cannonAttackAvailable,c.ap],[2,0,false,true,1]);A.ok(R.actionAt(s,c,{x:2,y:4}));
+ s=R.submit(s,'cannon',{x:2,y:4}).state;c=G(s,'cannon');A.equal(G(s,'target-a'),undefined);A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable,c.ap],[false,false,0]);A.strictEqual(R.submit(s,'cannon',{x:2,y:1}).state,s);A.strictEqual(R.submit(s,'cannon',{x:2,y:4}).state,s);
+ s=turn(s);c=G(s,'cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable,c.ap],[true,true,1]);
+ s=R.newGame();s.units=s.units.filter(u=>u.side==='player');s.phase='shop';s.gold=2;s=R.buy(s,'cannon');s=R.nextWave(s);const start=G(s,'starting-cannon'),shop=G(s,'cannon');A.deepEqual([start.cannonMoveAvailable,start.cannonAttackAvailable,shop.cannonMoveAvailable,shop.cannonAttackAvailable],[true,true,true,true]);s=R.submit(s,'starting-cannon',{x:1,y:1}).state;A.deepEqual([G(s,'starting-cannon').cannonMoveAvailable,G(s,'starting-cannon').cannonAttackAvailable,G(s,'cannon').cannonMoveAvailable,G(s,'cannon').cannonAttackAvailable],[false,true,true,true]);
+ const enemy=U('enemy-cannon','enemy','cannon',2,4),plain=F(enemy,U('screen','player','horse',2,2),U('target','player','rook',2,0));A.ok(R.actionAt(plain,enemy,{x:2,y:0}));
 });
