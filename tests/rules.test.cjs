@@ -182,3 +182,14 @@ test('US-006 敌方准备、相对锁定、友伤与实际阵亡结算',()=>{
  s=R.fixtureState('P9','chain');out=R.enemyPhase(s);A.deepEqual(out.effects.map(e=>e.status),['success','success']);A.equal(G(out.state,'rack'),undefined);A.equal(G(out.state,'target'),undefined);
  s=R.fixtureState('P6','mate');A.strictEqual(R.checkmate(s),s);A.equal(s.phase,'player');
 });
+
+test('US-006 纵推连推、炮架和冻结攻击边界',()=>{
+ let s=R.fixtureState('P9','push-line'),i=s.intents[0],e=G(s,'enemy-rook');e.x=3;e.y=4;A.deepEqual(R.intentTarget(s,i),{x:3,y:3});e.x=2;e.y=5;A.deepEqual(R.intentTarget(s,i),{x:2,y:4});
+ s=F(U('ec','enemy','cannon',2,5),U('rack','player','horse',3,3),U('victim','player','rook',3,1));s.intents=[{actor:'ec',from:{x:2,y:5},to:{x:2,y:1},offset:{x:0,y:-4},type:'attack',path:[],order:1}];G(s,'ec').x=3;let out=R.enemyPhase(s);A.equal(out.effects[0].status,'success');A.equal(G(out.state,'victim'),undefined);
+ s=F(U('ec','enemy','cannon',3,5),U('r1','player','horse',3,3),U('r2','player','pawn',3,2),U('victim','player','rook',3,1));s.intents=[{actor:'ec',from:{x:3,y:5},to:{x:3,y:1},offset:{x:0,y:-4},type:'attack',path:[],order:1}];out=R.enemyPhase(s);A.deepEqual([out.effects[0].status,out.effects[0].reason],['cancelled','炮架数量不为一']);
+ s=F(U('h','enemy','horse',1,4),U('leg','player','pawn',1,3));s.intents=[{actor:'h',from:{x:1,y:4},to:{x:2,y:2},offset:{x:1,y:-2},type:'attack',path:[],order:1}];A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
+ s=F(U('a','enemy','advisor',4,7));s.intents=[{actor:'a',from:{x:4,y:7},to:{x:3,y:8},offset:{x:-1,y:1},type:'attack',path:[],order:1}];G(s,'a').x=3;A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
+ s=F(U('er','enemy','rook',0,4),U('block','player','pawn',0,3));s.intents=[{actor:'er',from:{x:0,y:4},to:{x:0,y:2},offset:{x:0,y:-2},type:'charge',path:[],order:1}];A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
+ s=F(U('first','enemy','pawn',3,3),U('second','enemy','pawn',3,2));s.intents=[{actor:'first',from:{x:3,y:3},to:{x:3,y:2},offset:{x:0,y:-1},type:'attack',path:[],order:1},{actor:'second',from:{x:3,y:2},to:{x:3,y:1},offset:{x:0,y:-1},type:'attack',path:[],order:2}];out=R.enemyPhase(s);A.deepEqual(out.effects.map(x=>x.status),['success','removed']);
+ s=F(U('first','enemy','pawn',4,1),U('after','enemy','pawn',3,1));G(s,'king').hp=1;s.intents=[{actor:'first',from:{x:4,y:1},to:{x:4,y:0},offset:{x:0,y:-1},type:'attack',path:[],order:1},{actor:'after',from:{x:3,y:1},to:{x:3,y:0},offset:{x:0,y:-1},type:'attack',path:[],order:2}];out=R.enemyPhase(s);A.deepEqual([out.state.phase,out.state.result,out.effects.length],['result','dead',1]);
+});
