@@ -1,6 +1,6 @@
 # US-006：敌方先准备、方向锁定与解谜回合
 
-状态：Ready for development。优先级：P0。
+状态：Ready for product acceptance。优先级：P0。
 工作目录：`D:\Projects\mihuayou\gamehack2026`；分支：`codex/web-gameplay-validation`。
 代码基线：`7e3c5ab`（功能 `448ccdc`）；流程：策划 → 开发 → 策划验收。
 父需求：[M0](../design/m0-gdd.md)；设计背景：[V1 整合稿](../design/V1-Development-Handoff.md)。
@@ -93,7 +93,8 @@
 
 ## 6. 实施与策划验收记录
 
-- 开发：待接手。
+- 开发：已实现敌方“准备移动 → 冻结意图 → 玩家行动 → 顺序攻击”循环。开局、跨波和每次攻击结算后均先逐个准备；有攻击则原地、无攻击才按距帅和坐标靠近。冻结意图保存相对位移，推移攻击者后落点跟随平移；炮架、宫界、马腿、冲击路径均在执行时重验，不替换决策。敌方可命中当前落点的同伴，且不会产生我方成长；主帅仅实际阵亡失败。UI 默认展示全部威胁格和顺序，悬停显示冻结起点、当前路径、落点和失效原因。新增 P9 `escape`、`push-line`、`friendly-fire`、`cannon-rack`、`chain` 夹具。
+- 验证：`node --check web/js/rules.js`、`node --check web/js/app.js`；规则 22/22；UI 桩 7/7；重新生成正式马/炮回放 2/2（马 9 步/3 回合、炮 8 步/3 回合）；静态检查 40 DOM / 20 API 与 `git diff --check` 均通过。开发未操作浏览器、服务、标签、视口或存储。
 - 策划验收：待交付。
 
 ## Agent Handoff Audit
@@ -101,3 +102,4 @@
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | H-US-006-001 | 2026-09-24T16:27:55+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接｜US-006｜敌方先准备与方向锁定整改 | 用户确认方向锁定、受推落点平移并授权实施；交接回合、友伤、预览、实际阵亡结算和AC01–09；保护用户旧局与其他未提交设计，US005未完成独立保留 | 3e97dda；代码基线7e3c5ab；本文；直接交接消息（工具未返回message ID） | 发送成功，待开发确认接手；不代表实现完成 |
+| H-US-006-002 | 2026-09-24T16:28:19+08:00 | HANDOFF_ACK | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | US-006 接手确认 | 已核对合同、基线、范围和受保护的无关改动；开始规则与 UI 实现 | 本文；3e97dda；开发会话消息 | 已接手 |

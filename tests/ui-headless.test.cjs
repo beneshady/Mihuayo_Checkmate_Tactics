@@ -26,16 +26,16 @@ test('UI 桩加载 P2 blocked，显示 9×9 夹具并可连续重开',()=>{
  d.setState(M0.fixtureState('P3','basic-growth'));d.select('cannon');A.match(els['selected-card'].innerHTML,/基础攻击：单格 \/ 伤害 2 \/ 隔一子攻击/);A.match(els['selected-card'].innerHTML,/移动 .*可用.*攻击 .*可用/);A.match(els['selected-card'].innerHTML,/扩散 0\/8（不影响基础攻击）/);
  d.target({x:2,y:4});A.match(els['preview-box'].innerHTML,/炮架 友军马 @ \(2,2\)/);A.match(els['preview-box'].innerHTML,/攻击连线 \(2,1\) → \(2,2\) → \(2,3\) → \(2,4\)/);A.match(els['preview-box'].innerHTML,/主目标 敌军兵 @ \(2,4\) · 预期 −2/);d.execute();
  let cannon=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([cannon.level,cannon.sp,cannon.ap,cannon.cannonMask],[2,1,0,0]);A.equal(M0.legalActions(d.getState(),'cannon').length,0);d.target({x:5,y:1});A.match(els['preview-box'].innerHTML,/炮本回合已攻击/);A.equal(els['btn-execute'].disabled,true);
- d.upgrade('cannon','cannon-splash',2);cannon=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([cannon.sp,cannon.cannonMask],[0,4]);d.endTurn();A.equal(d.getState().units.find(u=>u.id==='cannon').ap,1);d.target({x:5,y:1});A.match(els['preview-box'].innerHTML,/炮架 友军马 @ \(3,1\)/);d.execute();A.equal(d.getState().units.some(u=>u.id==='target-b'||u.id==='splash-b'),false);A.equal(d.getState().units.some(u=>u.id==='boss'),true);
- d.setState(M0.newGame());d.select('starting-cannon');A.match(els['selected-card'].innerHTML,/<b>炮<\/b> @ \(1,2\)/);d.target({x:1,y:7});A.match(els['preview-box'].innerHTML,/炮架 敌军兵 @ \(1,5\)/);A.match(els['preview-box'].innerHTML,/主目标 敌军炮 @ \(1,7\) · 预期 −2/);d.execute();cannon=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([cannon.level,cannon.sp,cannon.ap],[2,1,0]);A.equal(d.getState().units.some(u=>u.id==='w1-0'),true);A.equal(d.getState().units.some(u=>u.id==='w1-4'),false);
- d.setState(M0.fixtureState('P8','enemy-empty'));A.match(els['intent-list'].innerHTML,/车 · 冲击.*起点 \(0,4\) → 目标 \(0,3\) · <b>可执行<\/b>/);d.endTurn();A.deepEqual([d.getState().units.find(u=>u.id==='enemy-rook').x,d.getState().units.find(u=>u.id==='enemy-rook').y],[0,3]);
- d.setState(M0.fixtureState('P6','mate'));A.deepEqual([d.getState().phase,d.getState().result],['result','mate']);A.equal(els['result-title'].textContent,'将死');A.equal(els['ov-result'].classList.contains('show'),true);
- els['btn-intents'].onclick();A.equal(els['intent-list'].classList.contains('show'),true);A.equal(els['btn-intents'].attributes['aria-expanded'],'true');
+ d.upgrade('cannon','cannon-splash',2);cannon=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([cannon.sp,cannon.cannonMask],[0,4]);
+ d.setState(M0.newGame());d.select('starting-cannon');A.match(els['selected-card'].innerHTML,/<b>炮<\/b> @ \(1,2\)/);d.target({x:1,y:7});A.match(els['preview-box'].innerHTML,/炮架 敌军兵 @ \(1,4\)/);A.match(els['preview-box'].innerHTML,/主目标 敌军炮 @ \(1,7\) · 预期 −2/);d.execute();cannon=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([cannon.level,cannon.sp,cannon.ap],[2,1,0]);A.equal(d.getState().units.some(u=>u.id==='w1-4'),false);
+ d.setState(M0.fixtureState('P8','enemy-empty'));A.match(els['intent-list'].innerHTML,/车 · 冲击.*冻结 \(0,4\) → 当前落点 \(0,3\) · <b>可执行<\/b>/);d.endTurn();A.deepEqual([d.getState().units.find(u=>u.id==='enemy-rook').x,d.getState().units.find(u=>u.id==='enemy-rook').y],[0,0]);
+ d.setState(M0.fixtureState('P6','mate'));A.deepEqual([d.getState().phase,d.getState().result],['player',undefined]);A.equal(els['ov-result'].classList.contains('show'),false);
+ els['btn-intents'].onclick();A.equal(els['intent-list'].classList.contains('show'),false);A.equal(els['btn-intents'].attributes['aria-expanded'],'false');
  const start=d.getEpoch();for(let i=0;i<3;i++)d.restart();A.equal(d.getEpoch(),start+3);s=d.getState();A.equal(s.revision,0);A.equal(s.units.some(u=>u.id==='block'),true);
 });
 
-test('页面含独立窄屏棋盘/操作/面板区、河道、九宫、技能与 P1-P8 入口',()=>{
- A.match(html,/#scene\{position:absolute;left:306px;right:160px/);A.match(html,/@media\(max-width:900px\)/);A.match(html,/#scene\{left:0;right:0;height:52vh/);A.match(html,/#actions\{top:52vh/);A.match(html,/#panel\{top:57vh/);A.match(html,/id="btn-intents"/);A.match(html,/9×9/);A.match(html,/河道为 y=4/);A.match(html,/九宫/);A.match(html,/技能/);A.match(html,/variant=river-edge/);for(let i=1;i<=8;i++)A.match(html,new RegExp(`fixture=P${i}`));
+test('页面含独立窄屏棋盘/操作/面板区、河道、九宫、技能与 P1-P9 入口',()=>{
+ A.match(html,/#scene\{position:absolute;left:306px;right:160px/);A.match(html,/@media\(max-width:900px\)/);A.match(html,/#scene\{left:0;right:0;height:52vh/);A.match(html,/#actions\{top:52vh/);A.match(html,/#panel\{top:57vh/);A.match(html,/id="btn-intents"/);A.match(html,/9×9/);A.match(html,/河道为 y=4/);A.match(html,/九宫/);A.match(html,/技能/);A.match(html,/variant=river-edge/);for(let i=1;i<=9;i++)A.match(html,new RegExp(`fixture=P${i}`));
 });
 
 test('PA-9-01 格盘纹理、棋子中心与点选换算共用内缩9×9区域',()=>{
@@ -60,7 +60,7 @@ test('US-004 纯移动直执行、LIFO 撤销与攻击锁定',()=>{
 test('US-004 危险纯移动可撤销、意图悬停只读且整格覆盖',()=>{
  const d=window.__M0_DEBUG__,U=M0.unit;
  let s=M0.emptyState([U('king','player','king',4,0),U('blocker','player','rook',4,1),U('boss','enemy','king',4,8),U('threat','enemy','rook',4,3)]);s.units.find(u=>u.id==='threat').rookChargeRange=3;s.intents=[{actor:'threat',from:{x:4,y:3},to:{x:4,y:0},type:'charge',path:[{x:4,y:2},{x:4,y:1},{x:4,y:0}],order:1}];d.setState(s);d.select('blocker');d.target({x:3,y:1});A.equal(d.getState().phase,'player');A.equal(d.getHistory(),1);d.undo();A.deepEqual([d.getState().units.find(u=>u.id==='blocker').x,d.getState().units.find(u=>u.id==='blocker').y],[4,1]);
- s=M0.fixtureState('P8','enemy-empty');const before=JSON.stringify(s);d.setState(s);d.hoverEnemy('enemy-rook');const marks=d.getMarks();A.equal(JSON.stringify(d.getState()),before);A.match(els['hover-intent'].innerHTML,/冲击.*可执行/);A.ok(marks.some(m=>m.layer==='intent-origin'));A.ok(marks.some(m=>m.layer==='intent-target'));A.ok(marks.filter(m=>m.layer!=='intent-line').every(m=>m.type==='PlaneGeometry'));d.hoverEnemy(null);A.equal(d.getMarks().length,0);A.equal(els['hover-intent'].classList.contains('show'),false);
+ s=M0.fixtureState('P8','enemy-empty');const before=JSON.stringify(s);d.setState(s);d.hoverEnemy('enemy-rook');const marks=d.getMarks();A.equal(JSON.stringify(d.getState()),before);A.match(els['hover-intent'].innerHTML,/冲击.*可执行/);A.ok(marks.some(m=>m.layer==='intent-origin'));A.ok(marks.some(m=>m.layer==='intent-target'));A.ok(marks.filter(m=>m.layer!=='intent-line').every(m=>m.type==='PlaneGeometry'));d.hoverEnemy(null);A.ok(d.getMarks().some(m=>m.layer==='intent-overview'));A.equal(els['hover-intent'].classList.contains('show'),false);
 });
 
 test('US-005 炮移动后攻击、撤销与双额度 UI',()=>{
@@ -68,4 +68,11 @@ test('US-005 炮移动后攻击、撤销与双额度 UI',()=>{
  d.setState(M0.fixtureState('P3','basic-growth'));d.select('cannon');d.target({x:2,y:0});let c=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([c.x,c.y,c.cannonMoveAvailable,c.cannonAttackAvailable],[2,0,false,true]);A.equal(d.getHistory(),1);A.match(els['selected-card'].innerHTML,/移动 .*已用.*攻击 .*可用/);d.target({x:2,y:4});A.match(els['preview-box'].innerHTML,/炮架 友军马 @ \(2,2\)/);d.execute();c=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable],[false,false]);A.equal(d.getHistory(),0);d.target({x:2,y:1});A.match(els['preview-box'].innerHTML,/已攻击/);
  d.setState(M0.fixtureState('P3','basic-growth'));d.select('cannon');d.target({x:2,y:0});d.undo();c=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([c.x,c.y,c.cannonMoveAvailable,c.cannonAttackAvailable],[2,1,true,true]);
  d.setState(M0.newGame());d.select('starting-cannon');d.target({x:1,y:7});d.execute();c=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable],[false,false]);
+});
+
+test('US-006 默认威胁、方向平移、友伤与顺序链 UI',()=>{
+ const d=window.__M0_DEBUG__;
+ d.setState(M0.fixtureState('P9','push-line'));A.ok(d.getMarks().some(m=>m.layer==='intent-overview'));A.match(els['intent-list'].innerHTML,/冻结 \(3,3\).*当前落点 \(3,2\)/);d.hoverEnemy('enemy-rook');A.match(els['hover-intent'].innerHTML,/冻结起点 \(3,3\).*当前 \(3,3\).*落点 \(3,2\)/);d.select('rook');d.setRookMode('charge');d.target({x:3,y:3});d.execute();A.deepEqual([d.getState().units.find(u=>u.id==='enemy-rook').x,d.getState().units.find(u=>u.id==='enemy-rook').y],[4,3]);A.match(els['intent-list'].innerHTML,/当前落点 \(4,2\)/);d.endTurn();A.deepEqual([d.getState().units.find(u=>u.id==='enemy-rook').x,d.getState().units.find(u=>u.id==='enemy-rook').y],[4,1]);
+ d.setState(M0.fixtureState('P9','friendly-fire'));d.endTurn();A.equal(d.getState().units.some(u=>u.id==='friend'),false);A.equal(d.getState().kills,0);
+ d.setState(M0.fixtureState('P9','chain'));d.endTurn();A.equal(d.getState().units.some(u=>u.id==='rack'),false);A.equal(d.getState().units.some(u=>u.id==='target'),false);
 });
