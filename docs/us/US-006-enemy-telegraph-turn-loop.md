@@ -100,3 +100,4 @@
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| H-US-006-001 | 2026-09-24T16:27:55+08:00 | US_READY | 策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接｜US-006｜敌方先准备与方向锁定整改 | 用户确认方向锁定、受推落点平移并授权实施；交接回合、友伤、预览、实际阵亡结算和AC01–09；保护用户旧局与其他未提交设计，US005未完成独立保留 | 3e97dda；代码基线7e3c5ab；本文；直接交接消息（工具未返回message ID） | 发送成功，待开发确认接手；不代表实现完成 |
