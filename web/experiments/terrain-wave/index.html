@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>渡河 · 单波地形实验</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><div><span class="eyebrow">TACTICAL FIELD NOTES / 007</span><h1>渡河 <span>水 · 山 · 林</span></h1></div><div class="badge">独立实验 · 仅一波 · 无成长</div></header>
+  <main id="workspace">
+    <section class="arena">
+      <div class="toolbar"><div id="status" aria-live="polite"></div><label>场景 <select id="scenario"><option value="main">单波战斗</option><option value="water">练习 · 震退入水</option><option value="mountain">练习 · 拆山与炮架</option><option value="forest">练习 · 树林与连锁预告</option><option value="custom" disabled>我的地图</option></select></label></div>
+      <div id="edit-toolbar" hidden><b id="brush-status">移动棋子：先点棋子，再点空格</b><div><button id="edit-undo" title="Ctrl / ⌘ + Z">↶ 撤销</button><button id="edit-redo" title="Ctrl / ⌘ + Shift + Z">↷ 重做</button><button id="test-map" class="primary">▶ 开始测试</button><button id="cancel-edit">取消编辑</button></div><div id="quick-tools"></div></div>
+      <div class="legend"><span>≈ 水：致死 / 禁攻</span><span>▰ 桥：普通陆地</span><span>▲ 山：两次命中坍塌</span><span>♠ 林：有一定概率闪避</span></div>
+      <div id="board" aria-label="九乘九地形棋盘"></div>
+      <div id="banner" role="status"></div>
+      <div class="controls"><button id="end" class="primary">结束回合</button><button id="undo">撤销移动</button><button id="restart">重开本场景</button><button id="edit-map">编辑地图</button></div>
+      <div id="confirmation" class="panel" hidden><p id="confirmation-text"></p><button id="confirm-action" class="primary">确定结束回合</button> <button id="dismiss-action">继续思考</button></div>
+      <p class="caption">下方为我方 · 格子坐标为「列,行」 · 红色标记为敌方预计攻击落点；有条件的威胁仍保留。</p>
+    </section>
+    <aside>
+      <section id="editor" class="panel" hidden><h2>布置你的战场</h2>
+        <p class="editor-guide">① 选画笔　② 点棋盘　③ 开始测试<br>编辑用正方格，点选更准确；测试切回立体视角。</p>
+        <h3>添加棋子</h3><div class="modes"><button id="team-player">我方 · 红</button><button id="team-enemy">敌方 · 蓝</button></div><div id="piece-tools" class="tool-grid"></div>
+        <p id="placement-help">选择棋种，再点空格放置。已有棋子请先移动或删除。</p>
+        <div id="map-errors" role="status"></div>
+        <hr><h3>保存与返回</h3><div class="editor-actions"><button id="save-map">保存到本机</button><button id="load-map">读取已保存地图</button></div><p id="save-status" role="status">手动保存后可在同一浏览器恢复；只保存这一张实验地图。</p>
+        <p>开始测试不会破坏编辑原稿。测试中点“返回编辑”调整原稿；重开会复原你设计的地图，而不是默认地图。快捷键：Ctrl / ⌘ + Z 撤销，Shift + Z 重做，Esc 取消棋子选取。</p>
+      </section>
+      <section id="play-panel" class="panel"><h2>01 / 我方行动</h2><div id="roster"></div><div id="selection">选择一枚我方棋子。</div><div class="modes"><button id="move">普通移动</button><button id="attack">攻击 / 冲击</button></div><div id="preview" aria-live="polite">点选棋子，再点选高亮格。攻击需要确认。</div><button id="execute" class="primary" disabled>确认执行</button><button id="cancel" disabled>取消预览</button></section>
+      <section id="intent-panel" class="panel"><h2>02 / 敌方冻结意图</h2><div id="intents"></div></section>
+      <section id="log-panel" class="panel"><h2>03 / 最近战况</h2><ol id="log" aria-live="polite"></ol></section>
+    </aside>
+  </main>
+  <details class="notes"><summary>实验范围与操作说明</summary><p>击杀敌将即通过本波，我方帅阵亡则失败。保留九宫、炮架、马腿和敌方先准备后预告的规则。兵及转职兵从任何位置都可向前、向左、向右移动，不能后退。</p><p>为了不依赖成长即可测试：我方车预设冲击 3 格与震退；弓、枪四向射程预设 3 格。炮不预设扩散。其余初始属性与当前六人阵容一致。这些是实验预设，不是正式平衡结论。</p><p>敌方会避开致死水路，无安全进展时待机；实验暂不主动选择山为攻击目标。车拆山后停在前一格。主动致死移动需确认，执行后不可撤销。攻击（包括 miss、冲击入水中断）均锁定此前移动。</p><p>水与山的占位规则对双方一致。树林闪避同时取消伤害和击退；预测显示可能结果，不提前判定闪避。第二波将换地形，但不在本次单波实验内。无商店、升级、存档或主原型改动。</p><p>专项练习仅便于验证交互，不代替单波通关。山林布点、敌人是否主动拆山，以及自亡撤销规则均仍属实验选择，待试玩确认。地图编辑允许修改任意格地形和双方棋子，但开始测试前须满足九宫、占位和双方将帅存在等约束；敌方最多八枚，马可通过编辑器加入调试。</p></details>
+  <script src="rules.js"></script><script src="app.js"></script>
+</body>
+</html>
