@@ -27,7 +27,7 @@ test('UI 桩加载 P2 blocked，显示 9×9 夹具并可连续重开',()=>{
  d.target({x:2,y:4});A.match(els['preview-box'].innerHTML,/炮架 友军马 @ \(2,2\)/);A.match(els['preview-box'].innerHTML,/攻击连线 \(2,1\) → \(2,2\) → \(2,3\) → \(2,4\)/);A.match(els['preview-box'].innerHTML,/主目标 敌军兵 @ \(2,4\) · 预期 −2/);d.execute();
  let cannon=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([cannon.level,cannon.sp,cannon.ap,cannon.cannonMask],[2,1,0,0]);A.equal(M0.legalActions(d.getState(),'cannon').length,0);d.target({x:5,y:1});A.match(els['preview-box'].innerHTML,/炮本回合已攻击/);A.equal(els['btn-execute'].disabled,true);
  d.upgrade('cannon','cannon-splash',2);cannon=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([cannon.sp,cannon.cannonMask],[0,4]);
- d.setState(M0.newGame());d.select('starting-cannon');A.match(els['selected-card'].innerHTML,/<b>炮<\/b> @ \(1,2\)/);d.target({x:1,y:7});A.match(els['preview-box'].innerHTML,/炮架 敌军兵 @ \(1,4\)/);A.match(els['preview-box'].innerHTML,/主目标 敌军炮 @ \(1,7\) · 预期 −2/);d.execute();cannon=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([cannon.level,cannon.sp,cannon.ap],[2,1,0]);A.equal(d.getState().units.some(u=>u.id==='w1-4'),false);
+ s=M0.newGame();s.units=s.units.filter(u=>u.id!=='starting-pawn');d.setState(s);d.select('starting-cannon');A.match(els['selected-card'].innerHTML,/<b>炮<\/b> @ \(1,2\)/);d.target({x:1,y:7});A.match(els['preview-box'].innerHTML,/炮架 敌军兵 @ \(1,4\)/);A.match(els['preview-box'].innerHTML,/主目标 敌军炮 @ \(1,7\) · 预期 −2/);d.execute();cannon=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([cannon.level,cannon.sp,cannon.ap],[2,1,0]);A.equal(d.getState().units.some(u=>u.id==='w1-4'),false);
  d.setState(M0.fixtureState('P8','enemy-empty'));A.match(els['intent-list'].innerHTML,/车 · 冲击.*冻结 \(0,4\) → 当前落点 \(0,3\) · <b>可执行<\/b>/);d.endTurn();A.deepEqual([d.getState().units.find(u=>u.id==='enemy-rook').x,d.getState().units.find(u=>u.id==='enemy-rook').y],[0,0]);
  d.setState(M0.fixtureState('P6','mate'));A.deepEqual([d.getState().phase,d.getState().result],['player',undefined]);A.equal(els['ov-result'].classList.contains('show'),false);
  els['btn-intents'].onclick();A.equal(els['intent-list'].classList.contains('show'),false);A.equal(els['btn-intents'].attributes['aria-expanded'],'false');
@@ -67,7 +67,7 @@ test('US-005 炮移动后攻击、撤销与双额度 UI',()=>{
  const d=window.__M0_DEBUG__;
  d.setState(M0.fixtureState('P3','basic-growth'));d.select('cannon');d.target({x:2,y:0});let c=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([c.x,c.y,c.cannonMoveAvailable,c.cannonAttackAvailable],[2,0,false,true]);A.equal(d.getHistory(),1);A.match(els['selected-card'].innerHTML,/移动 .*已用.*攻击 .*可用/);d.target({x:2,y:4});A.match(els['preview-box'].innerHTML,/炮架 友军马 @ \(2,2\)/);d.execute();c=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable],[false,false]);A.equal(d.getHistory(),0);d.target({x:2,y:1});A.match(els['preview-box'].innerHTML,/已攻击/);
  d.setState(M0.fixtureState('P3','basic-growth'));d.select('cannon');d.target({x:2,y:0});d.undo();c=d.getState().units.find(u=>u.id==='cannon');A.deepEqual([c.x,c.y,c.cannonMoveAvailable,c.cannonAttackAvailable],[2,1,true,true]);
- d.setState(M0.newGame());d.select('starting-cannon');d.target({x:1,y:7});d.execute();c=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable],[false,false]);
+ s=M0.newGame();s.units=s.units.filter(u=>u.id!=='starting-pawn');d.setState(s);d.select('starting-cannon');d.target({x:1,y:7});d.execute();c=d.getState().units.find(u=>u.id==='starting-cannon');A.deepEqual([c.cannonMoveAvailable,c.cannonAttackAvailable],[false,false]);
 });
 
 test('US-006 默认威胁、方向平移、友伤与顺序链 UI',()=>{
@@ -77,4 +77,12 @@ test('US-006 默认威胁、方向平移、友伤与顺序链 UI',()=>{
  d.setState(M0.fixtureState('P9','chain'));d.endTurn();A.equal(d.getState().units.some(u=>u.id==='rack'),false);A.equal(d.getState().units.some(u=>u.id==='target'),false);
  let removed=M0.emptyState([M0.unit('king','player','king',4,0),M0.unit('cannon','player','cannon',1,2),M0.unit('rack','player','horse',1,4),M0.unit('target','enemy','cannon',1,7),M0.unit('survivor','enemy','pawn',2,1),M0.unit('boss','enemy','king',4,8)]);removed.intents=[{actor:'target',kind:'cannon',from:{x:1,y:7},to:{x:1,y:2},offset:{x:0,y:-5},type:'attack',path:[],order:1},{actor:'survivor',kind:'pawn',from:{x:2,y:1},to:{x:2,y:0},offset:{x:0,y:-1},type:'attack',path:[],order:2}];d.setState(removed);d.select('cannon');d.target({x:1,y:7});d.execute();els['btn-cancel'].onclick();const overview=d.getMarks().filter(m=>m.layer==='intent-overview');A.equal(overview.some(m=>m.x===1&&m.y===2),false);A.ok(overview.some(m=>m.x===2&&m.y===0));A.doesNotMatch(els['intent-list'].innerHTML,/target/);A.match(els['intent-list'].innerHTML,/炮 · 攻击.*已移除/);
  d.setState(M0.fixtureState('P9','friendly-fire'));d.hoverEnemy('lead');A.match(els['hover-intent'].innerHTML,/第 1 序/);A.match(els['hover-intent'].innerHTML,/预计命中：敌军兵 HP 1→0（阵亡）/);
+});
+
+test('US-008 默认兵、弓、枪在单位列表与操作面板可见',()=>{
+ const d=window.__M0_DEBUG__;d.setState(M0.newGame());
+ for(const id of ['king','rook','starting-cannon','starting-pawn','starting-archer','starting-spearman'])A.ok(d.getState().units.some(u=>u.id===id));
+ d.select('starting-pawn');A.match(els['selected-card'].innerHTML,/<b>兵<\/b> @ \(1,3\)/);A.match(els['selected-card'].innerHTML,/HP 1\/1 · 攻击 1/);d.target({x:1,y:4});A.match(els['preview-box'].innerHTML,/攻击.*\(1,3\) → \(1,4\)/);d.execute();let pawn=d.getState().units.find(u=>u.id==='starting-pawn');A.deepEqual([pawn.x,pawn.y,pawn.ap],[1,3,0]);
+ d.setState(M0.newGame());d.select('starting-archer');A.match(els['selected-card'].innerHTML,/<b>弓<\/b> @ \(4,3\)/);A.match(els['selected-card'].innerHTML,/前向 Lv\.2\/8 · 攻击 1 格/);A.match(els.directions.innerHTML,/前 Lv\.2/);A.match(els.directions.innerHTML,/右 Lv\.2/);
+ d.select('starting-spearman');A.match(els['selected-card'].innerHTML,/<b>枪兵<\/b> @ \(7,3\)/);A.match(els['selected-card'].innerHTML,/HP 2\/2 · 攻击 1/);A.match(els.directions.innerHTML,/后 Lv\.2/);A.match(els.directions.innerHTML,/左 Lv\.2/);
 });

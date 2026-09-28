@@ -111,7 +111,7 @@ test('T34-T38 模拟纯净、升级解围、车双段搜索、unknown、旧预�
 test('T39-T40 跨波继承、新购干净、奖励一次、重开清零',()=>{
  let s=F(U('r','player','rook',0,0));Object.assign(G(s,'r'),{level:4,kills:3,sp:3,hp:1,rookChargeRange:3,rookMoveAvailable:false,rookChargeAvailable:false});s.phase='shop';s.gold=2;s=R.buy(s,'horse');A.deepEqual([G(s,'horse').level,G(s,'horse').sp],[1,0]);s=R.nextWave(s);A.deepEqual([G(s,'r').level,G(s,'r').hp,G(s,'r').rookChargeRange,G(s,'r').rookMoveAvailable],[4,1,3,true]);
  s=F(U('r','player','rook',4,7));G(s,'boss').hp=1;s=act(s,'r',{x:4,y:8},'charge');A.deepEqual([s.phase,s.gold],['shop',2]);A.strictEqual(R.endTurn(s).state,s);
- for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual([z.wave,z.turn,z.gold,z.kills,z.units.length],[1,1,0,0,11]);}
+ for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual([z.wave,z.turn,z.gold,z.kills,z.units.length],[1,1,0,0,14]);}
 });
 
 test('T41-T46 转职赠送一次、继承、总等级无上限、职业隔离',()=>{
@@ -154,15 +154,16 @@ test('US-002 河道、宫、外缘与炮跨8步',()=>{
 
 test('US-003 默认初始炮、双炮、继承、阵亡购买与重开',()=>{
  let s=R.newGame(),c=G(s,'starting-cannon');
- A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon']);A.equal(s.units.filter(u=>u.side==='enemy').length,8);A.equal(s.gold,0);
+ A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon','starting-pawn','starting-archer','starting-spearman']);A.equal(s.units.filter(u=>u.side==='enemy').length,8);A.equal(s.gold,0);
  A.deepEqual([c.kind,c.x,c.y,c.level,c.sp,c.hp,c.maxHp,c.attack,c.ap,c.cannonMask],['cannon',1,2,1,0,2,2,2,1,0]);
+ s.units=s.units.filter(u=>u.id!=='starting-pawn');c=G(s,'starting-cannon');
  const shot=R.actionAt(s,c,{x:1,y:7});A.ok(shot);A.deepEqual(shot.path,[{x:1,y:3},{x:1,y:4},{x:1,y:5},{x:1,y:6},{x:1,y:7}]);s=R.submitAction(s,shot).state;
  A.equal(G(s,'w1-4'),undefined);A.ok(G(s,'w1-0'));A.deepEqual([G(s,'starting-cannon').level,G(s,'starting-cannon').sp,G(s,'starting-cannon').ap],[2,1,0]);
  s=up(s,'starting-cannon','cannon-splash',2);A.deepEqual([G(s,'starting-cannon').sp,G(s,'starting-cannon').cannonMask],[0,4]);s=turn(s);A.equal(G(s,'starting-cannon').ap,1);
  s.phase='shop';s.gold=2;s.bought=false;const bought=R.buy(s,'cannon');A.notStrictEqual(bought,s);s=bought;A.deepEqual([G(s,'starting-cannon').id,G(s,'starting-cannon').x,G(s,'starting-cannon').y,G(s,'cannon').id,G(s,'cannon').x,G(s,'cannon').y],['starting-cannon',1,2,'cannon',2,2]);
  s=R.nextWave(s);A.deepEqual([G(s,'starting-cannon').level,G(s,'starting-cannon').sp,G(s,'starting-cannon').hp,G(s,'starting-cannon').cannonMask,G(s,'starting-cannon').x,G(s,'starting-cannon').y,G(s,'starting-cannon').ap],[2,0,2,4,1,2,1]);A.deepEqual([G(s,'cannon').level,G(s,'cannon').sp,G(s,'cannon').x,G(s,'cannon').y],[1,0,2,2]);
  s=R.newGame();s.units=s.units.filter(u=>u.id!=='starting-cannon');s.phase='shop';s.gold=2;const replacement=R.buy(s,'cannon');A.notStrictEqual(replacement,s);A.equal(G(replacement,'starting-cannon'),undefined);A.deepEqual([G(replacement,'cannon').level,G(replacement,'cannon').sp,G(replacement,'cannon').x,G(replacement,'cannon').y],[1,0,2,2]);
- for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual(z.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon']);A.equal(G(z,'cannon'),undefined);}
+ for(let i=0;i<3;i++){const z=R.newGame();A.deepEqual(z.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon','starting-pawn','starting-archer','starting-spearman']);A.equal(G(z,'cannon'),undefined);}
 });
 
 test('US-005 我方炮可移动后攻击，额度独立且敌炮不变',()=>{
@@ -192,4 +193,26 @@ test('US-006 纵推连推、炮架和冻结攻击边界',()=>{
  s=F(U('er','enemy','rook',0,4),U('block','player','pawn',0,3));s.intents=[{actor:'er',from:{x:0,y:4},to:{x:0,y:2},offset:{x:0,y:-2},type:'charge',path:[],order:1}];A.equal(R.enemyPhase(s).effects[0].status,'cancelled');
  s=F(U('first','enemy','pawn',3,3),U('second','enemy','pawn',3,2));s.intents=[{actor:'first',from:{x:3,y:3},to:{x:3,y:2},offset:{x:0,y:-1},type:'attack',path:[],order:1},{actor:'second',from:{x:3,y:2},to:{x:3,y:1},offset:{x:0,y:-1},type:'attack',path:[],order:2}];out=R.enemyPhase(s);A.deepEqual(out.effects.map(x=>x.status),['success','removed']);
  s=F(U('first','enemy','pawn',4,1),U('after','enemy','pawn',3,1));G(s,'king').hp=1;s.intents=[{actor:'first',from:{x:4,y:1},to:{x:4,y:0},offset:{x:0,y:-1},type:'attack',path:[],order:1},{actor:'after',from:{x:3,y:1},to:{x:3,y:0},offset:{x:0,y:-1},type:'attack',path:[],order:2}];out=R.enemyPhase(s);A.deepEqual([out.state.phase,out.state.result,out.effects.length],['result','dead',1]);
+});
+
+test('US-008 初始兵系阵容、攻击、成长、跨波与重开',()=>{
+ const starter=['king','rook','starting-cannon','starting-pawn','starting-archer','starting-spearman'];
+ let s=R.newGame(),players=s.units.filter(u=>u.side==='player');
+ A.deepEqual(players.map(u=>u.id),starter);A.equal(s.units.filter(u=>u.side==='enemy').length,8);A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);A.ok(s.intents.length===8);
+ for(const [id,kind,x,y,hp,attack] of [['starting-pawn','pawn',1,3,1,1],['starting-archer','archer',4,3,1,2],['starting-spearman','spearman',7,3,2,1]]){
+  const u=G(s,id);A.deepEqual([u.kind,u.x,u.y,u.hp,u.maxHp,u.attack,u.level,u.kills,u.sp,u.directionPaid],[kind,x,y,hp,hp,attack,1,0,0,[0,0,0,0]]);
+ }
+ for(const [id,target] of [['starting-pawn',{x:1,y:4}],['starting-archer',null],['starting-spearman',null]]){
+  s=R.newGame();const before=G(s,id),out=target?R.submit(s,id,target):R.submitDirection(s,id,0),u=G(out.state,id);
+  A.ok(out.effect);A.deepEqual([u.x,u.y,u.ap,u.kills,u.level,u.sp],[before.x,before.y,0,1,2,1]);
+ }
+ s=grant(R.newGame(),'starting-spearman',1);s=up(s,'starting-spearman','direction',0);s.units.push(U('pierce-target','enemy','pawn',7,5));let pierce=R.submitDirection(s,'starting-spearman',0);A.deepEqual(pierce.effect.victims.sort(),['pierce-target','w1-2']);
+ for(const kind of ['archer','spearman']){
+  s=R.newGame();s=R.submit(s,'starting-pawn',{x:1,y:4}).state;R.resetTurn(G(s,'starting-pawn'));s.units.push(U('promotion-target','enemy','pawn',1,4));s=R.submit(s,'starting-pawn',{x:1,y:4}).state;A.deepEqual([G(s,'starting-pawn').kills,G(s,'starting-pawn').sp],[2,2]);s=up(s,'starting-pawn','promote-'+kind);const u=G(s,'starting-pawn');
+  A.deepEqual([u.id,u.kind,u.x,u.y,u.level,u.kills,u.sp,u.attack,u.hp,u.maxHp],["starting-pawn",kind,1,3,3,2,0,kind==='archer'?2:1,kind==='archer'?1:2,kind==='archer'?1:2]);
+ }
+ s=grant(R.newGame(),'starting-archer',1);s=up(s,'starting-archer','direction',1);A.deepEqual(G(s,'starting-archer').directionPaid,[0,1,0,0]);A.deepEqual(G(s,'starting-spearman').directionPaid,[0,0,0,0]);s=grant(s,'starting-spearman',1);s=up(s,'starting-spearman','direction',2);A.deepEqual(G(s,'starting-spearman').directionPaid,[0,0,1,0]);
+ s=R.newGame();grant(s,'starting-pawn',2);s=up(s,'starting-pawn','promote-archer');s.phase='shop';s.gold=2;s.units=s.units.filter(u=>u.side==='player');s=R.buy(s,'horse');s=R.nextWave(s);A.deepEqual([G(s,'starting-pawn').kind,G(s,'starting-pawn').x,G(s,'starting-pawn').y],["archer",1,3]);A.deepEqual([G(s,'starting-archer').x,G(s,'starting-archer').y,G(s,'starting-spearman').x,G(s,'starting-spearman').y,G(s,'horse').x,G(s,'horse').y],[4,3,7,3,3,0]);A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);
+ s=R.newGame();s.units=s.units.filter(u=>u.id!=='starting-spearman');s.phase='shop';s.gold=2;s.units=s.units.filter(u=>u.side==='player');s=R.buy(s,'cannon');s=R.nextWave(s);A.equal(G(s,'starting-spearman'),undefined);A.deepEqual([G(s,'starting-cannon').x,G(s,'starting-cannon').y,G(s,'cannon').x,G(s,'cannon').y],[1,2,2,2]);A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);
+ s=R.newGame();players=s.units.filter(u=>u.side==='player');A.deepEqual(players.map(u=>u.id),starter);A.equal(players.some(u=>u.id==='horse'||u.id==='cannon'),false);
 });

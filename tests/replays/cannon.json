@@ -1,6 +1,20 @@
 [
   {
     "action": {
+      "actor": "starting-archer",
+      "type": "directional",
+      "to": {
+        "x": 4,
+        "y": 4
+      },
+      "direction": 0
+    }
+  },
+  {
+    "end": true
+  },
+  {
+    "action": {
       "actor": "starting-cannon",
       "type": "move",
       "to": {
@@ -8,9 +22,6 @@
         "y": 2
       }
     }
-  },
-  {
-    "end": true
   },
   {
     "action": {
@@ -25,7 +36,8 @@
   {
     "upgrade": {
       "actor": "starting-cannon",
-      "skill": "fortify"
+      "skill": "cannon-splash",
+      "index": 7
     }
   },
   {
@@ -36,20 +48,37 @@
       "actor": "cannon",
       "type": "move",
       "to": {
-        "x": 3,
+        "x": 5,
         "y": 2
       }
     }
-  },
-  {
-    "end": true
   },
   {
     "action": {
       "actor": "cannon",
       "type": "attack",
       "to": {
-        "x": 3,
+        "x": 5,
+        "y": 8
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "starting-cannon",
+      "type": "move",
+      "to": {
+        "x": 4,
+        "y": 2
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "starting-cannon",
+      "type": "attack",
+      "to": {
+        "x": 4,
         "y": 7
       }
     }
