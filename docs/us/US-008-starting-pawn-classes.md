@@ -48,3 +48,4 @@
 
 | Audit ID | Time (UTC+8) | Event | From role / thread ID | To role / thread ID | Message ID or title | Summary | Evidence links | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| H-US-008-001 | 2026-09-28T11:34:58+08:00 | US_READY | 主策划 / 01a06c5f-88f7-7b40-bc29-6e2885783326 | 开发 / 01a07037-771d-7322-9ffc-00310bb38c60 | 开发交接｜US-008｜初始兵系技能验证阵容 | 初始增加普通兵、弓兵、枪兵，保留帅车炮；明确属性、跨波稳定身份及AC01–06；保护旧局、地形草案与AGENTS改动 | 4f1a770；本文；直接交接消息（工具未返回message ID） | 发送成功，待开发确认接手；尚未实现或验收 |
