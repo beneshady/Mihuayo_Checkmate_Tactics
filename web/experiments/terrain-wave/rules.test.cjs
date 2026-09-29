@@ -121,4 +121,29 @@ test('所有预设无棋子重叠、无山占位，重开恢复山体',()=>{
   for(const scenario of ['main','water','mountain','forest']){const s=G.createState(scenario);assert.equal(new Set(s.units.map(G.key)).size,s.units.length);assert.ok(s.units.every(u=>!G.mountain(s,u)));}
   const s=G.createState('mountain');s.tiles['3,3']=0;assert.equal(G.createState('mountain').tiles['3,3'],2);
 });
+test('撞山额外1伤害，完整山开裂；撞死归推动者且车不追位',()=>{
+  const s=state(),r=add(s,'rook',1,3),e=add(s,'rook',3,3,'enemy');s.tiles['4,3']=2;attack(s,r,3,3);
+  assert.equal(e.hp,0);assert.equal(s.tiles['4,3'],1);assert.equal(s.kills,1);assert.equal(r.x,2);
+});
+test('撞塌山后存活棋子不移入山格，车也不追位',()=>{
+  const s=state(),r=add(s,'rook',1,3),e=add(s,'rook',3,3,'enemy');e.hp=e.maxHp=3;s.tiles['4,3']=1;attack(s,r,3,3);
+  assert.equal(e.hp,1);assert.equal(e.x,3);assert.equal(r.x,2);assert.equal(s.tiles['4,3'],0);assert.equal(s.kills,0);
+});
+test('直接击杀、无震退技能或树林闪避均不伤背后山体',()=>{
+  for(const variant of ['kill','no-push','miss']){const s=state(),r=add(s,'rook',1,3),e=add(s,'rook',3,3,'enemy');s.tiles['4,3']=2;
+    if(variant==='kill')e.hp=1;if(variant==='no-push')r.push=false;if(variant==='miss')s.tiles['3,3']='forest';
+    attack(s,r,3,3,variant==='miss'?0:1);assert.equal(s.tiles['4,3'],2);assert.equal(s.kills,variant==='kill'?1:0);
+  }
+});
+test('棋子阻挡、越界、宫界阻挡不产生撞山伤害',()=>{
+  const s=state(),r=add(s,'rook',1,3),e=add(s,'rook',3,3,'enemy');add(s,'pawn',4,3,'enemy');attack(s,r,3,3);assert.equal(e.hp,1);
+  const t=state(),a=add(t,'rook',4,6),k=t.units.find(u=>u.id==='boss');k.x=4;k.y=9;t.tiles['4,10']=2;attack(t,a,4,9);assert.equal(k.hp,1);
+  const v=state(),b=add(v,'rook',5,8),king=v.units.find(u=>u.id==='boss');king.x=6;king.y=8;v.tiles['7,8']=2;attack(v,b,6,8);assert.equal(king.hp,1);assert.equal(v.tiles['7,8'],2);
+});
+test('撞山斩将触发胜利，后续炮架随山坍塌失效',()=>{
+  const s=state(),r=add(s,'rook',5,6),boss=s.units.find(u=>u.id==='boss');boss.y=8;s.tiles['5,9']=1;attack(s,r,5,8);
+  assert.equal(s.result,'victory');assert.equal(s.kills,1);assert.equal(r.y,7);assert.equal(s.tiles['5,9'],0);
+  const t=state(),a=add(t,'rook',1,3),e=add(t,'rook',3,3,'enemy'),c=add(t,'cannon',4,1,'enemy','c');t.tiles['4,3']=1;
+  const intent={actor:'c',dx:0,dy:5,standby:false};assert.ok(G.intentAction(t,intent).action);attack(t,a,3,3);assert.match(G.intentAction(t,intent).reason,/失效/);
+});
 console.log(`${total}/${total} terrain rule checks passed`);

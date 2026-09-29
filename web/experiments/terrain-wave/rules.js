@@ -135,6 +135,12 @@
         if (inside(p) && !occupied(s, p) && (!['king', 'advisor'].includes(primary.kind) || inPalace(primary, p))) {
           primary.x = p.x; primary.y = p.y;
           note(s, `${label(primary)}被震退至 ${key(p)}`); water(s, primary, u);
+        } else if (inside(p) && mountain(s, p) && (!['king', 'advisor'].includes(primary.kind) || inPalace(primary, p))) {
+          primary.hp -= 1;
+          s.tiles[key(p)]--;
+          note(s, `${label(primary)}撞山，额外伤害 1；山 ${key(p)} ${s.tiles[key(p)] === 0 ? '坍塌为陆地' : '开裂 · 再命中一次坍塌'}`);
+          if (primary.hp <= 0) died(s, primary, u, '撞山');
+          // 碰撞不产生位移，即使山坍塌也不进入山格；车不追位。
         } else note(s, '震退受阻 · 无额外伤害');
       }
     }
