@@ -1,3 +1,4 @@
+"use strict";
 /**
  * 战局数据（formatVersion 1）的纯数据结构与解析校验。
  *
@@ -5,191 +6,51 @@
  * 便于脱离引擎独立审阅与验证（见 docs/cocos/development-baseline.md）。
  * 数据格式定义见 docs/design/battle-state-format.md。
  */
-
-/** 参战方控制类型 */
-export type ControllerType = 'human' | 'ai';
-
-/** 文档用途标记 */
-export type BattleKind = 'battleInit' | 'battleSave';
-
-export interface GridPos {
-    x: number;
-    y: number;
-}
-
-export interface BattleMeta {
-    kind: BattleKind;
-    battleId: string;
-    displayName?: string;
-    createdAt?: string;
-    savedAt?: string;
-    extra?: Record<string, unknown>;
-}
-
-export interface BattleCondition {
-    type: string;
-    /** eliminateDef 专用：目标棋子 defId（如"击杀帅即胜"） */
-    defId?: string;
-}
-
-export interface BattleRules {
-    rulesetId: string;
-    params: {
-        maxRounds?: number;
-        winConditions?: BattleCondition[];
-        loseConditions?: BattleCondition[];
-    };
-    extra?: Record<string, unknown>;
-}
-
-/** tileGrid 类型图层（地形层） */
-export interface TileGridLayer {
-    id: string;
-    type: 'tileGrid';
-    /** 稀疏格的默认地形（M0 要求 cells 为完整网格，暂不使用） */
-    default?: string;
-    /** cells[y][x] = 地形 defId；行数 = height，每行长度 = width */
-    cells: string[][];
-}
-
-/** 其他类型图层：本步骤不解析，原样透传保留 */
-export interface PassthroughLayer {
-    id: string;
-    type: string;
-    [key: string]: unknown;
-}
-
-export type MapLayer = TileGridLayer | PassthroughLayer;
-
-export interface BattleMap {
-    gridType: 'square';
-    width: number;
-    height: number;
-    layers: MapLayer[];
-    extra?: Record<string, unknown>;
-}
-
-export interface BattlePlayer {
-    id: string;
-    name?: string;
-    team?: number;
-    controller?: ControllerType;
-    extra?: Record<string, unknown>;
-}
-
-export interface UnitStatus {
-    id: string;
-    turns: number;
-    power?: number;
-}
-
-export interface BattleUnit {
-    id: string;
-    defId: string;
-    owner: string;
-    pos: GridPos;
-    hp?: number;
-    /** 当前体力（缺省视为满，满值由 def.maxStamina 决定）；每回合开始回满 */
-    stamina?: number;
-    actedThisTurn?: boolean;
-    statuses?: UnitStatus[];
-    extra?: Record<string, unknown>;
-}
-
-export interface BattleTurn {
-    round: number;
-    order: string[];
-    active: string;
-    phase: string;
-    extra?: Record<string, unknown>;
-}
-
-/**
- * 敌方冻结攻击意图（US-006 敌方预告回合；运行时字段，不入关卡 JSON，formatVersion 不变）。
- * 合同核心：锁定「相对位移 offset」而非受害者或世界坐标——
- * 预测/结算目标格 = 攻击者「当前实际位置 + offset」，方向与距离保持冻结值；
- * 形状合法性在每次结算时按当前局面重验，失效不另选动作。
- */
-export type FrozenIntentType = 'attack' | 'standby';
-
-export interface FrozenIntent {
-    /** 发起攻击的敌方单位 id */
-    actorId: string;
-    /** 冻结时的棋种 defId（攻击者阵亡后详情仍可显示棋种名） */
-    defId: string;
-    type: FrozenIntentType;
-    /** 冻结时攻击者位置（展示「冻结起点」） */
-    fromPos: GridPos;
-    /** 冻结时预计落点 = fromPos + offset */
-    toPos: GridPos;
-    /** 相对位移 = 冻结落点 − 冻结时攻击者位置 */
-    offset: GridPos;
-    /** 行动顺序（稳定出生序，1 起）；显示顺序必须等于执行顺序 */
-    order: number;
-}
-
-export interface BattleState {
-    formatVersion: 1;
-    meta: BattleMeta;
-    rules: BattleRules;
-    map: BattleMap;
-    players: BattlePlayer[];
-    units: BattleUnit[];
-    turn: BattleTurn;
-    /** 敌方冻结意图（运行时生成；关卡 JSON 不含此字段） */
-    intents?: FrozenIntent[];
-    rng?: { seed: number; calls: number };
-    result: { winner: string; reason: string } | null;
-    history?: { commands: unknown[] };
-}
-
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BattleParseError = void 0;
+exports.parseBattleState = parseBattleState;
+exports.findTileGridLayer = findTileGridLayer;
+exports.gridToIso = gridToIso;
+exports.isoToGrid = isoToGrid;
 /** 解析错误：message 前缀携带出错字段的 JSON 路径，便于定位 */
-export class BattleParseError extends Error {
-    public readonly path: string;
-
-    constructor(path: string, message: string) {
+class BattleParseError extends Error {
+    constructor(path, message) {
         super(`${path}: ${message}`);
         this.name = 'BattleParseError';
         this.path = path;
     }
 }
-
-function isObject(value: unknown): value is Record<string, unknown> {
+exports.BattleParseError = BattleParseError;
+function isObject(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
-
-function requireObject(value: unknown, path: string): Record<string, unknown> {
+function requireObject(value, path) {
     if (!isObject(value)) {
         throw new BattleParseError(path, '应为对象（object）');
     }
     return value;
 }
-
-function requireNumber(value: unknown, path: string): number {
+function requireNumber(value, path) {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
         throw new BattleParseError(path, '应为数字（number）');
     }
     return value;
 }
-
-function requireString(value: unknown, path: string): string {
+function requireString(value, path) {
     if (typeof value !== 'string') {
         throw new BattleParseError(path, '应为字符串（string）');
     }
     return value;
 }
-
-function requireArray(value: unknown, path: string): unknown[] {
+function requireArray(value, path) {
     if (!Array.isArray(value)) {
         throw new BattleParseError(path, '应为数组（array）');
     }
     return value;
 }
-
-function findTileGridLayerIndex(layers: unknown[]): number {
+function findTileGridLayerIndex(layers) {
     return layers.findIndex((layer) => isObject(layer) && layer.type === 'tileGrid');
 }
-
 /**
  * 解析并校验战局 JSON（formatVersion 1）。
  *
@@ -199,23 +60,19 @@ function findTileGridLayerIndex(layers: unknown[]): number {
  *
  * @throws BattleParseError 携带 JSON 路径的解析错误
  */
-export function parseBattleState(raw: unknown): BattleState {
+function parseBattleState(raw) {
     const root = requireObject(raw, '$');
-
     const formatVersion = requireNumber(root.formatVersion, '$.formatVersion');
     if (formatVersion !== 1) {
         throw new BattleParseError('$.formatVersion', `不支持的格式版本 ${formatVersion}，当前仅支持 1`);
     }
-
     const metaRaw = requireObject(root.meta, '$.meta');
     const kind = requireString(metaRaw.kind, '$.meta.kind');
     if (kind !== 'battleInit' && kind !== 'battleSave') {
         throw new BattleParseError('$.meta.kind', `应为 "battleInit" 或 "battleSave"，实际为 "${kind}"`);
     }
     requireString(metaRaw.battleId, '$.meta.battleId');
-
     requireObject(root.rules, '$.rules');
-
     const mapRaw = requireObject(root.map, '$.map');
     const gridType = requireString(mapRaw.gridType, '$.map.gridType');
     if (gridType !== 'square') {
@@ -235,16 +92,13 @@ export function parseBattleState(raw: unknown): BattleState {
         requireString(layerObj.id, `$.map.layers[${index}].id`);
         requireString(layerObj.type, `$.map.layers[${index}].type`);
     });
-
     requireArray(root.players, '$.players');
     requireArray(root.units, '$.units');
-
     const turnRaw = requireObject(root.turn, '$.turn');
     requireNumber(turnRaw.round, '$.turn.round');
     requireArray(turnRaw.order, '$.turn.order');
     requireString(turnRaw.active, '$.turn.active');
     requireString(turnRaw.phase, '$.turn.phase');
-
     // 地形层（tileGrid）：M0 要求完整网格
     const terrainIndex = findTileGridLayerIndex(layersRaw);
     if (terrainIndex < 0) {
@@ -265,57 +119,31 @@ export function parseBattleState(raw: unknown): BattleState {
             requireString(cell, `${terrainPath}.cells[${y}][${x}]`);
         });
     });
-
-    return raw as BattleState;
+    return raw;
 }
-
 /** 从图层列表中取地形层；parseBattleState 已保证其存在 */
-export function findTileGridLayer(map: BattleMap): TileGridLayer | undefined {
-    return map.layers.find((layer): layer is TileGridLayer => layer.type === 'tileGrid');
+function findTileGridLayer(map) {
+    return map.layers.find((layer) => layer.type === 'tileGrid');
 }
-
-export interface IsoOptions {
-    /** 顶面菱形半宽（世界单位） */
-    halfTileW: number;
-    /** 顶面菱形半高（世界单位） */
-    halfTileH: number;
-    /** 顶面中心相对图心的纵向修正（世界单位，向下为负） */
-    anchorOffsetY: number;
-}
-
-export interface IsoCoord {
-    isoX: number;
-    isoY: number;
-    /** 渲染深度：x+y，越小越远、越先绘制 */
-    depth: number;
-}
-
 /**
  * 逻辑格坐标 → 等距世界坐标。
  * Cocos +y 轴向上：深度（x+y）越大越靠近镜头，屏幕位置越靠下（y 越小）。
  * x 轴向右下、y 轴向左下展开（经典等距布局）；深度越小越远、越先绘制。
  * 逻辑网格仍是方形（x,y），等距只是视觉投影，两者解耦。
  */
-export function gridToIso(x: number, y: number, options: IsoOptions): IsoCoord {
+function gridToIso(x, y, options) {
     return {
         isoX: (x - y) * options.halfTileW,
         isoY: -(x + y) * options.halfTileH + options.anchorOffsetY,
         depth: x + y,
     };
 }
-
 /**
  * 等距世界坐标 → 逻辑格坐标（gridToIso 的逆运算，供触摸拾取使用）。
  * 输入必须是地块所在容器的本地坐标；调用方先用容器世界矩阵的逆把触点转到本地，
  * 因此本函数对任意平移/缩放视角都成立。逻辑格出界返回 null。
  */
-export function isoToGrid(
-    isoX: number,
-    isoY: number,
-    options: IsoOptions,
-    width: number,
-    height: number,
-): GridPos | null {
+function isoToGrid(isoX, isoY, options, width, height) {
     const diff = isoX / options.halfTileW; // x − y
     const sum = (options.anchorOffsetY - isoY) / options.halfTileH; // x + y
     const x = Math.round((diff + sum) / 2);

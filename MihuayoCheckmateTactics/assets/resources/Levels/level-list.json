@@ -2,6 +2,9 @@
   "formatVersion": 1,
   "levels": [
     { "id": "level-01", "name": "第一关 · 初阵", "rewardGold": 100 },
-    { "id": "level-02", "name": "第二关 · 荒林遭遇", "rewardGold": 150 }
+    { "id": "level-02", "name": "第二关 · 荒林遭遇", "rewardGold": 150 },
+    { "id": "fixture-01-basics", "name": "演练 · 敌方预告基础", "rewardGold": 0 },
+    { "id": "fixture-02-cannon-rack", "name": "演练 · 炮架攻防", "rewardGold": 0 },
+    { "id": "fixture-03-chain", "name": "演练 · 序贯连锁", "rewardGold": 0 }
   ]
 }

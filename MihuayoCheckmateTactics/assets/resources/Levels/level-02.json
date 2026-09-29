@@ -49,6 +49,7 @@
     { "id": "p2", "name": "敌军", "team": 1, "controller": "ai", "extra": {} }
   ],
   "units": [
+    { "id": "king", "defId": "shuai", "owner": "p1", "pos": { "x": 0, "y": 5 }, "extra": {} },
     { "id": "u1", "defId": "che", "owner": "p1", "pos": { "x": 0, "y": 4 }, "extra": {} },
     { "id": "u2", "defId": "pao", "owner": "p1", "pos": { "x": 1, "y": 4 }, "extra": {} },
     { "id": "u3", "defId": "soldier", "owner": "p1", "pos": { "x": 2, "y": 4 }, "extra": {} },

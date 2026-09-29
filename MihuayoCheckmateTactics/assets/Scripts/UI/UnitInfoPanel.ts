@@ -21,8 +21,8 @@ export class UnitInfoPanel extends Component {
         this.node.active = false;
     }
 
-    /** 显示棋子信息 */
-    public show(info: UnitInfo): void {
+    /** 显示棋子信息；extraLines 为协调者组装的附加行（如敌方威胁预测），按序追加在信息之后 */
+    public show(info: UnitInfo, extraLines?: string[]): void {
         if (!this.infoLabel) {
             if (!this.warnedLabelMissing) {
                 this.warnedLabelMissing = true;
@@ -32,7 +32,7 @@ export class UnitInfoPanel extends Component {
             return;
         }
         this.node.active = true;
-        this.infoLabel.string = this.format(info);
+        this.infoLabel.string = this.format(info) + (extraLines?.length ? `\n${extraLines.join('\n')}` : '');
     }
 
     /** 收起面板 */

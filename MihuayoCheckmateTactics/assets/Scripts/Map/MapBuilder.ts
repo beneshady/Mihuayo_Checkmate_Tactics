@@ -1,5 +1,5 @@
 import { _decorator, Color, Component, Node, Prefab, Sprite, SpriteFrame, UITransform, Vec3, error, instantiate, tween } from 'cc';
-import { BattleState, findTileGridLayer, gridToIso } from '../Core/BattleState';
+import { BattleMap, BattleState, findTileGridLayer, gridToIso } from '../Core/BattleState';
 import { ISO_SQUASH_K, IsoLayout, makeIsoLayout, squareTileSide } from './IsoLayout';
 import { Tile } from './Tile';
 
@@ -114,7 +114,8 @@ export class MapBuilder extends Component {
             const faceSprite = face.addComponent(Sprite);
             faceSprite.sizeMode = Sprite.SizeMode.CUSTOM;
             faceSprite.spriteFrame = tile.getSpriteFrame(cell.terrainId);
-            const faceTransform = face.addComponent(UITransform);
+            // Sprite 依赖（requireComponent）已自动补挂 UITransform，这里只取不再加，否则重复添加报错
+            const faceTransform = face.getComponent(UITransform)!;
             const side = squareTileSide(this.halfTileW) * TILE_OVERLAP;
             faceTransform.setContentSize(side, side);
             face.angle = 45;

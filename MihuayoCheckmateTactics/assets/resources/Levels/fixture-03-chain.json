@@ -1,0 +1,69 @@
+{
+  "formatVersion": 1,
+  "meta": {
+    "kind": "battleInit",
+    "battleId": "fixture-03-chain",
+    "displayName": "演练 · 序贯连锁",
+    "createdAt": "2026-02-11T10:00:00+08:00",
+    "savedAt": "2026-02-11T10:00:00+08:00",
+    "extra": {}
+  },
+  "rules": {
+    "rulesetId": "core-v1",
+    "params": {
+      "maxRounds": 20,
+      "winConditions": [
+        { "type": "eliminateAllEnemies" }
+      ],
+      "loseConditions": [
+        { "type": "loseAllUnits" }
+      ]
+    },
+    "extra": {}
+  },
+  "map": {
+    "gridType": "square",
+    "width": 9,
+    "height": 7,
+    "layers": [
+      {
+        "id": "terrain",
+        "type": "tileGrid",
+        "default": "plain",
+        "cells": [
+          ["road", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+          ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
+        ]
+      }
+    ],
+    "extra": {}
+  },
+  "players": [
+    { "id": "p1", "name": "玩家", "team": 0, "controller": "human", "extra": {} },
+    { "id": "p2", "name": "敌军", "team": 1, "controller": "ai", "extra": {} }
+  ],
+  "units": [
+    { "id": "king", "defId": "shuai", "owner": "p1", "pos": { "x": 0, "y": 0 }, "extra": {} },
+    { "id": "S", "defId": "soldier", "owner": "p1", "pos": { "x": 5, "y": 2 }, "hp": 30, "extra": {} },
+    { "id": "T", "defId": "soldier", "owner": "p1", "pos": { "x": 3, "y": 2 }, "extra": {} },
+    { "id": "W", "defId": "soldier", "owner": "p1", "pos": { "x": 1, "y": 5 }, "extra": {} },
+    { "id": "e1", "defId": "soldier", "owner": "p2", "pos": { "x": 5, "y": 1 }, "extra": {} },
+    { "id": "e2", "defId": "pao", "owner": "p2", "pos": { "x": 7, "y": 2 }, "extra": {} },
+    { "id": "e3", "defId": "soldier", "owner": "p2", "pos": { "x": 6, "y": 6 }, "extra": {} }
+  ],
+  "turn": {
+    "round": 1,
+    "order": ["p1", "p2"],
+    "active": "p1",
+    "phase": "command",
+    "extra": {}
+  },
+  "rng": { "seed": 20260213, "calls": 0 },
+  "result": null,
+  "history": { "commands": [] }
+}
