@@ -1,16 +1,5 @@
 [
   {
-    "action": {
-      "actor": "starting-archer",
-      "type": "directional",
-      "to": {
-        "x": 4,
-        "y": 4
-      },
-      "direction": 0
-    }
-  },
-  {
     "end": true
   },
   {
@@ -68,23 +57,25 @@
   },
   {
     "action": {
-      "actor": "horse",
+      "actor": "starting-cannon",
       "type": "attack",
       "to": {
-        "x": 1,
-        "y": 1
+        "x": 4,
+        "y": 4
       }
     }
   },
   {
+    "end": true
+  },
+  {
     "action": {
-      "actor": "starting-archer",
-      "type": "directional",
+      "actor": "horse",
+      "type": "attack",
       "to": {
-        "x": 4,
-        "y": 4
-      },
-      "direction": 0
+        "x": 2,
+        "y": 2
+      }
     }
   },
   {
@@ -93,7 +84,7 @@
       "type": "attack",
       "to": {
         "x": 4,
-        "y": 7
+        "y": 6
       }
     }
   }

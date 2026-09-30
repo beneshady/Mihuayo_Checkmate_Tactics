@@ -1,7 +1,7 @@
 // US-001 正式局确定性回放：马/炮分支，两波胜利、首波花 SP、队友造成伤害。
 const {test}=require('node:test'),A=require('node:assert/strict'),R=require('../web/js/rules.js');
 for(const branch of ['horse','cannon'])test(`${branch} 分支：未注入资源的完整两波胜利`,()=>{
- let s=R.newGame(),wave1Upgrade=false,allyDamage=false,maxAnalysisMs=0;const log=require(`./replays/${branch}.json`);
+ let s=R.chooseCommanderBuff(R.newGame(),'health'),wave1Upgrade=false,allyDamage=false,maxAnalysisMs=0;const log=require(`./replays/${branch}.json`);
  A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon','starting-pawn','starting-archer','starting-spearman']);A.equal(s.units.reduce((n,u)=>n+u.sp,0),0);A.equal(s.gold,0);
  for(const [i,step] of log.entries()){
   if(s.phase==='player'){const before=JSON.stringify(s),t=performance.now(),a=R.analyze(s);maxAnalysisMs=Math.max(maxAnalysisMs,performance.now()-t);A.equal(a.safe,true,`步骤 ${i} 被判无解`);A.equal(JSON.stringify(s),before,'分析污染状态')}

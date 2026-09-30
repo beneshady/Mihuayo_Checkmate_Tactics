@@ -1,16 +1,5 @@
 [
   {
-    "action": {
-      "actor": "starting-archer",
-      "type": "directional",
-      "to": {
-        "x": 4,
-        "y": 4
-      },
-      "direction": 0
-    }
-  },
-  {
     "end": true
   },
   {
@@ -48,7 +37,7 @@
       "actor": "cannon",
       "type": "move",
       "to": {
-        "x": 5,
+        "x": 1,
         "y": 2
       }
     }
@@ -58,8 +47,8 @@
       "actor": "cannon",
       "type": "attack",
       "to": {
-        "x": 5,
-        "y": 8
+        "x": 1,
+        "y": 4
       }
     }
   },
