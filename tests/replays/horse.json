@@ -1,5 +1,22 @@
 [
   {
+    "action": {
+      "actor": "starting-cannon",
+      "type": "attack",
+      "to": {
+        "x": 1,
+        "y": 4
+      }
+    }
+  },
+  {
+    "upgrade": {
+      "actor": "starting-cannon",
+      "skill": "cannon-splash",
+      "index": 2
+    }
+  },
+  {
     "end": true
   },
   {
@@ -20,13 +37,6 @@
         "x": 3,
         "y": 7
       }
-    }
-  },
-  {
-    "upgrade": {
-      "actor": "starting-cannon",
-      "skill": "cannon-splash",
-      "index": 1
     }
   },
   {
@@ -37,31 +47,28 @@
       "actor": "starting-cannon",
       "type": "move",
       "to": {
-        "x": 4,
-        "y": 2
-      }
-    }
-  },
-  {
-    "action": {
-      "actor": "starting-cannon",
-      "type": "attack",
-      "to": {
-        "x": 4,
-        "y": 7
-      }
-    }
-  },
-  {
-    "end": true
-  },
-  {
-    "action": {
-      "actor": "starting-cannon",
-      "type": "attack",
-      "to": {
-        "x": 4,
+        "x": 3,
         "y": 4
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "starting-cannon",
+      "type": "attack",
+      "to": {
+        "x": 7,
+        "y": 4
+      }
+    }
+  },
+  {
+    "action": {
+      "actor": "horse",
+      "type": "move",
+      "to": {
+        "x": 1,
+        "y": 1
       }
     }
   },
@@ -74,7 +81,7 @@
       "type": "attack",
       "to": {
         "x": 2,
-        "y": 2
+        "y": 3
       }
     }
   },
@@ -83,8 +90,8 @@
       "actor": "starting-cannon",
       "type": "attack",
       "to": {
-        "x": 4,
-        "y": 6
+        "x": 3,
+        "y": 7
       }
     }
   }
