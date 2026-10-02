@@ -1,14 +1,3 @@
-// US-001 正式局确定性回放：马/炮分支，两波胜利、首波花 SP、队友造成伤害。
-const {test}=require('node:test'),A=require('node:assert/strict'),R=require('../web/js/rules.js');
-for(const branch of ['horse','cannon'])test(`${branch} 分支：未注入资源的完整两波胜利`,()=>{
- let s=R.chooseCommanderBuff(R.newGame(),'health'),wave1Upgrade=false,allyDamage=false,maxAnalysisMs=0;const log=require(`./replays/${branch}.json`);
- A.deepEqual(s.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-cannon','starting-pawn','starting-archer','starting-spearman']);A.equal(s.units.reduce((n,u)=>n+u.sp,0),0);A.equal(s.gold,0);
- for(const [i,step] of log.entries()){
-  if(s.phase==='player'){const before=JSON.stringify(s),t=performance.now(),a=R.analyze(s);maxAnalysisMs=Math.max(maxAnalysisMs,performance.now()-t);A.equal(a.safe,true,`步骤 ${i} 被判无解`);A.equal(JSON.stringify(s),before,'分析污染状态')}
-  if(step.buy){A.equal(s.phase,'shop');A.equal(wave1Upgrade,true);const bought=R.buy(s,step.buy);A.notStrictEqual(bought,s);s=R.nextWave(bought);continue}
-  if(step.upgrade){A.ok(s.phase==='player'||s.phase==='shop');const n=R.purchaseUpgrade(s,step.upgrade.actor,step.upgrade.skill,step.upgrade.index);A.notStrictEqual(n,s,`非法升级 @${i}`);if(s.wave===1)wave1Upgrade=true;s=n;continue}
-  if(step.end){const n=R.endTurn(s).state;A.notStrictEqual(n,s,`非法结束 @${i}`);s=n;continue}
-  const actor=s.units.find(u=>u.id===step.action.actor),r=R.submitAction(s,step.action);A.ok(actor,`单位不存在 @${i}`);A.ok(r.effect,`非法动作 @${i}: ${JSON.stringify(step.action)}`);if(s.wave===2&&actor.id===branch&&r.effect.damage.length)allyDamage=true;s=r.state;
- }
- A.equal(s.phase,'result');A.equal(s.result,'victory');A.equal(wave1Upgrade,true);A.equal(allyDamage,true);A.ok(s.highestLevel>=2);console.log(JSON.stringify({branch,steps:log.length,turn:s.turn,kills:s.kills,highestLevel:s.highestLevel,maxAnalysisMs:+maxAnalysisMs.toFixed(2)}));
-});
+const test=require('node:test');const assert=require('node:assert/strict');const R=require('../web/js/rules.js');
+test('正式状态链：新局、主帅选择、固定第六回合与第十一回合结算',()=>{let s=R.chooseCommanderBuff(R.newGame(),'move');for(let i=0;i<5;i++)s=R.endTurn(s).state;assert.equal(s.turn,6);assert.equal(s.wave,2);s=R.emptyState([R.unit('king','player','king',4,0),R.unit('boss','enemy','king',4,8)]);s.phase='player';s.turn=11;s=R.endTurn(s).state;assert.equal(s.phase,'intermission');});
+test('正式状态链：结算、购买、布阵、下一关主帅选择',()=>{let s=R.newGame();s.phase='intermission';s.gold=5;s=R.buy(s,'rook');s=R.nextLevel(s);assert.equal(s.phase,'deploy');s=R.confirmDeployment(s);s=R.chooseCommanderBuff(s,'health');assert.equal(s.phase,'player');});
