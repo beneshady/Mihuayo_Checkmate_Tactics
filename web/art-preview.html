@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>九格战阵 · 美术占位</title><link rel="stylesheet" href="art-preview.css"></head>
+<body>
+<nav class="review-tools" aria-label="美术页面预览"><label>页面 <select id="view"><option value="loading">Loading</option><option value="menu" selected>主菜单</option><option value="map">三关地图</option><option value="ui">UI资源目录</option></select></label><label><input type="checkbox" id="labels" checked> 显示资源编号</label><a href="preview.html?device=desktop">战斗试玩 ↗</a></nav>
+<main>
+<section id="loading" class="screen" hidden data-slot="loading-bg">
+ <div class="title-block" data-slot="game-logo"><small>九格战阵</small><h1>山河为局</h1><p>Loading 美术占位</p></div>
+ <div class="loading-box"><div class="spinner" data-slot="loading-spinner">阵</div><div class="track" data-slot="loading-track"><div class="fill" data-slot="loading-fill"></div></div><p>加载进度样式 · 65% 示意</p><div class="tip" data-slot="loading-tip">观察敌方意图，再决定每一步。</div><button data-go="menu">查看主菜单</button></div>
+</section>
+<section id="menu" class="screen" data-slot="menu-bg">
+ <div class="mountains" data-slot="menu-ornament" aria-hidden="true"></div>
+ <div class="title-block" data-slot="game-logo"><small>九格战阵</small><h1>山河为局</h1><p>一子落定，山河未定</p></div>
+ <div class="menu-actions"><button class="primary" data-slot="menu-primary" data-go="map">开始游戏</button><button disabled>继续游戏 · 功能预留</button><div class="menu-secondary" data-slot="menu-secondary"><button data-note="设置界面资源待制作，当前仅为美术占位。">设置</button><button data-note="制作人员页面资源待制作，当前仅为美术占位。">制作人员</button></div></div>
+ <p class="footnote">美术占位样稿 · 题字、背景和功能接入待确认</p>
+</section>
+<section id="map" class="screen" hidden>
+ <header><button data-go="menu">← 返回菜单</button><div><small>征战山河</small><h1>三地，三关</h1></div><span>关卡地图草案</span></header>
+ <div class="campaign-layout"><div class="map-wrap" data-slot="campaign-map">
+ <svg viewBox="0 0 1000 800" role="img" aria-labelledby="map-title map-desc"><title id="map-title">战国题材三关区域示意图</title><desc id="map-desc">西部关中、中央中原、东南江淮三个关卡区域。仅为美术构图占位，不代表准确历史疆界。</desc>
+ <defs><pattern id="paper" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24 24 0" stroke="#735d3f" stroke-opacity=".06"/></pattern></defs>
+ <rect width="1000" height="800" rx="16" fill="#d7c49e"/><rect width="1000" height="800" fill="url(#paper)"/>
+ <g class="terrain" fill="none" stroke="#968463" stroke-width="2"><path d="M80 300 115 255 150 300 M100 300 135 250 175 300 M175 200 210 155 245 200 M220 200 255 140 295 200 M370 650 405 600 445 650 M730 185 770 135 810 185"/></g>
+ <g class="regions" stroke="#f9e8bc" stroke-width="4"><path id="region-01" data-region="0" data-slot="region-01" class="selected" d="M125 305 170 230 275 235 335 185 425 230 470 315 450 440 380 505 265 490 185 425 110 410Z"/><path id="region-02" data-region="1" data-slot="region-02" d="M425 230 480 195 550 215 600 130 685 145 745 220 830 230 820 290 890 310 835 350 795 390 790 445 690 455 610 485 515 455 450 440 470 315Z"/><path id="region-03" data-region="2" data-slot="region-03" d="M450 440 515 455 610 485 690 455 790 445 835 495 800 550 820 580 775 625 740 690 650 715 535 690 470 730 400 690 320 655 310 585 380 505Z"/></g>
+ <g fill="none" stroke="#5e90a0" stroke-width="6" opacity=".75"><path d="M265 280 325 255 355 295 355 345 430 355 510 375 610 355 715 375 825 350"/><path d="M270 520 355 550 420 590 520 565 615 605 700 580 803 560"/></g>
+ <path d="M300 370 Q410 280 590 330 Q700 400 620 570" fill="none" stroke="#6e4531" stroke-width="3" stroke-dasharray="8 10"/>
+ <g class="map-labels" fill="#fff4d8" text-anchor="middle"><circle cx="300" cy="365" r="25"/><circle cx="590" cy="330" r="25"/><circle cx="620" cy="565" r="25"/><g fill="#302c24" font-size="22"><text x="300" y="373">一</text><text x="590" y="338">二</text><text x="620" y="573">三</text></g><g font-size="36" font-weight="bold"><text x="300" y="425">关中</text><text x="590" y="390">中原</text><text x="620" y="625">江淮</text></g></g>
+ <text x="60" y="70" fill="#605540" font-size="20">战国题材 · 关卡构图示意</text><text x="60" y="760" fill="#605540" font-size="16">区域名称、范围与关卡内容 TBD；非历史国界</text><text x="925" y="80" fill="#605540" font-size="22">北 ↑</text>
+ </svg></div>
+ <aside class="level-detail" data-slot="level-panel"><div class="level-art" data-slot="level-art"><span id="level-symbol">隘</span><small>关卡插画占位</small></div><p id="level-number">第一关</p><h2 id="level-name">关中</h2><p id="level-copy">山隘与城塞。预留西部关卡的地图区域和主题插画。</p><div class="level-options" aria-label="选择关卡"><button data-region="0" aria-pressed="true">一 · 关中</button><button data-region="1" aria-pressed="false">二 · 中原</button><button data-region="2" aria-pressed="false">三 · 江淮</button></div><button class="primary" data-note="该区域为关卡美术占位。三关敌阵、解锁条件和战斗接入待确认。">关卡入口 · 预留</button><small>解锁条件、敌阵、难度、奖励均 TBD</small></aside></div>
+</section>
+<section id="ui" class="screen catalog" hidden><header><div><small>美术资源目录</small><h1>界面组件</h1></div><p>资源编号与 Excel 一致</p></header><div id="resource-list"></div></section>
+</main><div id="notice" role="status" hidden></div><script src="js/art-preview.js"></script></body></html>

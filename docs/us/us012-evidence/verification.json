@@ -1,0 +1,204 @@
+{
+  "recordedAt": "2026-10-06T23:59:08.693272+08:00",
+  "branch": "codex/web-gameplay-validation",
+  "head": "c8eef3a35049b9f114fcd1385400aeb4850aab7e",
+  "workingTree": "本轮+既有未提交改动，未提交/推送/部署",
+  "versions": {
+    "web/index.html": "847790abe284b433bb953c835c402372730318e8adc0fe60fa65dfab7774ca72",
+    "web/vendor/three.min.js": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2",
+    "web/js/rules.js": "00ff3df25b81b3f83ceacf8c43d62439cfda6a3ef55e223d5648d07921a138fd",
+    "web/js/app.js": "32c9943783cd6c4128879fdfb897f76a7e0093348224b63b521160f668f2dda8",
+    "web/js/ui.js": "adbfed2a194832594fedd6536215ca7dcdecfb8555833da038a9bfb2c80d9ac7",
+    "web/js/maps.js": "878d29b09826a7e661c7d643ae784c916b920e9d6dc1c1e830d13195e69cd4bf",
+    "web/js/editor.js": "d428aa5fb2949ddc2c201b14e2f7fcbf52fa14fa84e943a171ab821959e0a0da",
+    "web/editor.html": "4f4179db2ec6e118bead1ae9fce5ce428571e222c8b522fd06c469ddf3bd2d0d",
+    "web/editor.css": "dde1e4b7f27e92f120369a2b97a0d7d432a06a9e0d87671fdb148749801bf3fb",
+    "web/ui.css": "c952f38439f18b42af02ebe855c228013b042809e3d1d65ebb0d28f392d6bc7d",
+    "web/desktop.css": "dee16e6832704f6c9f5c0d5aabc7526324ce270c42ed5b9822190523e8ac2630",
+    "web/mobile.css": "b15c49148c02669238fa6aeb4b9443548ac07b8bfdd7a6a66c2dbed44953e0fc",
+    "web/preview.html": "ad969f81faa59662d33f631f9d4225b039b055e2e88dce0ae4ae75354f5e2f88",
+    "web/js/preview.js": "4a695b4aafecd1766133fbe68726ca392c0642fe63eda21a5c4d80219f2d4191",
+    "web/preview.css": "4de2714e3348c40e4805a529e1546dd1a7aaced3e23b628307dd45f8ebdb54fc",
+    "web/campaign.css": "0a7fe615546fcdd0ad2deeabde9c9cb232ed9937a6719288fe40bf1f025b7fc9",
+    "web/js/campaign.js": "7e2424b25d3f503f0bed1c92596cfcce411af920ed4232eb65b00e0097a161b1",
+    "web/art-preview.html": "937a1516ce58b6839b237f4ed0f898393b4ef85b96fbd59b191843acaef07a84",
+    "web/art-preview.css": "36fc852cfc4a842f978e83b3f2015661575454e560326763e5564b768de96c73",
+    "web/js/art-preview.js": "e1f2a4e9a8c56dc0c301db5e63056afcb41e34e11508f34050cacf460638f2cc"
+  },
+  "flow": {
+    "result": "PASS",
+    "finishedAt": "2026-10-06T15:57:50.017Z",
+    "cases": 14,
+    "errors": [],
+    "levels": [
+      {
+        "level": 1,
+        "turn": 11,
+        "wave": 2,
+        "gold": 8,
+        "kills": 8,
+        "buff": "health",
+        "broken": true,
+        "party": [
+          {
+            "id": "rook",
+            "level": 4,
+            "sp": 3
+          },
+          {
+            "id": "starting-cannon",
+            "level": 4,
+            "sp": 3
+          },
+          {
+            "id": "starting-pawn",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-archer",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-spearman",
+            "level": 2,
+            "sp": 1
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "turn": 11,
+        "wave": 2,
+        "gold": 10,
+        "kills": 5,
+        "buff": "health",
+        "broken": false,
+        "party": [
+          {
+            "id": "rook",
+            "level": 4,
+            "sp": 3
+          },
+          {
+            "id": "starting-cannon",
+            "level": 8,
+            "sp": 7
+          },
+          {
+            "id": "starting-pawn",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-archer",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-spearman",
+            "level": 3,
+            "sp": 2
+          },
+          {
+            "id": "recruit-pawn-0",
+            "level": 1,
+            "sp": 0
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "turn": 11,
+        "wave": 2,
+        "gold": 15,
+        "kills": 5,
+        "buff": "health",
+        "broken": false,
+        "party": [
+          {
+            "id": "rook",
+            "level": 4,
+            "sp": 3
+          },
+          {
+            "id": "starting-cannon",
+            "level": 12,
+            "sp": 11
+          },
+          {
+            "id": "starting-pawn",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-archer",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-spearman",
+            "level": 4,
+            "sp": 3
+          },
+          {
+            "id": "recruit-pawn-0",
+            "level": 1,
+            "sp": 0
+          }
+        ]
+      },
+      {
+        "level": 1,
+        "turn": 11,
+        "wave": 2,
+        "gold": 5,
+        "kills": 5,
+        "buff": "health",
+        "broken": false,
+        "party": [
+          {
+            "id": "rook",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-cannon",
+            "level": 5,
+            "sp": 4
+          },
+          {
+            "id": "starting-pawn",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-archer",
+            "level": 1,
+            "sp": 0
+          },
+          {
+            "id": "starting-spearman",
+            "level": 2,
+            "sp": 1
+          }
+        ]
+      }
+    ]
+  },
+  "unchangedBaseline": [
+    "rules.js",
+    "maps.js",
+    "ui.js",
+    "preview.html",
+    "preview.js"
+  ],
+  "scope": "仅US012 F流程+PA-MAP-01；B/T/M基础矩阵未重跑",
+  "limitations": [
+    "本页内存旅程，S3未实现",
+    "不代表平衡/全部基础历史验收",
+    "旧基础回归脚本仅适配新入口与另存控件，未本轮执行",
+    "实体手机/真实切页及IAB历史异常未签收"
+  ]
+}

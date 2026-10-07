@@ -1,0 +1,1501 @@
+{
+  "startedVersion": {
+    "web/index.html": "8d6ff8b3d11a224ab0fd5f47a8b9980240697446d05ab2176699db8db6339125",
+    "web/js/app.js": "cb0041e08b7955283a0dcf9d3a4f38611817a2e95b1a05317513394800807660",
+    "web/js/rules.js": "156e373d0da6e8c327eab72d2a78a01cbf92ce52dac7a9afc1ead64d80d519a9",
+    "web/js/ui.js": "47f4d5ea2ddd7dc336b41564e453f052e4b368f172229588d0ff868d29050393",
+    "web/preview.html": "ad969f81faa59662d33f631f9d4225b039b055e2e88dce0ae4ae75354f5e2f88",
+    "web/js/preview.js": "4a695b4aafecd1766133fbe68726ca392c0642fe63eda21a5c4d80219f2d4191",
+    "docs/us/us010-r3-evidence/ui-result.json": "3ad1b5d848af8d4f2eece63f30353f6c2533e6bc6cecf395b4cfea0156691743"
+  },
+  "finishedVersion": {
+    "web/index.html": "8d6ff8b3d11a224ab0fd5f47a8b9980240697446d05ab2176699db8db6339125",
+    "web/js/app.js": "cb0041e08b7955283a0dcf9d3a4f38611817a2e95b1a05317513394800807660",
+    "web/js/rules.js": "156e373d0da6e8c327eab72d2a78a01cbf92ce52dac7a9afc1ead64d80d519a9",
+    "web/js/ui.js": "47f4d5ea2ddd7dc336b41564e453f052e4b368f172229588d0ff868d29050393",
+    "web/preview.html": "ad969f81faa59662d33f631f9d4225b039b055e2e88dce0ae4ae75354f5e2f88",
+    "web/js/preview.js": "4a695b4aafecd1766133fbe68726ca392c0642fe63eda21a5c4d80219f2d4191",
+    "docs/us/us010-r3-evidence/ui-result.json": "3ad1b5d848af8d4f2eece63f30353f6c2533e6bc6cecf395b4cfea0156691743"
+  },
+  "sourceAndOriginalEvidenceUnchanged": true,
+  "browserVersion": "151.0.7922.34",
+  "finishedAt": "2026-10-05T09:05:46.046Z",
+  "scope": "12 fresh-context cache-disabled baseline cold loads + 4 separate observe-instrumented loads; no gameplay/actions or resource injection",
+  "runs": [
+    {
+      "route": "root-desktop",
+      "instrument": false,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x531400c8c000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+          "location": {
+            "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+            "line": 62,
+            "column": 0,
+            "lineNumber": 62,
+            "columnNumber": 0
+          }
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x531400c8c000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+          "location": {
+            "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x531400c8c000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+          "location": {
+            "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x531400c8c000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+          "location": {
+            "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+            "line": 0,
+            "column": 0,
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-desktop",
+      "instrument": false,
+      "iteration": 2,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-desktop",
+      "instrument": false,
+      "iteration": 3,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-mobile",
+      "instrument": false,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-mobile",
+      "instrument": false,
+      "iteration": 2,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-mobile",
+      "instrument": false,
+      "iteration": 3,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-mate40pro",
+      "instrument": false,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": null
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-mate40pro",
+      "instrument": false,
+      "iteration": 2,
+      "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": null
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-mate40pro",
+      "instrument": false,
+      "iteration": 3,
+      "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": null
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-desktop",
+      "instrument": false,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": null
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-desktop",
+      "instrument": false,
+      "iteration": 2,
+      "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": null
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-desktop",
+      "instrument": false,
+      "iteration": 3,
+      "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": null
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": null
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-desktop",
+      "instrument": true,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": {
+            "observations": [
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ally-list",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "selected-card",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "skills",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "rook-modes",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "directions",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "btn-execute",
+                  "nodeType": 1,
+                  "nodeName": "BUTTON"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:205:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:211:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-commander",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-confirm",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-pause",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-shop",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-result",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-mobile-info",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-deploy",
+                  "nodeType": 1,
+                  "nodeName": "SECTION"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:214:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "banner",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:226:6\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              }
+            ],
+            "errors": []
+          }
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "root-mobile",
+      "instrument": true,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": {
+            "observations": [
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ally-list",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "selected-card",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "skills",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "rook-modes",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "directions",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "btn-execute",
+                  "nodeType": 1,
+                  "nodeName": "BUTTON"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:205:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:211:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-commander",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-confirm",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-pause",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-shop",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-result",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-mobile-info",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-deploy",
+                  "nodeType": 1,
+                  "nodeName": "SECTION"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:214:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?diagnostic=load-mobile-20261005",
+                "readyState": "loading",
+                "target": {
+                  "id": "banner",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:226:6\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              }
+            ],
+            "errors": []
+          }
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-mate40pro",
+      "instrument": true,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=mate40pro&acceptance=final-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": {
+            "observations": [],
+            "errors": []
+          }
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": {
+            "observations": [
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ally-list",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "selected-card",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "skills",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "rook-modes",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "directions",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "btn-execute",
+                  "nodeType": 1,
+                  "nodeName": "BUTTON"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:205:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:211:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-commander",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-confirm",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-pause",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-shop",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-result",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-mobile-info",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-deploy",
+                  "nodeType": 1,
+                  "nodeName": "SECTION"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:214:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "banner",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:226:6\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              }
+            ],
+            "errors": []
+          }
+        }
+      ],
+      "gameReady": true
+    },
+    {
+      "route": "preview-desktop",
+      "instrument": true,
+      "iteration": 1,
+      "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+      "pageErrors": [],
+      "exceptions": [],
+      "console": [],
+      "requestFailures": [],
+      "badResponses": [],
+      "frames": [
+        {
+          "url": "http://127.0.0.1:8773/preview.html?device=desktop&diagnostic=load-20261005",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/js/preview.js?v=20261003-dropdown"
+          ],
+          "gameReady": false,
+          "observedNodes": {
+            "ally-list": null,
+            "selected-card": null,
+            "preview-box": null,
+            "skills": null,
+            "rook-modes": null,
+            "directions": null,
+            "btn-execute": null,
+            "ov-deploy": null,
+            "banner": null
+          },
+          "diagnostic": {
+            "observations": [],
+            "errors": []
+          }
+        },
+        {
+          "url": "http://127.0.0.1:8773/?device-preview=20261003",
+          "readyState": "complete",
+          "scripts": [
+            "http://127.0.0.1:8773/vendor/three.min.js",
+            "http://127.0.0.1:8773/js/rules.js?v=us003-starting-cannon",
+            "http://127.0.0.1:8773/js/app.js?v=itb-layout-1",
+            "http://127.0.0.1:8773/js/ui.js?v=itb-layout-1"
+          ],
+          "gameReady": true,
+          "phase": "deploy",
+          "observedNodes": {
+            "ally-list": "DIV",
+            "selected-card": "DIV",
+            "preview-box": "DIV",
+            "skills": "DIV",
+            "rook-modes": "DIV",
+            "directions": "DIV",
+            "btn-execute": "BUTTON",
+            "ov-deploy": "SECTION",
+            "banner": "DIV"
+          },
+          "diagnostic": {
+            "observations": [
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ally-list",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "selected-card",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "skills",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:200:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:199:59\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "rook-modes",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "directions",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:203:21\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:202:32\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "btn-execute",
+                  "nodeType": 1,
+                  "nodeName": "BUTTON"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:205:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "preview-box",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:211:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-commander",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-confirm",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-pause",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-shop",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-result",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-mobile-info",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:49\n    at Array.forEach (<anonymous>)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:213:12\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "ov-deploy",
+                  "nodeType": 1,
+                  "nodeName": "SECTION"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:214:19\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              },
+              {
+                "href": "http://127.0.0.1:8773/?device-preview=20261003",
+                "readyState": "loading",
+                "target": {
+                  "id": "banner",
+                  "nodeType": 1,
+                  "nodeName": "DIV"
+                },
+                "stack": "Error: observe call\n    at MutationObserver.observe (<anonymous>:6:163)\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:226:6\n    at http://127.0.0.1:8773/js/ui.js?v=itb-layout-1:229:3"
+              }
+            ],
+            "errors": []
+          }
+        }
+      ],
+      "gameReady": true
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "passed": 11,
+  "failed": 0,
+  "browserErrors": [],
+  "versions": {
+    "web/index.html": "b31c79273697fd121a9e9e2b2f5f6e1897ba5d45f9bead20ea7eb8d4ce42d9c3",
+    "web/js/rules.js": "00ff3df25b81b3f83ceacf8c43d62439cfda6a3ef55e223d5648d07921a138fd",
+    "web/js/app.js": "78b053a16cc54ff80a8dad26896fdc2be916072cb3bee2282d6363e313a745b0",
+    "web/js/ui.js": "adbfed2a194832594fedd6536215ca7dcdecfb8555833da038a9bfb2c80d9ac7",
+    "web/ui.css": "c952f38439f18b42af02ebe855c228013b042809e3d1d65ebb0d28f392d6bc7d",
+    "web/desktop.css": "dee16e6832704f6c9f5c0d5aabc7526324ce270c42ed5b9822190523e8ac2630",
+    "web/mobile.css": "b15c49148c02669238fa6aeb4b9443548ac07b8bfdd7a6a66c2dbed44953e0fc"
+  },
+  "finishedAt": "2026-10-06T15:10:57.351Z",
+  "scope": "2 historical-map isolated UI chains + current normal mobile undo; other isolated UI probes; new normal terrain/editor flow in terrain-editor-browser.cjs"
+}

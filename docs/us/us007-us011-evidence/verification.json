@@ -1,0 +1,438 @@
+{
+  "recordedAt": "2026-10-06T15:10:00.313Z",
+  "branch": "codex/web-gameplay-validation",
+  "head": "c8eef3a35049b9f114fcd1385400aeb4850aab7e",
+  "workingTree": "未提交改动，保留原US010/策划/美术改动",
+  "versions": {
+    "web/index.html": "b31c79273697fd121a9e9e2b2f5f6e1897ba5d45f9bead20ea7eb8d4ce42d9c3",
+    "web/vendor/three.min.js": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2",
+    "web/js/rules.js": "00ff3df25b81b3f83ceacf8c43d62439cfda6a3ef55e223d5648d07921a138fd",
+    "web/js/app.js": "78b053a16cc54ff80a8dad26896fdc2be916072cb3bee2282d6363e313a745b0",
+    "web/js/ui.js": "adbfed2a194832594fedd6536215ca7dcdecfb8555833da038a9bfb2c80d9ac7",
+    "web/js/maps.js": "878d29b09826a7e661c7d643ae784c916b920e9d6dc1c1e830d13195e69cd4bf",
+    "web/js/editor.js": "707452389fd6ca4b6c901232103494043a7c22fb7bd0c525fd5437af1331a30a",
+    "web/editor.html": "88341428e413d25e5907133b94e01c50cc8a5eeea2f36f36ae7e8f6a75e5ee0c",
+    "web/editor.css": "6afa99d22cb4539ddd9a907d7f00bae5111f095dd436e586977620339b65522f",
+    "web/ui.css": "c952f38439f18b42af02ebe855c228013b042809e3d1d65ebb0d28f392d6bc7d",
+    "web/desktop.css": "dee16e6832704f6c9f5c0d5aabc7526324ce270c42ed5b9822190523e8ac2630",
+    "web/mobile.css": "b15c49148c02669238fa6aeb4b9443548ac07b8bfdd7a6a66c2dbed44953e0fc",
+    "web/preview.html": "ad969f81faa59662d33f631f9d4225b039b055e2e88dce0ae4ae75354f5e2f88",
+    "web/js/preview.js": "4a695b4aafecd1766133fbe68726ca392c0642fe63eda21a5c4d80219f2d4191",
+    "web/preview.css": "4de2714e3348c40e4805a529e1546dd1a7aaced3e23b628307dd45f8ebdb54fc"
+  },
+  "browser": {
+    "result": "PASS",
+    "finishedAt": "2026-10-06T15:07:51.245Z",
+    "cases": [
+      {
+        "name": "E01/AC01-06 桌面六地形、双方棋子、撤销/重做、非法校验"
+      },
+      {
+        "name": "E03/AC09/12 两张命名保存、另存、刷新分别读取、读取可撤销"
+      },
+      {
+        "name": "E02/AC07/08/11 实际准备/拆山、原稿隔离、取消恢复测试、重开自定义、正式局未变"
+      },
+      {
+        "name": "T01 正常首关11回合两波成功",
+        "gold": 8,
+        "kills": 8,
+        "broken": true,
+        "terrain": "land"
+      },
+      {
+        "name": "E04/AC13 正常首关收益购买→商店→绑定第2关手动布阵",
+        "gold": 5,
+        "mapInfo": "自定义：浏览器甲图 · 保存版本1"
+      },
+      {
+        "name": "E05/AC14 重绑不改在途第2关或失败重试快照"
+      },
+      {
+        "name": "T01 正常首关11回合两波成功",
+        "gold": 5,
+        "kills": 5,
+        "broken": false,
+        "terrain": "mountain"
+      },
+      {
+        "name": "E05 新入口正常两波后，第2关实际采用重新绑定的新保存版本"
+      },
+      {
+        "name": "E03 存储错误专项：无记录/损坏/模拟quota失败，原稿与上次保存不被覆盖",
+        "scope": "独立context错误存储注入；非正常玩法"
+      },
+      {
+        "name": "E01/AC10 窄屏实际绘制/添加/撤销与测试入口可操作"
+      }
+    ],
+    "steps": [
+      {
+        "turn": 1,
+        "actor": "rook",
+        "type": "move",
+        "to": [
+          2,
+          0
+        ]
+      },
+      {
+        "turn": 1,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          1,
+          4
+        ],
+        "kills": 1,
+        "kingHP": 3
+      },
+      {
+        "turn": 1,
+        "actor": "starting-spearman",
+        "type": "directional",
+        "to": [
+          7,
+          4
+        ],
+        "kills": 2,
+        "kingHP": 3
+      },
+      {
+        "turn": 2,
+        "actor": "rook",
+        "type": "attack",
+        "to": [
+          2,
+          2
+        ],
+        "terrain": "cracked"
+      },
+      {
+        "turn": 2,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          1,
+          7
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 3,
+        "actor": "rook",
+        "type": "attack",
+        "to": [
+          2,
+          2
+        ],
+        "terrain": "land"
+      },
+      {
+        "turn": 4,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          0
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 5,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          1
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 6,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          4,
+          1
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 6,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          1,
+          4
+        ],
+        "kills": 4,
+        "kingHP": 3
+      },
+      {
+        "turn": 6,
+        "actor": "rook",
+        "type": "attack",
+        "to": [
+          2,
+          5
+        ],
+        "kills": 5,
+        "kingHP": 3
+      },
+      {
+        "turn": 7,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          0
+        ],
+        "kills": 5,
+        "kingHP": 3
+      },
+      {
+        "turn": 7,
+        "actor": "rook",
+        "type": "attack",
+        "to": [
+          5,
+          5
+        ],
+        "kills": 6,
+        "kingHP": 3
+      },
+      {
+        "turn": 8,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          1
+        ],
+        "kills": 6,
+        "kingHP": 3
+      },
+      {
+        "turn": 8,
+        "actor": "rook",
+        "type": "attack",
+        "to": [
+          8,
+          5
+        ],
+        "kills": 7,
+        "kingHP": 3
+      },
+      {
+        "turn": 9,
+        "actor": "king",
+        "type": "attack",
+        "to": [
+          3,
+          0
+        ],
+        "kills": 8,
+        "kingHP": 3
+      },
+      {
+        "turn": 9,
+        "actor": "starting-cannon",
+        "type": "move",
+        "to": [
+          2,
+          2
+        ],
+        "kills": 8,
+        "kingHP": 3
+      },
+      {
+        "turn": 1,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          1,
+          4
+        ],
+        "kills": 1,
+        "kingHP": 3
+      },
+      {
+        "turn": 1,
+        "actor": "starting-spearman",
+        "type": "directional",
+        "to": [
+          7,
+          4
+        ],
+        "kills": 2,
+        "kingHP": 3
+      },
+      {
+        "turn": 2,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          1,
+          7
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 4,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          0
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 5,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          1
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 6,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          4,
+          1
+        ],
+        "kills": 3,
+        "kingHP": 3
+      },
+      {
+        "turn": 6,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          1,
+          4
+        ],
+        "kills": 4,
+        "kingHP": 3
+      },
+      {
+        "turn": 7,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          0
+        ],
+        "kills": 4,
+        "kingHP": 3
+      },
+      {
+        "turn": 7,
+        "actor": "starting-cannon",
+        "type": "attack",
+        "to": [
+          4,
+          2
+        ],
+        "kills": 5,
+        "kingHP": 3
+      },
+      {
+        "turn": 8,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          1
+        ],
+        "kills": 5,
+        "kingHP": 3
+      },
+      {
+        "turn": 9,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          4,
+          1
+        ],
+        "kills": 5,
+        "kingHP": 3
+      },
+      {
+        "turn": 10,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          0
+        ],
+        "kills": 5,
+        "kingHP": 3
+      },
+      {
+        "turn": 11,
+        "actor": "king",
+        "type": "move",
+        "to": [
+          3,
+          1
+        ],
+        "kills": 5,
+        "kingHP": 3
+      }
+    ],
+    "errors": []
+  },
+  "rules": {
+    "terrain": 15,
+    "maps": 9,
+    "base": 9,
+    "legacy": 26,
+    "v23": 12,
+    "plannerAcceptance": 16,
+    "plannerContract": 27,
+    "historicalReplay": 2
+  },
+  "static": {
+    "ui": 3,
+    "dom": 53,
+    "apis": 33
+  },
+  "limitations": [
+    "规则测试为隔离专项，历史地图回放不是新首关正常入口",
+    "存储失败及损坏为独立context故障注入",
+    "真实系统切页/实体手机未本轮独立验收",
+    "IAB历史一次无堆栈异常未归因",
+    "S3战斗自动存档未实施"
+  ],
+  "uiRegression": {
+    "passed": 11,
+    "failed": 0,
+    "browserErrors": [],
+    "versions": {
+      "web/index.html": "b31c79273697fd121a9e9e2b2f5f6e1897ba5d45f9bead20ea7eb8d4ce42d9c3",
+      "web/js/rules.js": "00ff3df25b81b3f83ceacf8c43d62439cfda6a3ef55e223d5648d07921a138fd",
+      "web/js/app.js": "78b053a16cc54ff80a8dad26896fdc2be916072cb3bee2282d6363e313a745b0",
+      "web/js/ui.js": "adbfed2a194832594fedd6536215ca7dcdecfb8555833da038a9bfb2c80d9ac7",
+      "web/ui.css": "c952f38439f18b42af02ebe855c228013b042809e3d1d65ebb0d28f392d6bc7d",
+      "web/desktop.css": "dee16e6832704f6c9f5c0d5aabc7526324ce270c42ed5b9822190523e8ac2630",
+      "web/mobile.css": "b15c49148c02669238fa6aeb4b9443548ac07b8bfdd7a6a66c2dbed44953e0fc"
+    },
+    "finishedAt": "2026-10-06T15:10:57.351Z",
+    "scope": "2 historical-map isolated UI chains + current normal mobile undo; other isolated UI probes; new normal terrain/editor flow in terrain-editor-browser.cjs"
+  },
+  "frozenCheckedAt": "2026-10-06T23:17:47.8335544+08:00"
+}

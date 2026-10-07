@@ -1,0 +1,9 @@
+:root { color-scheme: dark; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: #edf1f5; background: #0c121c; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+/* 预览控件悬浮于页面，不为它保留游戏布局空间。 */
+#preview-device { position: fixed; z-index: 2; top: 12px; right: 12px; width: 214px; height: 34px; padding: 5px 8px; border: 1px solid #53647a; border-radius: 7px; background: #182230eb; color: #c7dcf5; font: inherit; font-size: 12px; cursor: pointer; }
+#preview-device:focus-visible { outline: 3px solid #f7d994; outline-offset: 3px; }
+#preview-stage { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 20%, #223044, #0c121c 75%); }
+#device-shell { position: relative; background: #101722; }
+#game-preview { position: absolute; top: 0; left: 0; border: 0; transform-origin: top left; background: #101722; }

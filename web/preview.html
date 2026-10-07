@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>九格战阵 · 双端预览</title>
+  <link rel="stylesheet" href="preview.css?v=20261003-dropdown">
+</head>
+<body>
+  <select id="preview-device" aria-label="预览分辨率" title="切换预览分辨率，保留当前棋局">
+    <option value="desktop">电脑 · 1920×1080</option>
+    <option value="adaptive">电脑 · 窗口自适应</option>
+    <option value="mate40pro">Mate 40 Pro · 1344×2772</option>
+  </select>
+  <main id="preview-stage" aria-label="游戏预览区域">
+    <div id="device-shell"><iframe id="game-preview" src="./?device-preview=20261003" title="九格战阵游戏" allow="fullscreen"></iframe></div>
+  </main>
+  <script src="js/preview.js?v=20261003-dropdown"></script>
+</body>
+</html>

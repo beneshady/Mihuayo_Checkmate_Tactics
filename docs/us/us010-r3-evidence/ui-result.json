@@ -1,0 +1,16 @@
+{
+  "passed": 10,
+  "failed": 0,
+  "browserErrors": [],
+  "versions": {
+    "web/index.html": "8d6ff8b3d11a224ab0fd5f47a8b9980240697446d05ab2176699db8db6339125",
+    "web/js/rules.js": "156e373d0da6e8c327eab72d2a78a01cbf92ce52dac7a9afc1ead64d80d519a9",
+    "web/js/app.js": "cb0041e08b7955283a0dcf9d3a4f38611817a2e95b1a05317513394800807660",
+    "web/js/ui.js": "47f4d5ea2ddd7dc336b41564e453f052e4b368f172229588d0ff868d29050393",
+    "web/ui.css": "c952f38439f18b42af02ebe855c228013b042809e3d1d65ebb0d28f392d6bc7d",
+    "web/desktop.css": "dee16e6832704f6c9f5c0d5aabc7526324ce270c42ed5b9822190523e8ac2630",
+    "web/mobile.css": "b15c49148c02669238fa6aeb4b9443548ac07b8bfdd7a6a66c2dbed44953e0fc"
+  },
+  "finishedAt": "2026-10-04T14:14:33.854Z",
+  "scope": "2 normal desktop/mobile flows + normal mobile undo; other cases are isolated UI probes"
+}
