@@ -3,7 +3,7 @@ import { _decorator, Component, SpriteFrame, warn } from 'cc';
 const { ccclass, property } = _decorator;
 
 /** 贴图缺失时的兜底地形 id（占位策略，素材齐全后可移除） */
-const FALLBACK_TERRAIN_ID = 'plain';
+const FALLBACK_TERRAIN_ID = 'land';
 
 /** 同一地形只警告一次，避免整张地图刷屏 */
 const warnedTerrains = new Set<string>();

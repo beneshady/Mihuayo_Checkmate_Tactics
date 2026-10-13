@@ -61,7 +61,7 @@ export class UnitBuilder extends Component {
      * 按 depth（x+y）从深到浅遍历——棋子重叠时前景优先。
      */
     public hitUnitAt(localX: number, localY: number, units: BattleUnit[]): string | undefined {
-        const sorted = [...units].sort((a, b) => (b.pos.x + b.pos.y) - (a.pos.x + a.pos.y));
+        const sorted = [...units].sort((a, b) => (b.x + b.y) - (a.x + a.y));
         for (const unit of sorted) {
             const node = this.unitNodes.get(unit.id);
             if (!node) continue;
@@ -143,7 +143,7 @@ export class UnitBuilder extends Component {
 
         // 按 depth（x+y）升序创建：棋子相互重叠时前景后创建、盖在上面
         const units = [...state.units].sort(
-            (a, b) => (a.pos.x + a.pos.y) - (b.pos.x + b.pos.y),
+            (a, b) => (a.x + a.y) - (b.x + b.y),
         );
 
         // 重建注册表：buildUnits 可能在重开局时再次调用
@@ -153,10 +153,10 @@ export class UnitBuilder extends Component {
         for (const unit of units) {
             const node = instantiate(this.unitPrefab);
             this.node.addChild(node);
-            node.name = `unit_${unit.id}_${unit.owner}`;
-            const { isoX, isoY } = gridToIso(unit.pos.x, unit.pos.y, layout);
+            node.name = `unit_${unit.id}_${unit.side}`;
+            const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
             const finalY = isoY;
-            node.getComponent(Unit)!.setUnit(unit.id, unit.owner, unit.defId);
+            node.getComponent(Unit)!.setUnit(unit.id, unit.side, unit.kind);
 
             // 底边中心锚点：棋子底座底边顶在顶面中心
             node.getComponent(UITransform)?.setAnchorPoint(0.5, 0);
@@ -168,8 +168,8 @@ export class UnitBuilder extends Component {
             const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : 1;
             node.setScale(unitScale, unitScale, 1);
 
-            // 阵营标记：玩家(controller=human)金、敌方红
-            this.addSideMarker(node, unit.owner, state);
+            // 阵营标记：我方金、敌方红
+            this.addSideMarker(node, unit.side);
 
             this.unitNodes.set(unit.id, node);
 
@@ -198,22 +198,16 @@ export class UnitBuilder extends Component {
         this.scheduleOnce(() => { onComplete?.(); }, Math.max(totalReveal, 0));
     }
 
-    /** 玩家（controller=human）的 owner id；无人方时返回 undefined */
-    private selfOwnerId(state: BattleState): string | undefined {
-        const self = state.players.find((p) => p.controller === 'human');
-        return self?.id;
-    }
-
     /**
      * 在棋子底部画一个带色圆环作为阵营标记（底边中心上方，紧贴底座/踩点边缘）。
      * 用描边圆环（透明中心），避免盖住棋子本体；绘制在棋子本地坐标系，随节点缩放。
      */
-    private addSideMarker(node: Node, ownerId: string, state: BattleState): void {
+    private addSideMarker(node: Node, side: string): void {
         const sprite = node.getComponent(Sprite);
         if (!sprite || !sprite.spriteFrame) {
             return;
         }
-        const color = ownerId === this.selfOwnerId(state) ? this.sideMarkerSelfColor : this.sideMarkerEnemyColor;
+        const color = side === 'player' ? this.sideMarkerSelfColor : this.sideMarkerEnemyColor;
 
         const marker = new Node('sideMarker');
         marker.layer = node.layer;

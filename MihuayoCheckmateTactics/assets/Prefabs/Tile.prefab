@@ -173,7 +173,7 @@
   },
   {
     "__type__": "TerrainSpriteEntry",
-    "terrainId": "plain",
+    "terrainId": "land",
     "spriteFrame": {
       "__uuid__": "a83b0ea9-f96f-4fea-9be6-cb3816328a10@f9941",
       "__expectedType__": "cc.SpriteFrame"
@@ -197,7 +197,7 @@
   },
   {
     "__type__": "TerrainSpriteEntry",
-    "terrainId": "hill",
+    "terrainId": "mountain",
     "spriteFrame": {
       "__uuid__": "b9247150-8568-4af9-bd1c-47463863edaa@f9941",
       "__expectedType__": "cc.SpriteFrame"
@@ -205,7 +205,7 @@
   },
   {
     "__type__": "TerrainSpriteEntry",
-    "terrainId": "road",
+    "terrainId": "bridge",
     "spriteFrame": {
       "__uuid__": "55ab3cd7-c640-4c53-974b-f79cb932ea8e@f9941",
       "__expectedType__": "cc.SpriteFrame"

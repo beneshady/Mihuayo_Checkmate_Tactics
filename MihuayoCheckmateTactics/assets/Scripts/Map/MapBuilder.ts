@@ -1,5 +1,6 @@
 import { _decorator, Color, Component, Node, Prefab, Sprite, SpriteFrame, UITransform, Vec3, error, instantiate, tween } from 'cc';
-import { BattleMap, BattleState, findTileGridLayer, gridToIso } from '../Core/BattleState';
+import { BattleState, gridToIso, terrainAt } from '../Core/BattleState';
+import { CONFIG } from '../Core/Config';
 import { ISO_SQUASH_K, IsoLayout, makeIsoLayout, squareTileSide } from './IsoLayout';
 import { Tile } from './Tile';
 
@@ -57,7 +58,8 @@ export class MapBuilder extends Component {
 
     /** 推导等距布局（棋子层必须使用同一布局，才能落在正确格点上） */
     public makeLayout(state: BattleState): IsoLayout {
-        return makeIsoLayout(this.halfTileW, state.map);
+        void state;
+        return makeIsoLayout(this.halfTileW, CONFIG.width, CONFIG.height);
     }
 
     /**
@@ -74,26 +76,20 @@ export class MapBuilder extends Component {
             return;
         }
 
-        const layer = findTileGridLayer(state.map);
-        if (!layer) {
-            error('[MapBuilder] map.layers 中未找到 tileGrid 地形层');
-            return;
-        }
-
-        // 先收集全部格子，再按 depth（x+y）升序创建：前景后创建，自然覆盖背景墙体
+        // v2 地图：tiles 稀疏字典（缺省 land），全盘 9×9 枚举
         const cells: Array<{ x: number; y: number; terrainId: string }> = [];
-        for (let y = 0; y < layer.cells.length; y++) {
-            for (let x = 0; x < layer.cells[y].length; x++) {
-                cells.push({ x, y, terrainId: layer.cells[y][x] });
+        for (let y = 0; y < CONFIG.height; y++) {
+            for (let x = 0; x < CONFIG.width; x++) {
+                cells.push({ x, y, terrainId: terrainAt(state.map, x, y) });
             }
         }
         cells.sort((a, b) => (a.x + a.y) - (b.x + b.y));
 
         const layout = this.makeLayout(state);
-        const maxDepth = state.map.width + state.map.height - 2;
+        const maxDepth = CONFIG.width + CONFIG.height - 2;
 
         // 浮岛底座先建（排在所有地块之前 → 渲染在最底层），取景包围盒也会把它算进去（整岛可见）
-        this.createMapBase(layout, state.map);
+        this.createMapBase(layout);
 
         for (const cell of cells) {
             const node = instantiate(this.tilePrefab);
@@ -175,12 +171,13 @@ export class MapBuilder extends Component {
      * 浮岛底座：在全部地块后方垫两片大菱形（顶面 + 下移的下缘），消除棋盘外沿的"悬空硬切边"。
      * 复用地块同款变换（scale (1,k) + Face 旋转 45°），中性灰贴图 × 深色 tint 得到土壤色。
      */
-    private createMapBase(layout: IsoLayout, map: BattleMap): void {
+    private createMapBase(layout: IsoLayout): void {
         if (!this.mapBaseSprite) {
             return;
         }
-        const span = (map.width + map.height) * this.halfTileW;          // 地图菱形全宽
-        const centerX = ((map.width - map.height) / 2) * this.halfTileW; // 地图包围盒中心（x 向不对称）
+        void layout;
+        const span = (CONFIG.width + CONFIG.height) * this.halfTileW;          // 地图菱形全宽
+        const centerX = ((CONFIG.width - CONFIG.height) / 2) * this.halfTileW; // 地图包围盒中心（x 向不对称）
         const side = (span + BASE_MARGIN * 2) / Math.SQRT2;              // 旋转 45° 后对角线 = 菱形宽
         const make = (name: string, y: number, tint: Color): Node => {
             const node = new Node(name);

@@ -1,13 +1,12 @@
 import { _decorator, Color, Component, Graphics, Node } from 'cc';
-import { gridToIso } from '../Core/BattleState';
-import { ReachableCell } from '../Core/movement';
+import { GridPos, gridToIso } from '../Core/BattleState';
 import { IsoLayout } from './IsoLayout';
 
 const { ccclass, property } = _decorator;
 
 /** 一组同色高亮；color 缺省用默认填充色（移动蓝），攻击场景传灰/红两组 */
 export interface HighlightGroup {
-    cells: ReachableCell[];
+    cells: GridPos[];
     color?: Color;
 }
 

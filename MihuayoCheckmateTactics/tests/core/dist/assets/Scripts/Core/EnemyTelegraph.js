@@ -1,312 +1,279 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ROOK_DEF_ID = exports.KING_DEF_ID = void 0;
-exports.findHumanPlayerId = findHumanPlayerId;
-exports.findKing = findKing;
-exports.cloneState = cloneState;
-exports.planEnemyPrep = planEnemyPrep;
-exports.generateEnemyIntents = generateEnemyIntents;
-exports.applyIntent = applyIntent;
-exports.simulateIntents = simulateIntents;
+exports.findHumanKing = findHumanKing;
 exports.isHumanKingDead = isHumanKingDead;
-const movement_1 = require("./movement");
+exports.intentTarget = intentTarget;
+exports.planEnemyPrep = planEnemyPrep;
+exports.applyPrepMove = applyPrepMove;
+exports.generateIntents = generateIntents;
+exports.revalidateIntent = revalidateIntent;
+exports.applyEnemyIntent = applyEnemyIntent;
+exports.enemyPhase = enemyPhase;
+exports.simulateIntent = simulateIntent;
+const Rules_1 = require("./Rules");
+const Actions_1 = require("./Actions");
 const Terrain_1 = require("./Terrain");
-const UnitDefs_1 = require("./UnitDefs");
-/**
- * 敌方预告回合（US-006）核心规则（纯 TS，零引擎依赖）。
- *
- * 回合合同（详见 preview/docs/us/US-006-enemy-telegraph-turn-loop.md §2）：
- * 1. 敌方准备：按稳定出生序逐敌至多一次普通移动（已有合法攻击则原地），逐个使用实时占位；
- * 2. 全部准备完成后按最终局面为每敌冻结至多一个攻击意图（无合法攻击 → 待机），统一冻结后交给玩家；
- * 3. 玩家行动不重新生成意图；预测仅随局面刷新；
- * 4. 玩家结束回合后按冻结顺序逐个执行；帅阵亡立即停止后续动作。
- *
- * 目标锁定（合同 2.2）：意图保存「冻结落点 − 冻结时位置」的相对位移 offset，
- * 结算目标 = 攻击者当前位置 + offset；不追踪受害者、不回打原绝对格、不换目标。
- * 形状/炮架/马腿/宫界/越界在每次结算时按当前局面重验（applyIntent 单一结算路径），
- * 预测（simulateIntents，跑在深拷贝上）与实际执行共用同一函数，保证「预览 = 实际」。
- *
- * 参照原型 preview/web/js/rules.js 的 prepareEnemy / generateIntents / revalidate / enemyPhase。
- * 参见 docs/design/enemy-telegraph-plan.md。
- */
-/** 帅的棋种 id（意图优先级与「帅亡停止」判定的数据约定） */
-exports.KING_DEF_ID = 'shuai';
-/** 车的棋种 id（意图优先级第二档） */
-exports.ROOK_DEF_ID = 'che';
-/** 我方（human 控制方）玩家 id；无则返回 null */
-function findHumanPlayerId(state) {
-    return state.players.find((p) => p.controller === 'human')?.id ?? null;
+const Config_1 = require("./Config");
+/** 当前回合我方帅；不存在返回 undefined */
+function findHumanKing(state) {
+    return state.units.find((u) => u.side === 'player' && u.kind === 'king');
 }
-/** 某玩家的存活帅；场上无帅（如现有关卡未布帅）返回 undefined */
-function findKing(state, ownerId) {
-    return state.units.find((u) => u.owner === ownerId && u.defId === exports.KING_DEF_ID && (u.hp ?? 1) > 0);
+/** 我方帅是否已阵亡（帅亡即时败北判定用） */
+function isHumanKingDead(state) {
+    return !findHumanKing(state);
 }
-/** 深拷贝战局（BattleState 为纯数据；含运行时 intents，供预测模拟使用） */
-function cloneState(state) {
-    return JSON.parse(JSON.stringify(state));
+/** 意图结算落点 = 攻击者当前位置 + offset（对齐原型 intentTarget） */
+function intentTarget(state, intent) {
+    const unit = state.units.find((v) => v.id === intent.actorId);
+    if (unit) {
+        return { x: unit.x + intent.offset.x, y: unit.y + intent.offset.y };
+    }
+    return { ...intent.toPos };
 }
 /**
- * 规划全部敌方准备移动（不改动传入战局；内部在深拷贝上推演）。
- * 每敌：已有合法攻击 → 原地（'保持原位'）；否则在合法空格里选「距帅最近，
- * 同距按 y、x 坐标」的一步（确定性，不引入随机）；逐个移动使用实时占位，不叠子。
- * 我方无存活帅时不移动（与原型一致：无从「接近」）。
- * 准备移动不扣体力（与原型 apply(...,consume=false) 一致；M0 体力只约束我方行动）。
+ * 敌方准备计划（对齐原型 prepareEnemy：边规划边即时落位——后续敌人的攻击判定
+ * 与走位枚举都能看到前序移动后的占位）。返回值供视图逐个播放动画。
+ * 已有攻击 → ready 原地；否则向帅曼哈顿最近的移动一步。
  */
-function planEnemyPrep(state, defs) {
-    const humanId = findHumanPlayerId(state);
-    const king = humanId ? findKing(state, humanId) : undefined;
+function planEnemyPrep(state) {
+    const king = findHumanKing(state);
     const moves = [];
-    if (!humanId || !king) {
+    if (!king) {
         return moves;
     }
-    const sim = cloneState(state);
-    for (const unit of sim.units) {
-        if (unit.owner === humanId || (unit.hp ?? 1) <= 0) {
-            continue;
+    state.units.filter((u) => u.side === 'enemy').forEach((unit) => {
+        const attacks = (0, Actions_1.enemyAttacks)(state, unit);
+        if (attacks.length) {
+            moves.push({ unitId: unit.id, from: { x: unit.x, y: unit.y }, to: { x: unit.x, y: unit.y }, reason: '有攻击可用，原地待命', ready: true });
+            return;
         }
-        const def = (0, UnitDefs_1.getUnitDef)(defs, unit.defId);
-        if (!def) {
-            continue;
+        const options = (0, Actions_1.enemyMoves)(state, unit);
+        options.sort((a, b) => {
+            const da = Math.abs(a.to.x - king.x) + Math.abs(a.to.y - king.y);
+            const db = Math.abs(b.to.x - king.x) + Math.abs(b.to.y - king.y);
+            return da - db || a.to.y - b.to.y || a.to.x - b.to.x;
+        });
+        if (!options.length) {
+            moves.push({ unitId: unit.id, from: { x: unit.x, y: unit.y }, to: { x: unit.x, y: unit.y }, reason: '无可行动作，待机', ready: true });
+            return;
         }
-        const hasAttack = (0, movement_1.computeReachableCells)(sim, unit, def, 'attack').some((c) => c.capture);
-        if (hasAttack) {
-            continue; // 保持原位
-        }
-        const best = (0, movement_1.computeReachableCells)(sim, unit, def, 'move')
-            .filter((c) => !c.capture)
-            .map((c) => ({ cell: c, d: Math.abs(c.x - king.pos.x) + Math.abs(c.y - king.pos.y) }))
-            .sort((a, b) => a.d - b.d || a.cell.y - b.cell.y || a.cell.x - b.cell.x)[0];
-        if (!best) {
-            continue; // 无合法移动：原地
-        }
-        const from = { x: unit.pos.x, y: unit.pos.y };
-        unit.pos = { x: best.cell.x, y: best.cell.y }; // 实时占位：后续敌人按最新局面决策
+        const best = options[0];
         moves.push({
             unitId: unit.id,
-            defId: unit.defId,
-            from,
-            to: { x: unit.pos.x, y: unit.pos.y },
-            reason: `逼近帅（距离 ${best.d}）`,
+            from: { x: unit.x, y: unit.y },
+            to: { ...best.to },
+            reason: `逼近帅（距离 ${Math.abs(best.to.x - king.x) + Math.abs(best.to.y - king.y)}）`,
+            ready: false,
         });
-    }
+        // 原型口径：规划即落位（不扣额度），保证后续敌人规划基于最新占位
+        unit.x = best.to.x;
+        unit.y = best.to.y;
+    });
     return moves;
 }
-// ---------- 意图冻结（合同 2.1.3） ----------
-/**
- * 按当前局面为每个敌方存活单位生成至多一个意图（稳定出生序 = state.units 顺序）。
- * 攻击候选来自走法引擎 attack 模式（炮架/马腿/象眼/入水/地形规则已算好，零特判）；
- * 目标优先级 帅 > 车 > 其他，同优先级按 y、x 坐标（确定性）。
- * 无合法攻击 → standby（明确待机）。不看体力：冻结即承诺（决策④）。
- */
-function generateEnemyIntents(state, defs) {
-    const humanId = findHumanPlayerId(state);
-    const intents = [];
-    let order = 0;
-    for (const unit of state.units) {
-        if (!humanId || unit.owner === humanId || (unit.hp ?? 1) <= 0) {
-            continue;
-        }
-        order += 1;
-        const base = {
-            actorId: unit.id,
-            defId: unit.defId,
-            fromPos: { x: unit.pos.x, y: unit.pos.y },
-            order,
-        };
-        const def = (0, UnitDefs_1.getUnitDef)(defs, unit.defId);
-        const candidates = def
-            ? (0, movement_1.computeReachableCells)(state, unit, def, 'attack').filter((c) => c.capture)
-            : [];
-        if (candidates.length === 0) {
-            intents.push({ ...base, type: 'standby', toPos: { x: unit.pos.x, y: unit.pos.y }, offset: { x: 0, y: 0 } });
-            continue;
-        }
-        const targetPriority = (targetDefId) => targetDefId === exports.KING_DEF_ID ? 0 : targetDefId === exports.ROOK_DEF_ID ? 1 : 2;
-        candidates.sort((a, b) => {
-            const ta = state.units.find((u) => u.pos.x === a.x && u.pos.y === a.y);
-            const tb = state.units.find((u) => u.pos.x === b.x && u.pos.y === b.y);
-            return ((ta ? targetPriority(ta.defId) : 3) - (tb ? targetPriority(tb.defId) : 3) ||
-                a.y - b.y ||
-                a.x - b.x);
-        });
-        const target = candidates[0];
-        intents.push({
-            ...base,
-            type: 'attack',
-            toPos: { x: target.x, y: target.y },
-            offset: { x: target.x - unit.pos.x, y: target.y - unit.pos.y },
-        });
+/** 应用一步准备移动（视图播放时调用；直接改 state 坐标，不扣额度；重复落位幂等） */
+function applyPrepMove(state, unitId, to) {
+    const unit = state.units.find((u) => u.id === unitId);
+    if (!unit || unit.side !== 'enemy' || !(0, Config_1.inside)(to)) {
+        return false;
     }
-    return intents;
-}
-function forecast(intent, patch) {
-    return { intent, status: 'invalid', fromPos: null, toPos: null, path: [], victim: null, reason: null, ...patch };
-}
-function occupiedAt(state, x, y) {
-    return state.units.find((u) => u.pos.x === x && u.pos.y === y && (u.hp ?? 1) > 0);
-}
-/** 直线方向匹配（slide 用；dir 为单位轴向量） */
-function matchesDir(dx, dy, dir) {
-    if (dx === 0 && dy === 0)
-        return false;
-    if (dir.dx !== 0 ? Math.sign(dx) !== dir.dx : dx !== 0)
-        return false;
-    if (dir.dy !== 0 ? Math.sign(dy) !== dir.dy : dy !== 0)
-        return false;
+    if (unit.x === to.x && unit.y === to.y) {
+        return true; // planEnemyPrep 已即时落位 → 幂等确认
+    }
+    if ((0, Terrain_1.unitAt)(state, to.x, to.y)) {
+        return false; // 不叠子
+    }
+    unit.x = to.x;
+    unit.y = to.y;
     return true;
 }
-/** from → to 的直线格序列（含两端；仅同行/列时有效） */
-function linePath(from, to) {
-    const path = [];
-    const stepX = Math.sign(to.x - from.x);
-    const stepY = Math.sign(to.y - from.y);
-    let x = from.x;
-    let y = from.y;
-    path.push({ x, y });
-    while (x !== to.x || y !== to.y) {
-        x += stepX;
-        y += stepY;
-        path.push({ x, y });
+/** 冻结全部敌方意图（对齐原型 generateIntents：优先级 帅0>车1>其他2，同级按 y/x） */
+function generateIntents(state) {
+    const king = findHumanKing(state);
+    if (!king) {
+        return [];
     }
-    return path;
-}
-/**
- * 按「攻击者当前位置 → 落点」重验攻击形状（合同 2.2/2.3）：
- * 走法引擎同源的形状判定（step/jump 逐 spec 比对方向距离、leg 别腿、slide 直线路径），
- * 但不看落点是谁——友伤由结算层处理（合同 2.3：不能因为是同阵营而取消）。
- */
-function validateAttackShape(state, attacker, def, to) {
-    const specs = def.attackSpecs ?? def.moveSpecs;
-    const dx = to.x - attacker.pos.x;
-    const dy = to.y - attacker.pos.y;
-    if (dx === 0 && dy === 0) {
-        return { ok: false, reason: '落点与攻击者重合', path: [] };
-    }
-    for (const spec of specs) {
-        if (spec.type === 'step' || spec.type === 'jump') {
-            if (dx !== spec.dir.dx || dy !== spec.dir.dy) {
-                continue;
-            }
-            if (spec.passage === 'leg') {
-                const leg = {
-                    x: attacker.pos.x + (spec.leg?.dx ?? 0),
-                    y: attacker.pos.y + (spec.leg?.dy ?? 0),
-                };
-                if (occupiedAt(state, leg.x, leg.y)) {
-                    return { ok: false, reason: '马腿/象眼受阻', path: [] };
-                }
-            }
-            if (!(0, Terrain_1.canAttackIntoTerrain)(def, (0, Terrain_1.getTerrainAt)(state, to.x, to.y))) {
-                return { ok: false, reason: '目标地形不可攻击', path: [] };
-            }
-            return { ok: true, reason: null, path: [{ x: attacker.pos.x, y: attacker.pos.y }, { ...to }] };
-        }
-        // slide（炮 = screen；solid 直线为未来棋种备用）
-        if (!matchesDir(dx, dy, spec.dir)) {
-            continue;
-        }
-        const path = linePath({ x: attacker.pos.x, y: attacker.pos.y }, to);
-        const between = path.slice(1, -1);
-        if (spec.passage === 'screen') {
-            const screens = between.filter((p) => occupiedAt(state, p.x, p.y)).length;
-            if (screens !== (spec.screen ?? 1)) {
-                return { ok: false, reason: screens === 0 ? '缺少炮架' : '炮架数量不为一', path: [] };
-            }
-        }
-        else if (spec.passage === 'solid') {
-            if (between.some((p) => occupiedAt(state, p.x, p.y))) {
-                return { ok: false, reason: '攻击路径被阻挡', path: [] };
-            }
-        } // fly：无视阻挡
-        if (!(0, Terrain_1.canAttackIntoTerrain)(def, (0, Terrain_1.getTerrainAt)(state, to.x, to.y))) {
-            return { ok: false, reason: '目标地形不可攻击', path: [] };
-        }
-        return { ok: true, reason: null, path };
-    }
-    return { ok: false, reason: '攻击形状或方向失效', path: [] };
-}
-/**
- * 结算单个意图并【修改战局】（预测时传入深拷贝、执行时传入真实战局——同一函数同一语义）。
- * 失效/落空/待机不改动局面；命中按当前落点占位者扣血（不分阵营，友伤照常），
- * 阵亡即从战局移除（与 attackUnit 同约定）。不扣体力：冻结攻击是承诺。
- */
-function applyIntent(state, defs, intent) {
-    const attacker = state.units.find((u) => u.id === intent.actorId && (u.hp ?? 1) > 0);
-    if (!attacker) {
-        return forecast(intent, { status: 'removed', reason: '攻击者已阵亡' });
-    }
-    const fromPos = { x: attacker.pos.x, y: attacker.pos.y };
-    if (intent.type === 'standby') {
-        return forecast(intent, { status: 'standby', fromPos, toPos: { ...fromPos } });
-    }
-    const to = { x: attacker.pos.x + intent.offset.x, y: attacker.pos.y + intent.offset.y };
-    if (to.x < 0 || to.x >= state.map.width || to.y < 0 || to.y >= state.map.height) {
-        return forecast(intent, { status: 'invalid', fromPos, toPos: to, reason: '落点越界' });
-    }
-    const def = (0, UnitDefs_1.getUnitDef)(defs, intent.defId);
-    if (!def) {
-        return forecast(intent, { status: 'invalid', fromPos, toPos: to, reason: '棋种定义缺失' });
-    }
-    const shape = validateAttackShape(state, attacker, def, to);
-    if (!shape.ok) {
-        return forecast(intent, { status: 'invalid', fromPos, toPos: to, reason: shape.reason });
-    }
-    const victim = occupiedAt(state, to.x, to.y) ?? null;
-    if (!victim) {
-        // 落点为空：炮“射空”（炮架已验），其他棋种目标已走开——都不产生伤害（合同 2.3）
-        const isCannon = (def.attackSpecs ?? []).some((s) => s.passage === 'screen');
-        return forecast(intent, {
-            status: 'miss',
-            fromPos,
-            toPos: to,
-            path: shape.path,
-            reason: isCannon ? '射空（落点无目标）' : '目标已离开，落空',
-        });
-    }
-    const victimDef = (0, UnitDefs_1.getUnitDef)(defs, victim.defId);
-    const hpBefore = victim.hp ?? victimDef?.maxHp ?? 1;
-    const hpAfter = hpBefore - def.attack;
-    victim.hp = hpAfter;
-    let dies = false;
-    if (victim.hp <= 0) {
-        dies = true;
-        state.units.splice(state.units.indexOf(victim), 1);
-    }
-    return forecast(intent, {
-        status: 'hit',
-        fromPos,
-        toPos: to,
-        path: shape.path,
-        victim: { unitId: victim.id, defId: victim.defId, hpBefore, hpAfter, dies },
-        reason: victim.owner === attacker.owner ? '友伤：命中本方同伴' : null,
-    });
-}
-/**
- * 按冻结顺序预测全部意图（不改传入战局；跑在深拷贝上，前序结果影响后序局面）。
- * 我方帅阵亡后剩余意图标记 skipped（合同 2.4：停止后续动作；预测与执行同样截断）。
- */
-function simulateIntents(state, defs) {
-    const sim = cloneState(state);
-    const humanId = findHumanPlayerId(sim);
     const out = [];
-    const intents = sim.intents ?? [];
-    for (let i = 0; i < intents.length; i++) {
-        if (humanId && !findKing(sim, humanId)) {
-            out.push(forecast(intents[i], { status: 'skipped', reason: '我方帅已阵亡，停止后续攻击' }));
-            continue;
+    let order = 0;
+    state.units.filter((u) => u.side === 'enemy').forEach((unit) => {
+        order += 1;
+        const attacks = (0, Actions_1.enemyAttacks)(state, unit);
+        attacks.sort((a, b) => {
+            const ta = (0, Terrain_1.unitAt)(state, a.to.x, a.to.y);
+            const tb = (0, Terrain_1.unitAt)(state, b.to.x, b.to.y);
+            const pa = ta && ta.kind === 'king' ? 0 : ta && ta.kind === 'rook' ? 1 : 2;
+            const pb = tb && tb.kind === 'king' ? 0 : tb && tb.kind === 'rook' ? 1 : 2;
+            return pa - pb || a.to.y - b.to.y || a.to.x - b.to.x;
+        });
+        const best = attacks[0];
+        if (!best) {
+            out.push({
+                actorId: unit.id,
+                kind: unit.kind,
+                type: 'standby',
+                fromPos: { x: unit.x, y: unit.y },
+                toPos: { x: unit.x, y: unit.y },
+                offset: { x: 0, y: 0 },
+                order,
+                path: [],
+            });
+            return;
         }
-        out.push(applyIntent(sim, defs, intents[i]));
-    }
+        const action = (0, Rules_1.deepCopy)(best);
+        out.push({
+            actorId: unit.id,
+            kind: unit.kind,
+            type: action.type === 'directional' ? 'directional' : action.type === 'charge' ? 'charge' : 'attack',
+            fromPos: { x: unit.x, y: unit.y },
+            toPos: { ...action.to },
+            offset: { x: action.to.x - unit.x, y: action.to.y - unit.y },
+            order,
+            direction: action.direction,
+            targets: action.targets,
+            mountains: action.mountains,
+            path: action.path.map((p) => ({ ...p })),
+        });
+    });
     return out;
 }
 /**
- * 敌方攻击阶段是否应截断（合同 2.4：我方帅实际阵亡立即失败并停止后续）。
- * 场上无帅的关卡恒为 false（帅生死不参与）。
+ * 攻击形状重验（对齐原型 frozenAttack）：
+ * 炮沿冻结方向重找炮架（山架修正）；普通攻击以「侧交换」验证形状；
+ * 无目标可打但形状成立 → missOnly（射空/落空）。
  */
-function isHumanKingDead(state) {
-    const humanId = findHumanPlayerId(state);
-    if (!humanId) {
-        return false;
+function frozenAttack(state, unit, to) {
+    if (!(0, Config_1.inside)(to) || (unit.x === to.x && unit.y === to.y)) {
+        return { kind: 'invalid', reason: '落点越界或与攻击者重合' };
     }
-    return !findKing(state, humanId);
+    let path = (0, Terrain_1.linePath)(unit, to);
+    if (unit.kind === 'cannon') {
+        if (!path.length) {
+            return { kind: 'invalid', reason: '炮的攻击方向失效' };
+        }
+        const rocks = path.filter((p) => (0, Terrain_1.isMountainAt)(state, p.x, p.y));
+        for (const rp of rocks) {
+            const prefix = (0, Terrain_1.linePath)(unit, rp);
+            if (prefix.slice(0, -1).filter((p) => (0, Terrain_1.isOccupied)(state, p.x, p.y)).length === 1) {
+                to = { ...rp };
+                path = prefix;
+                break;
+            }
+        }
+        // 炮架口径与原型 occupied 一致：活单位 / 尸体 / 山均可作架
+        const screens = path.slice(0, -1).filter((p) => (0, Terrain_1.isOccupied)(state, p.x, p.y)).length;
+        if (screens !== 1) {
+            return { kind: 'invalid', reason: screens > 0 ? '炮架数量不为一' : '缺少炮架' };
+        }
+        return { kind: 'action', action: { actorId: unit.id, from: { x: unit.x, y: unit.y }, to: { ...to }, type: 'attack', path } };
+    }
+    const rock = path.find((p) => (0, Terrain_1.isMountainAt)(state, p.x, p.y));
+    if (rock) {
+        to = { ...rock };
+    }
+    const target = (0, Terrain_1.unitAt)(state, to.x, to.y);
+    if (!target && !(0, Terrain_1.isMountainAt)(state, to.x, to.y)) {
+        return (0, Actions_1.ordinaryAction)(state, unit, to, true)
+            ? { kind: 'missOnly', to: { ...to } }
+            : { kind: 'invalid', reason: '攻击形状或路径失效' };
+    }
+    // 侧交换验证形状：临时把目标换到攻击者阵营，排除「目标自身占位」对形状的干扰
+    let action;
+    if (target) {
+        const old = target.side;
+        target.side = unit.side === 'enemy' ? 'player' : 'enemy';
+        action = (0, Actions_1.ordinaryAction)(state, unit, to);
+        target.side = old;
+    }
+    else {
+        action = (0, Actions_1.ordinaryAction)(state, unit, to);
+    }
+    if (!action) {
+        return { kind: 'invalid', reason: '攻击形状或路径失效' };
+    }
+    return { kind: 'action', action: { ...action, type: 'attack' } };
+}
+/** 意图重验（对齐原型 revalidate：按类型走对应引擎） */
+function revalidateIntent(state, intent) {
+    const unit = state.units.find((v) => v.id === intent.actorId);
+    if (!unit) {
+        return { kind: 'invalid', reason: '攻击者已阵亡' };
+    }
+    if (intent.type === 'standby') {
+        return { kind: 'standby', intent };
+    }
+    if ((0, Terrain_1.isWet)(state, unit)) {
+        return { kind: 'invalid', reason: '水中无法攻击' };
+    }
+    const to = intentTarget(state, intent);
+    if (intent.type === 'directional') {
+        const a = (0, Actions_1.directionalAction)(state, unit.id, intent.direction ?? -1);
+        return a ? { kind: 'action', action: a } : { kind: 'missOnly', to };
+    }
+    if (intent.type === 'charge') {
+        const path = (0, Terrain_1.linePath)(unit, to);
+        if (!path.length || path.length > 1 || path.slice(0, -1).some((p) => (0, Terrain_1.isOccupied)(state, p.x, p.y))) {
+            return { kind: 'invalid', reason: '冲击路径失效' };
+        }
+        return { kind: 'action', action: { actorId: unit.id, from: { x: unit.x, y: unit.y }, to: { ...to }, type: 'charge', path } };
+    }
+    return frozenAttack(state, unit, to);
+}
+/**
+ * 结算单个敌方意图（对齐原型 enemyPhase 的单意图分支）。
+ * @param previewMode 预测模式：在深拷贝上运行，林闪避只标条件
+ */
+function applyEnemyIntent(state, intent, previewMode = false) {
+    const to = intentTarget(state, intent);
+    const unit = state.units.find((v) => v.id === intent.actorId);
+    if (!unit) {
+        return { actor: intent.actorId, to, status: 'removed' };
+    }
+    if (intent.type === 'standby') {
+        return { actor: intent.actorId, to, status: 'standby' };
+    }
+    const revalidated = revalidateIntent(state, intent);
+    if (revalidated.kind === 'invalid') {
+        return { actor: intent.actorId, to, status: 'cancelled', reason: revalidated.reason };
+    }
+    if (revalidated.kind === 'standby') {
+        return { actor: intent.actorId, to, status: 'standby' };
+    }
+    if (revalidated.kind === 'missOnly') {
+        return { actor: intent.actorId, to: revalidated.to, status: 'miss' };
+    }
+    // 敌方无额度概念：consumeAction=false
+    const effect = (0, Rules_1.applyAction)(state, revalidated.action, false, previewMode);
+    return { actor: intent.actorId, to: { x: unit.x, y: unit.y }, status: 'success', effect };
+}
+/**
+ * 全量敌方回合（对齐原型 enemyPhase）：按 order 逐意图结算，终局发生立即截断。
+ * 预测用法：enemyPhase(deepCopy(state), true)。
+ */
+function enemyPhase(state, previewMode = false) {
+    const next = previewMode ? (0, Rules_1.deepCopy)(state) : state;
+    const effects = [];
+    let conditional = false;
+    const intents = next.intents ?? [];
+    intents.forEach((intent) => {
+        if (next.result) {
+            return; // 帅亡等终局已发生，截断后续意图
+        }
+        const e = applyEnemyIntent(next, intent, previewMode);
+        if (previewMode && (conditional || e.conditional)) {
+            e.conditional = true;
+            conditional = true;
+        }
+        effects.push(e);
+    });
+    if (!previewMode) {
+        next.intents = [];
+    }
+    return { state: next, effects, conditional };
+}
+/** 意图预测（威胁面板用）：单意图在深拷贝上的结算结果状态 */
+function simulateIntent(state, intent) {
+    const sim = (0, Rules_1.deepCopy)(state);
+    sim.intents = [intent];
+    return enemyPhase(sim, true).effects[0]
+        ?? { actor: intent.actorId, to: intentTarget(state, intent), status: 'standby' };
 }

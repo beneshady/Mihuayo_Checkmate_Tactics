@@ -1,4 +1,4 @@
-import { BattleParseError } from './BattleState';
+import { BattleParseError, BattleUnit } from './BattleState';
 import { LevelEntry } from './LevelConfig';
 
 /**
@@ -7,25 +7,32 @@ import { LevelEntry } from './LevelConfig';
  * 设计要点（docs/design/main-menu-plan.md §6）：
  * - 配置表回答"世界有什么"，存档回答"玩家到哪了"，二者只通过关卡 id 关联
  * - 解锁是推导值（第 N 关 ⇔ 第 N−1 关已通关），不在存档落盘，杜绝两处状态不一致
- * - 兵营（升级/买兵）设计未定：本期只预留 gold，不预埋字段；将来加字段时 formatVersion 升 2 + 迁移
+ * - P1 升 formatVersion 2：+ 队伍底册（party/activeIds/bench，跨会话延续战役队伍）；
+ *   v1 档自动迁移（队伍视为未开战役，进战斗时按模板重建）
  */
 
-/** 玩家进度存档（formatVersion 1） */
+/** 玩家进度存档（formatVersion 2） */
 export interface PlayerProfile {
-    formatVersion: 1;
-    /** 金币余额（单货币） */
+    formatVersion: 2;
+    /** 金币余额（单货币；战斗内结算经 finishVictory 入 state.gold，胜利时回写） */
     gold: number;
     /** 已通关的关卡 id（去重；解锁推导依据） */
     clearedLevels: string[];
     /** 最近进入的关卡 id（战斗启动参数兼"接着打"；缺省回落第 1 关） */
     currentLevelId?: string;
+    /** 队伍底册（全员最新成长快照；P1，空=尚未开战役） */
+    party?: BattleUnit[];
+    /** 上阵成员 id（P1） */
+    activeIds?: string[];
+    /** 后备成员 id（P1） */
+    bench?: string[];
     /** 透传保留：将来未知字段不丢 */
     extra?: Record<string, unknown>;
 }
 
 /** 新档 */
 export function newProfile(): PlayerProfile {
-    return { formatVersion: 1, gold: 0, clearedLevels: [], extra: {} };
+    return { formatVersion: 2, gold: 0, clearedLevels: [], extra: {} };
 }
 
 /**
@@ -39,10 +46,10 @@ export function parsePlayerProfile(raw: unknown): PlayerProfile {
         throw new BattleParseError('$', '存档根应为对象（object）');
     }
     const obj = raw as Record<string, unknown>;
-    if (obj.formatVersion !== 1) {
+    if (obj.formatVersion !== 1 && obj.formatVersion !== 2) {
         throw new BattleParseError(
             '$.formatVersion',
-            `不支持的存档版本 ${JSON.stringify(obj.formatVersion)}（当前仅支持 1）`,
+            `不支持的存档版本 ${JSON.stringify(obj.formatVersion)}（当前支持 1/2）`,
         );
     }
     const profile = newProfile();
@@ -58,6 +65,16 @@ export function parsePlayerProfile(raw: unknown): PlayerProfile {
     }
     if (typeof obj.currentLevelId === 'string' && obj.currentLevelId.length > 0) {
         profile.currentLevelId = obj.currentLevelId;
+    }
+    // 队伍底册：宽容解析（数组即收；坏项由 constructLevel 防御性校验兜底）
+    if (Array.isArray(obj.party)) {
+        profile.party = obj.party.filter((u): u is BattleUnit => typeof u === 'object' && u !== null && typeof (u as BattleUnit).id === 'string');
+    }
+    if (Array.isArray(obj.activeIds)) {
+        profile.activeIds = obj.activeIds.filter((id): id is string => typeof id === 'string');
+    }
+    if (Array.isArray(obj.bench)) {
+        profile.bench = obj.bench.filter((id): id is string => typeof id === 'string');
     }
     if (typeof obj.extra === 'object' && obj.extra !== null && !Array.isArray(obj.extra)) {
         profile.extra = obj.extra as Record<string, unknown>;
@@ -81,14 +98,18 @@ export function isLevelUnlocked(profile: PlayerProfile, levels: LevelEntry[], id
 }
 
 /**
- * 战胜结算：发放金币并登记通关（复通同样发奖，暂不防刷——用户决策 2026-02）。
+ * 战胜结算：登记通关并发放金币（复通同样发奖，暂不防刷——用户决策 2026-02）。
  * 沿用 Rules.ts 风格：先校验、原地修改、返回是否成功。失败（奖励非法）不动档案。
+ * P1 修订：奖励金额改由战斗结算增量提供（killValues 汇总），0 视为合法（仍登记通关，
+ * 只是没钱可发）；负数仍视为非法拒绝。
  */
 export function grantBattleReward(profile: PlayerProfile, levelId: string, rewardGold: number): boolean {
-    if (!Number.isFinite(rewardGold) || rewardGold <= 0) {
+    if (!Number.isFinite(rewardGold) || rewardGold < 0) {
         return false;
     }
-    profile.gold += Math.floor(rewardGold);
+    if (rewardGold > 0) {
+        profile.gold += Math.floor(rewardGold);
+    }
     if (profile.clearedLevels.indexOf(levelId) === -1) {
         profile.clearedLevels.push(levelId);
     }

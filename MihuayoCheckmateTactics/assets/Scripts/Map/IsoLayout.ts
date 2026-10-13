@@ -1,5 +1,3 @@
-import { BattleMap } from '../Core/BattleState';
-
 /**
  * 等距投影常量（正方形贴图管线）。
  * 顶面贴图是正方形（内容顶到四边），渲染时旋转 45° 并纵向压缩 ISO_SQUASH_K 得到菱形：
@@ -27,10 +25,11 @@ export interface IsoLayout {
  * 推导等距布局：菱形半高 + 深度居中。
  * 地块节点位置 = 顶面菱形中心（正方形贴图中心旋转后即菱形中心），
  * 因此不存在画布中心与顶面中心的偏移，anchorOffsetY 只做地图深度居中。
+ * v2：地图尺寸来自 CONFIG（9×9 固定），不再随关卡 JSON 变化。
  */
-export function makeIsoLayout(halfTileW: number, map: BattleMap): IsoLayout {
+export function makeIsoLayout(halfTileW: number, width: number, height: number): IsoLayout {
     const halfTileH = halfTileW * ISO_SQUASH_K;
-    const depthCenter = (map.width + map.height - 2) / 2;
+    const depthCenter = (width + height - 2) / 2;
     const anchorOffsetY = depthCenter * halfTileH;
     return { halfTileW, halfTileH, anchorOffsetY };
 }

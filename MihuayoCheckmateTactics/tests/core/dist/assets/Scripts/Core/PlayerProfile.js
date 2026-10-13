@@ -7,7 +7,7 @@ exports.grantBattleReward = grantBattleReward;
 const BattleState_1 = require("./BattleState");
 /** 新档 */
 function newProfile() {
-    return { formatVersion: 1, gold: 0, clearedLevels: [], extra: {} };
+    return { formatVersion: 2, gold: 0, clearedLevels: [], extra: {} };
 }
 /**
  * 宽容解析玩家存档（与 assets 配置的"报错拒载"刻意相反，存档能救就救）：
@@ -20,8 +20,8 @@ function parsePlayerProfile(raw) {
         throw new BattleState_1.BattleParseError('$', '存档根应为对象（object）');
     }
     const obj = raw;
-    if (obj.formatVersion !== 1) {
-        throw new BattleState_1.BattleParseError('$.formatVersion', `不支持的存档版本 ${JSON.stringify(obj.formatVersion)}（当前仅支持 1）`);
+    if (obj.formatVersion !== 1 && obj.formatVersion !== 2) {
+        throw new BattleState_1.BattleParseError('$.formatVersion', `不支持的存档版本 ${JSON.stringify(obj.formatVersion)}（当前支持 1/2）`);
     }
     const profile = newProfile();
     if (typeof obj.gold === 'number' && Number.isFinite(obj.gold) && obj.gold >= 0) {
@@ -38,6 +38,16 @@ function parsePlayerProfile(raw) {
     }
     if (typeof obj.currentLevelId === 'string' && obj.currentLevelId.length > 0) {
         profile.currentLevelId = obj.currentLevelId;
+    }
+    // 队伍底册：宽容解析（数组即收；坏项由 constructLevel 防御性校验兜底）
+    if (Array.isArray(obj.party)) {
+        profile.party = obj.party.filter((u) => typeof u === 'object' && u !== null && typeof u.id === 'string');
+    }
+    if (Array.isArray(obj.activeIds)) {
+        profile.activeIds = obj.activeIds.filter((id) => typeof id === 'string');
+    }
+    if (Array.isArray(obj.bench)) {
+        profile.bench = obj.bench.filter((id) => typeof id === 'string');
     }
     if (typeof obj.extra === 'object' && obj.extra !== null && !Array.isArray(obj.extra)) {
         profile.extra = obj.extra;
@@ -59,14 +69,18 @@ function isLevelUnlocked(profile, levels, id) {
     return profile.clearedLevels.indexOf(levels[index - 1].id) !== -1;
 }
 /**
- * 战胜结算：发放金币并登记通关（复通同样发奖，暂不防刷——用户决策 2026-02）。
+ * 战胜结算：登记通关并发放金币（复通同样发奖，暂不防刷——用户决策 2026-02）。
  * 沿用 Rules.ts 风格：先校验、原地修改、返回是否成功。失败（奖励非法）不动档案。
+ * P1 修订：奖励金额改由战斗结算增量提供（killValues 汇总），0 视为合法（仍登记通关，
+ * 只是没钱可发）；负数仍视为非法拒绝。
  */
 function grantBattleReward(profile, levelId, rewardGold) {
-    if (!Number.isFinite(rewardGold) || rewardGold <= 0) {
+    if (!Number.isFinite(rewardGold) || rewardGold < 0) {
         return false;
     }
-    profile.gold += Math.floor(rewardGold);
+    if (rewardGold > 0) {
+        profile.gold += Math.floor(rewardGold);
+    }
     if (profile.clearedLevels.indexOf(levelId) === -1) {
         profile.clearedLevels.push(levelId);
     }
