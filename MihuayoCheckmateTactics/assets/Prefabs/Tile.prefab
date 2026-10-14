@@ -175,7 +175,11 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "land",
     "spriteFrame": {
-      "__uuid__": "a83b0ea9-f96f-4fea-9be6-cb3816328a10@f9941",
+      "__uuid__": "c5e1eb1e-8dfc-42b8-bedb-f1af17eeb77c@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "sideFrame": {
+      "__uuid__": "2baed6d3-17ab-4598-9a18-57b51661e968@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -183,7 +187,11 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "water",
     "spriteFrame": {
-      "__uuid__": "fad366b0-e27a-4e15-a932-bc6922394b35@f9941",
+      "__uuid__": "0506c258-251d-4bb4-b753-fc3c035fceb1@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "sideFrame": {
+      "__uuid__": "651b291a-fcae-4605-81f2-690d644766c7@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -191,7 +199,11 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "forest",
     "spriteFrame": {
-      "__uuid__": "5b96f781-20b3-4a15-ba92-a4f4561acd4c@f9941",
+      "__uuid__": "8d3a5f21-94c7-4b1e-a6d2-3f8b0c5e7a91@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "sideFrame": {
+      "__uuid__": "2baed6d3-17ab-4598-9a18-57b51661e968@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -199,7 +211,11 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "mountain",
     "spriteFrame": {
-      "__uuid__": "b9247150-8568-4af9-bd1c-47463863edaa@f9941",
+      "__uuid__": "b1e94c67-2d5a-4f83-9c0e-6a71d8b2f4e2@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "sideFrame": {
+      "__uuid__": "2baed6d3-17ab-4598-9a18-57b51661e968@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -207,7 +223,11 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "bridge",
     "spriteFrame": {
-      "__uuid__": "55ab3cd7-c640-4c53-974b-f79cb932ea8e@f9941",
+      "__uuid__": "cf2a7d35-8b16-4e92-b7a4-90d3e1f6c8b5@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "sideFrame": {
+      "__uuid__": "2baed6d3-17ab-4598-9a18-57b51661e968@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },

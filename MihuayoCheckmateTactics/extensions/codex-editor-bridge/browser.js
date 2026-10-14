@@ -200,6 +200,7 @@ function isAllowedEditorMessage(packageName, message) {
       'query-url',
       'query-path',
       'create-asset',
+      'refresh-asset',
     ]),
     scene: new Set([
       'execute-scene-script',

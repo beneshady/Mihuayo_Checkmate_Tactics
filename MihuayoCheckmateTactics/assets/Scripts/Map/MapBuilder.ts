@@ -2,6 +2,7 @@ import { _decorator, Color, Component, Node, Prefab, Sprite, SpriteFrame, UITran
 import { BattleState, gridToIso, terrainAt } from '../Core/BattleState';
 import { CONFIG } from '../Core/Config';
 import { ISO_SQUASH_K, IsoLayout, makeIsoLayout, squareTileSide } from './IsoLayout';
+import { SideWallSprite } from './SideWallSprite';
 import { Tile } from './Tile';
 
 const { ccclass, property } = _decorator;
@@ -56,6 +57,9 @@ export class MapBuilder extends Component {
     @property({ type: SpriteFrame, tooltip: '地图底座贴图（中性灰噪点，运行时乘深色）；空则不生成底座' })
     public mapBaseSprite: SpriteFrame | null = null;
 
+    @property({ tooltip: '逐格侧壁厚度（世界单位）。侧面贴图是正方形原始素材（Tile 的 sideFrame），运行时由 SideWallSprite 渲染成侧壁' })
+    public tileThickness = 80;
+
     /** 推导等距布局（棋子层必须使用同一布局，才能落在正确格点上） */
     public makeLayout(state: BattleState): IsoLayout {
         void state;
@@ -103,6 +107,29 @@ export class MapBuilder extends Component {
             const tile = node.getComponent(Tile)!;
             tile.setTerrain(cell.terrainId);
 
+            // 左右侧壁：Tile 的 sideFrame 正方形素材，由 SideWallSprite 运行时渲染成
+            // 「顶边 1:2 斜边 + 竖直边厚度」的平行四边形（先于 Face 添加，接缝被顶面盖住）。
+            // y 缩放抵消父节点 0.5 压缩；左壁用 flipX 顶点镜像。bbox 顶边 = 菱形下边，向下延 tileThickness。
+            const sideFrame = tile.getSideFrame(cell.terrainId);
+            const wallSprites: SideWallSprite[] = [];
+            if (sideFrame) {
+                const wallH = layout.halfTileH + this.tileThickness;
+                for (const dir of [-1, 1]) {
+                    const wall = new Node(dir < 0 ? 'WallL' : 'WallR');
+                    node.addChild(wall);
+                    const wallSprite = wall.addComponent(SideWallSprite);
+                    wallSprite.sizeMode = Sprite.SizeMode.CUSTOM;
+                    wallSprite.spriteFrame = sideFrame;
+                    wallSprite.sideTopRise = layout.halfTileH;
+                    wallSprite.sideThickness = this.tileThickness;
+                    wallSprite.flipX = dir < 0;
+                    wall.getComponent(UITransform)!.setContentSize(this.halfTileW, wallH);
+                    wall.setPosition(dir * this.halfTileW / 2, -(wallH / 2) / ISO_SQUASH_K, 0);
+                    wall.setScale(1, 1 / ISO_SQUASH_K, 1);
+                    wallSprites.push(wallSprite);
+                }
+            }
+
             // 顶面子节点：正方形贴图旋转 45°（运行时创建；边长按世界尺寸归一化，贴图分辨率无关，
             // 不同尺寸素材统一到同一显示大小）。轻微放大覆盖相邻 quad 的浮点发丝缝。
             const face = new Node('Face');
@@ -125,6 +152,7 @@ export class MapBuilder extends Component {
             // 延迟按 (depth/maxDepth)^exponent 递增：指数>1 时前几行间隔小（快）、越往后间隔越大（慢）——先快后慢。
             node.active = false;
             if (faceSprite) faceSprite.color = new Color(255, 255, 255, 0); // 从透明开始，下落时淡入
+            for (const wallSprite of wallSprites) wallSprite.color = new Color(255, 255, 255, 0);
             const finalPos = new Vec3(isoX, isoY, 0);
             const beginY = isoY + TILE_DROP_Y;
             const depth = cell.x + cell.y;
@@ -137,6 +165,11 @@ export class MapBuilder extends Component {
                     .start();
                 if (faceSprite) {
                     tween(faceSprite)
+                        .to(this.tileRevealDuration, { color: new Color(255, 255, 255, 255) }, { easing: 'quadOut' })
+                        .start();
+                }
+                for (const wallSprite of wallSprites) {
+                    tween(wallSprite)
                         .to(this.tileRevealDuration, { color: new Color(255, 255, 255, 255) }, { easing: 'quadOut' })
                         .start();
                 }

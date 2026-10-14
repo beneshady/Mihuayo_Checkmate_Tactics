@@ -16,6 +16,9 @@ export class TerrainSpriteEntry {
 
     @property({ type: SpriteFrame })
     public spriteFrame: SpriteFrame | null = null;
+
+    @property({ type: SpriteFrame, tooltip: '侧面贴图（正方形原始素材，运行时由 SideWallSprite 渲染成侧壁）；空则回退 land 的侧面' })
+    public sideFrame: SpriteFrame | null = null;
 }
 
 /**
@@ -53,5 +56,24 @@ export class Tile extends Component {
         }
         const fallback = this.terrainSprites.find((candidate) => candidate.terrainId === FALLBACK_TERRAIN_ID);
         return fallback ? fallback.spriteFrame : null;
+    }
+
+    /**
+     * 查询地形侧面贴图（正方形原始素材）。条目缺失或未配 sideFrame 时回退 land（与顶面同一兜底策略），
+     * 仍无则返回 null（该地形不生成侧壁）。
+     */
+    public getSideFrame(terrainId: string): SpriteFrame | null {
+        const entry = this.terrainSprites.find((candidate) => candidate.terrainId === terrainId);
+        const frame = entry ? entry.sideFrame : null;
+        if (frame) {
+            return frame;
+        }
+
+        if (!warnedTerrains.has(`side:${terrainId}`)) {
+            warn(`[Tile] 地形 "${terrainId}" 无侧面贴图，使用 "${FALLBACK_TERRAIN_ID}" 的侧面占位`);
+            warnedTerrains.add(`side:${terrainId}`);
+        }
+        const fallback = this.terrainSprites.find((candidate) => candidate.terrainId === FALLBACK_TERRAIN_ID);
+        return fallback ? fallback.sideFrame : null;
     }
 }

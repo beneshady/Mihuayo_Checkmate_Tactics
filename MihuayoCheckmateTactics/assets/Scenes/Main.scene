@@ -345,6 +345,7 @@
     "forestDecorOffsetX": 0,
     "forestDecorOffsetY": 30,
     "mapBaseSprite": null,
+    "tileThickness": 80,
     "_id": "96oe3tcelMuapvzflvcrJm"
   },
   {
