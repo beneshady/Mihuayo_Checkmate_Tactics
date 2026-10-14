@@ -17,6 +17,7 @@ const UnitDefs_1 = require("../../assets/Scripts/Core/UnitDefs");
 const Actions_1 = require("../../assets/Scripts/Core/Actions");
 const Rules_1 = require("../../assets/Scripts/Core/Rules");
 const EnemyTelegraph_1 = require("../../assets/Scripts/Core/EnemyTelegraph");
+const Waves_1 = require("../../assets/Scripts/Core/Waves");
 // ---------- 断言助手 ----------
 let passed = 0;
 const failures = [];
@@ -662,6 +663,324 @@ function actionTo(state, unitId, x, y, type) {
             { id: 'kk', side: 'enemy', kind: 'king', x: 4, y: 8 },
         ] });
     eq(okWater.units.length, 3, 'T23 车/马可出生在水上');
+}
+// ---------- T24 位移碰撞（对拍原型 applyCharge / applyPushCorpse / applyPull 的 pushStatus 全集） ----------
+/** 冲锋车 / 牵引车测试单位工厂（打开对应槽位与射程） */
+function makeCharger(state, id, opts) {
+    const unit = unitById(state, id);
+    unit.rookRole = opts.role;
+    unit.rookChargeAvailable = true;
+    if (opts.role === 'charge') {
+        unit.rookChargeRange = opts.range;
+    }
+    else {
+        unit.rookPullRange = opts.range;
+    }
+    if (opts.push !== undefined) {
+        unit.rookPush = opts.push;
+    }
+}
+{
+    // T24.1 冲锋空地：直接冲到目标格
+    const state = makeState([{ id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 }]);
+    makeCharger(state, 'r', { role: 'charge', range: 3 });
+    const a = actionTo(state, 'r', 2, 5, 'charge');
+    assert(!!a, 'T24.1 冲锋空地动作生成');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    assert(!!submitted.effect, 'T24.1 提交成功');
+    const r2 = unitById(submitted.state, 'r');
+    eq([r2.x, r2.y], [2, 5], 'T24.1 车冲到目标格');
+    eq(submitted.effect.pushStatus ?? null, null, 'T24.1 无 pushStatus');
+}
+{
+    // T24.2 水中断：路径遇水车停在水面（车不淹）
+    const state = makeState([{ id: 'r', side: 'player', kind: 'rook', x: 2, y: 1 }]);
+    makeCharger(state, 'r', { role: 'charge', range: 3 });
+    const tiles = state.map.tiles;
+    tiles['2,3'] = 'water';
+    const a = actionTo(state, 'r', 2, 4, 'charge');
+    assert(!!a, 'T24.2 跨水冲锋动作生成');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    const r2 = unitById(submitted.state, 'r');
+    eq([r2.x, r2.y], [2, 3], 'T24.2 车停在水面格');
+    eq(submitted.effect.pushStatus, 'water-interrupted', 'T24.2 pushStatus=water-interrupted');
+    eq(r2.hp, unitById(state, 'r').hp, 'T24.2 车不淹（hp 不变）');
+}
+{
+    // T24.3 击杀占位：目标阵亡后车占其格
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 5 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3 });
+    unitById(state, 't').hp = 1;
+    unitById(state, 't').maxHp = 1;
+    const a = actionTo(state, 'r', 2, 5, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.victims, ['t'], 'T24.3 目标阵亡');
+    const r2 = unitById(submitted.state, 'r');
+    eq([r2.x, r2.y], [2, 5], 'T24.3 车占目标格');
+}
+{
+    // T24.4 震退 pushed：目标后移 1 格、车近身
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 5 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    unitById(state, 't').hp = 9;
+    unitById(state, 't').maxHp = 9;
+    const a = actionTo(state, 'r', 2, 5, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    const t2 = unitById(submitted.state, 't');
+    const r2 = unitById(submitted.state, 'r');
+    eq([t2.x, t2.y, t2.hp], [2, 6, 8], 'T24.4 目标被推到 (2,6) 且扣直伤 1');
+    eq([r2.x, r2.y], [2, 4], 'T24.4 车近身 (2,4)');
+    eq(submitted.effect.pushStatus, 'pushed', 'T24.4 pushStatus=pushed');
+}
+{
+    // T24.5 outside：目标贴边、身后出界
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 5 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 8 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    unitById(state, 't').hp = 9;
+    unitById(state, 't').maxHp = 9;
+    const a = actionTo(state, 'r', 2, 8, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    const t2 = unitById(submitted.state, 't');
+    eq([t2.x, t2.y, t2.hp], [2, 8, 8], 'T24.5 目标原地扣直伤 1');
+    eq(submitted.effect.pushStatus, 'outside', 'T24.5 pushStatus=outside');
+}
+{
+    // T24.6 palace：推帅出宫被拒
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 4, y: 7 },
+        { id: 'a', side: 'enemy', kind: 'advisor', x: 4, y: 6 },
+        { id: 'kk', side: 'enemy', kind: 'king', x: 4, y: 8 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    unitById(state, 'a').hp = 9;
+    unitById(state, 'a').maxHp = 9;
+    const a = actionTo(state, 'r', 4, 6, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    const a2 = unitById(submitted.state, 'a');
+    eq([a2.x, a2.y, a2.hp], [4, 6, 8], 'T24.6 敌士原地扣直伤 1');
+    eq(submitted.effect.pushStatus, 'palace', 'T24.6 pushStatus=palace（推士出宫被拒）');
+}
+{
+    // T24.7 collision：身后有敌，车-1 / 目标-2 / 阻挡者-1，均不移动
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 5 },
+        { id: 'b', side: 'enemy', kind: 'rook', x: 2, y: 6 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    [['t', 9], ['b', 9], ['r', 9]].forEach(([id, hp]) => {
+        const u = unitById(state, id);
+        u.hp = hp;
+        u.maxHp = hp;
+    });
+    const a = actionTo(state, 'r', 2, 5, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'collision', 'T24.7 pushStatus=collision');
+    eq([unitById(submitted.state, 'r').hp, unitById(submitted.state, 't').hp, unitById(submitted.state, 'b').hp], [8, 6, 8], 'T24.7 目标扣直伤1+碰撞2，其余各 1');
+    eq([unitById(submitted.state, 'r').x, unitById(submitted.state, 't').x, unitById(submitted.state, 'b').x], [2, 2, 2], 'T24.7 三方均不移动');
+}
+{
+    // T24.8 collision-mountain：身后是山，山被撞裂
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 5 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    state.map.tiles['2,6'] = 'mountain';
+    unitById(state, 't').hp = 9;
+    unitById(state, 't').maxHp = 9;
+    const a = actionTo(state, 'r', 2, 5, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'collision-mountain', 'T24.8 pushStatus=collision-mountain');
+    eq(submitted.state.map.tiles['2,6'], 'cracked', 'T24.8 山被撞裂');
+    eq(unitById(submitted.state, 'r').hp, unitById(state, 'r').hp - 1, 'T24.8 车-1');
+    eq(unitById(submitted.state, 't').hp, 6, 'T24.8 目标扣直伤1+碰撞2');
+}
+{
+    // T24.9 未解锁震退：目标只扣血不动
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 5 },
+    ]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: false });
+    unitById(state, 't').hp = 9;
+    unitById(state, 't').maxHp = 9;
+    const a = actionTo(state, 'r', 2, 5, 'charge');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    const t2 = unitById(submitted.state, 't');
+    eq([t2.x, t2.y, t2.hp], [2, 5, 8], 'T24.9 目标原地扣直伤 1');
+    eq(submitted.effect.pushStatus ?? null, null, 'T24.9 无 pushStatus');
+}
+{
+    // T24.10 charge-corpse pushed：尸体被推 1 格
+    const state = makeState([{ id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 }]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    state.corpses = [{ id: 'body-1', x: 2, y: 5, unit: { ...unitById(state, 'r'), id: 'dead-1', side: 'enemy' } }];
+    const a = actionTo(state, 'r', 2, 5, 'charge-corpse');
+    assert(!!a, 'T24.10 推尸动作生成');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'pushed', 'T24.10 pushStatus=pushed');
+    const body = submitted.state.corpses.find((c) => c.id === 'body-1');
+    eq([body.x, body.y], [2, 6], 'T24.10 尸体后移 1 格');
+    eq([unitById(submitted.state, 'r').x, unitById(submitted.state, 'r').y], [2, 4], 'T24.10 车近身');
+}
+{
+    // T24.11 charge-corpse water：尸体被推入水销毁
+    const state = makeState([{ id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 }]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    state.map.tiles['2,6'] = 'water';
+    state.corpses = [{ id: 'body-1', x: 2, y: 5, unit: { ...unitById(state, 'r'), id: 'dead-1', side: 'enemy' } }];
+    const a = actionTo(state, 'r', 2, 5, 'charge-corpse');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'water', 'T24.11 pushStatus=water（销尸）');
+    eq(submitted.state.corpses.length, 0, 'T24.11 尸体已销毁');
+}
+{
+    // T24.12 charge-corpse corpse：身后又有尸体 → 推尸失败
+    const state = makeState([{ id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 }]);
+    makeCharger(state, 'r', { role: 'charge', range: 3, push: true });
+    state.corpses = [
+        { id: 'body-1', x: 2, y: 5, unit: { ...unitById(state, 'r'), id: 'dead-1', side: 'enemy' } },
+        { id: 'body-2', x: 2, y: 6, unit: { ...unitById(state, 'r'), id: 'dead-2', side: 'enemy' } },
+    ];
+    const a = actionTo(state, 'r', 2, 5, 'charge-corpse');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'corpse', 'T24.12 pushStatus=corpse（身后被尸挡）');
+    eq(submitted.state.corpses.map((c) => `${c.x},${c.y}`), ['2,5', '2,6'], 'T24.12 两具尸体原地');
+}
+{
+    // T24.13 pull：敌被拉近 1 格
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 5 },
+    ]);
+    makeCharger(state, 'r', { role: 'pull', range: 3 });
+    unitById(state, 't').hp = 9;
+    unitById(state, 't').maxHp = 9;
+    const a = actionTo(state, 'r', 2, 5, 'pull');
+    assert(!!a, 'T24.13 牵引动作生成');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'pulled', 'T24.13 pushStatus=pulled');
+    eq([unitById(submitted.state, 't').x, unitById(submitted.state, 't').y], [2, 4], 'T24.13 敌被拉近到 (2,4)');
+    eq([unitById(submitted.state, 'r').x, unitById(submitted.state, 'r').y], [2, 2], 'T24.13 车保持原地');
+}
+{
+    // T24.14 pull-collision：贴身强拉双方各 -1，不换位
+    const state = makeState([
+        { id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 },
+        { id: 't', side: 'enemy', kind: 'rook', x: 2, y: 3 },
+    ]);
+    makeCharger(state, 'r', { role: 'pull', range: 3 });
+    unitById(state, 't').hp = 9;
+    unitById(state, 't').maxHp = 9;
+    const a = actionTo(state, 'r', 2, 3, 'pull-collision');
+    assert(!!a, 'T24.14 贴身强拉动作生成');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'collision', 'T24.14 pushStatus=collision');
+    eq([unitById(submitted.state, 'r').hp, unitById(submitted.state, 't').hp], [
+        unitById(state, 'r').hp - 1,
+        unitById(state, 't').hp - 1,
+    ], 'T24.14 双方各 -1');
+    eq([unitById(submitted.state, 't').x, unitById(submitted.state, 't').y], [2, 3], 'T24.14 目标不换位');
+}
+{
+    // T24.15 pull 尸体入水：拉入水销毁
+    const state = makeState([{ id: 'r', side: 'player', kind: 'rook', x: 2, y: 2 }]);
+    makeCharger(state, 'r', { role: 'pull', range: 3 });
+    state.map.tiles['2,3'] = 'water';
+    state.corpses = [{ id: 'body-1', x: 2, y: 4, unit: { ...unitById(state, 'r'), id: 'dead-1', side: 'enemy' } }];
+    const a = actionTo(state, 'r', 2, 4, 'pull');
+    assert(!!a, 'T24.15 牵引尸体动作生成');
+    const submitted = (0, Rules_1.submitAction)(state, a);
+    eq(submitted.effect.pushStatus, 'water', 'T24.15 pushStatus=water（尸体落水销毁）');
+    eq(submitted.state.corpses.length, 0, 'T24.15 尸体已销毁');
+}
+// ---------- T25 回合推进本体（对拍原型 endTurn 的 turn++ 后半段） ----------
+{
+    // T25.1 拒绝：phase 非 player 返回原引用
+    const state = makeState([{ id: 'p', side: 'player', kind: 'pawn', x: 2, y: 2 }]);
+    state.turn.phase = 'rescue';
+    eq((0, Waves_1.advanceTurn)(state), state, 'T25.1 phase 非 player → 原引用');
+}
+{
+    // T25.2 推进与额度重置；原 state 不被修改（纯函数）
+    const state = makeState([
+        { id: 'p', side: 'player', kind: 'pawn', x: 2, y: 2 },
+        { id: 'e', side: 'enemy', kind: 'pawn', x: 2, y: 6 },
+    ]);
+    state.turn.round = 3;
+    const p = unitById(state, 'p');
+    p.ap = 0;
+    const snapshot = state.turn.round;
+    const advanced = (0, Waves_1.advanceTurn)(state);
+    eq(advanced.turn.round, 4, 'T25.2 round+1');
+    eq(unitById(advanced, 'p').ap, unitById(advanced, 'p').apLimit, 'T25.2 行动额度已重置');
+    eq(state.turn.round, snapshot, 'T25.2 原 state 不变（纯函数）');
+    eq(state.units.find((u) => u.id === 'p').ap, 0, 'T25.2 原单位额度不变');
+}
+{
+    // T25.3 round5：增援预告 + 待入场列表
+    const state = makeState([{ id: 'p', side: 'player', kind: 'pawn', x: 2, y: 2 }]);
+    state.turn.round = 4;
+    const advanced = (0, Waves_1.advanceTurn)(state);
+    eq(advanced.reinforcementPreview, true, 'T25.3 增援预告标记');
+    eq((advanced.pendingSpawns ?? []).length, 6, 'T25.3 六名第二波待入场');
+    eq(advanced.pendingSpawns[0].id, 'w2-0', 'T25.3 待入场编号 w2-*');
+}
+{
+    // T25.4 round6（无救援 buff）：直接进第二波，全部入场
+    const state = makeState([{ id: 'p', side: 'player', kind: 'pawn', x: 2, y: 2 }]);
+    state.turn.round = 5;
+    const advanced = (0, Waves_1.advanceTurn)(state);
+    eq(advanced.wave, 2, 'T25.4 进入第二波');
+    eq(advanced.rescueRequired ?? false, false, 'T25.4 不要求救援');
+    eq((advanced.pendingSpawns ?? []).every((p) => p.status === 'spawned'), true, 'T25.4 全部入场');
+    eq(advanced.units.length, state.units.length + 6, 'T25.4 敌方 +6');
+}
+{
+    // T25.5 round6（救援 buff 未用且有我方可选）：进 rescue 阶段
+    const state = makeState([
+        { id: 'p', side: 'player', kind: 'pawn', x: 2, y: 2 },
+        { id: 'e', side: 'enemy', kind: 'pawn', x: 2, y: 6 },
+    ]);
+    state.turn.round = 5;
+    state.commanderBuff = 'rescue';
+    const advanced = (0, Waves_1.advanceTurn)(state);
+    eq(advanced.turn.phase, 'rescue', 'T25.5 进入 rescue 阶段');
+    eq(advanced.rescueRequired ?? false, true, 'T25.5 rescueRequired 标记');
+    eq(advanced.intents ?? [], [], 'T25.5 清空意图');
+    eq(advanced.wave ?? 1, 1, 'T25.5 波次未进');
+}
+{
+    // T25.6 round6（救援已用）：仍然进第二波
+    const state = makeState([{ id: 'p', side: 'player', kind: 'pawn', x: 2, y: 2 }]);
+    state.turn.round = 5;
+    state.commanderBuff = 'rescue';
+    state.rescueUsed = true;
+    const advanced = (0, Waves_1.advanceTurn)(state);
+    eq(advanced.wave, 2, 'T25.6 救援已用 → 直接第二波');
+}
+{
+    // T25.7 round7+：占格阻挡与扣血链路（我方 pawn 占出生格 → 扣 1 阵亡留尸）
+    const state = makeState([
+        { id: 'p', side: 'player', kind: 'pawn', x: 2, y: 5 },
+    ]);
+    state.turn.round = 6;
+    state.pendingSpawns = [{ id: 'w2-0', kind: 'pawn', x: 2, y: 5, status: 'pending' }];
+    const advanced = (0, Waves_1.advanceTurn)(state);
+    eq(advanced.pendingSpawns[0].status, 'blocked', 'T25.7 出生格被占 → blocked');
+    eq(advanced.units.some((u) => u.id === 'p'), false, 'T25.7 占格者 hp1 扣 1 阵亡移除');
+    eq((advanced.corpses ?? []).some((c) => c.unit && c.unit.id === 'p'), true, 'T25.7 阵亡留尸');
+    eq(advanced.units.some((u) => u.id === 'w2-0'), false, 'T25.7 敌未入场');
 }
 // ---------- 汇总 ----------
 console.log(`\n通过 ${passed} 项断言，失败 ${failures.length} 项`);

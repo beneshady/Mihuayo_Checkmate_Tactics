@@ -173,8 +173,8 @@ function intermissionState(gold: number): BattleState {
     const step2 = deployUnit(step1, horse.id, { x: 6, y: 3 });
     eq([step2.units.find((u) => u.kind === 'horse')!.x, step2.units.find((u) => u.kind === 'horse')!.y], [6, 3], 'T7 布阵可连续调整');
     const confirmed = confirmDeployment(step2);
-    eq(confirmed.turn.phase, 'player', 'T7 确认后进 player');
-    assert(!!confirmed.entrySnapshot && confirmed.entrySnapshot!.turn.phase === 'player', 'T7 快照重设为确认后状态');
+    eq(confirmed.turn.phase, 'commander', 'T7 确认后进 commander（P3 帅增益阶段）');
+    assert(!!confirmed.entrySnapshot && confirmed.entrySnapshot!.turn.phase === 'commander', 'T7 快照重设为确认后状态');
     // 后备不获本关收益：后备成员不在战斗单位里（9 人底册 = 帅 + 8 上阵）
     const b2 = confirmDeployment(constructLevel(withNineUnits(), loadLevelJson('level-02') as never, { next: true }));
     eq(b2.units.filter((u) => u.side === 'player').length, 9, 'T7 上阵 8 + 帅，后备第 9 人不上阵');

@@ -114,10 +114,14 @@ export function rockHit(
     }
 }
 
+/** 帅增益/救援的受益对象：我方非帅、非士（对齐原型 commanderTarget；基础层供 Growth/Waves 共用） */
+export function isCommanderTarget(unit: BattleUnit): boolean {
+    return unit.side === 'player' && unit.kind !== 'king' && unit.kind !== 'advisor';
+}
+
 /** 单位死亡留尸：我方 commanderTarget 阵亡且不在水中 → 陆地留尸（对齐原型 leaveCorpse） */
 export function leaveCorpse(state: BattleState, unit: BattleUnit): void {
-    const isCommanderTarget = unit.side === 'player' && unit.kind !== 'king' && unit.kind !== 'advisor';
-    if (!isCommanderTarget || isWaterAt(state, unit.x, unit.y)) {
+    if (!isCommanderTarget(unit) || isWaterAt(state, unit.x, unit.y)) {
         return;
     }
     const body: BattleUnit = { ...unit, hp: 0 };

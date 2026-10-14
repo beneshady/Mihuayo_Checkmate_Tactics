@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Label, Node } from 'cc';
+import { _decorator, Button, Component, Label, Node, warn } from 'cc';
 import { ShopKind } from '../Core/Campaign';
 
 const { ccclass } = _decorator;
@@ -66,7 +66,10 @@ export class IntermissionPanel extends Component {
     public show(gold: number, activeCount: number, benchCount: number, canStart: boolean): void {
         this.node.active = true;
         this.refresh(gold, activeCount, benchCount);
-        this.startDeployButton()?.setActive(canStart);
+        const startButton = this.startDeployButton();
+        if (startButton) {
+            startButton.active = canStart;
+        }
     }
 
     public hide(): void {

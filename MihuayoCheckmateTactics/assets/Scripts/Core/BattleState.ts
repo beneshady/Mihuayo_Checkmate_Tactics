@@ -189,6 +189,16 @@ export interface BattleState {
     bench?: string[];
     /** 过关一次性结算已执行（幂等防重；P1） */
     settled?: boolean;
+    /** 帅增益选择（P3：health 生命 / move 机动 / rescue 救援；部署确认后的 commander 阶段三选一） */
+    commanderBuff?: 'health' | 'move' | 'rescue' | null;
+    /** 本关救援 buff 是否已用（P3；rescue 阶段消费一次） */
+    rescueUsed?: boolean;
+    /** 处于 rescue 阶段：必须救活或复活一人后进入第二波（P3） */
+    rescueRequired?: boolean;
+    /** 第 5 回合增援预告已播（P6；第 6 回合入场） */
+    reinforcementPreview?: boolean;
+    /** 关内波次（1 起；第二波敌人经 pendingSpawns 入场，P6） */
+    wave?: number;
     /** 进战斗前快照（P1） */
     entrySnapshot?: BattleState;
     /** 本关开局快照：失败重试的完整回滚源（P1） */

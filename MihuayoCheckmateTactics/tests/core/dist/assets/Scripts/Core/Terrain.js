@@ -12,6 +12,7 @@ exports.samePos = samePos;
 exports.linePath = linePath;
 exports.isSafePath = isSafePath;
 exports.rockHit = rockHit;
+exports.isCommanderTarget = isCommanderTarget;
 exports.leaveCorpse = leaveCorpse;
 exports.drownCheck = drownCheck;
 exports.insideState = insideState;
@@ -112,10 +113,13 @@ function rockHit(state, p, effect) {
         }
     }
 }
+/** 帅增益/救援的受益对象：我方非帅、非士（对齐原型 commanderTarget；基础层供 Growth/Waves 共用） */
+function isCommanderTarget(unit) {
+    return unit.side === 'player' && unit.kind !== 'king' && unit.kind !== 'advisor';
+}
 /** 单位死亡留尸：我方 commanderTarget 阵亡且不在水中 → 陆地留尸（对齐原型 leaveCorpse） */
 function leaveCorpse(state, unit) {
-    const isCommanderTarget = unit.side === 'player' && unit.kind !== 'king' && unit.kind !== 'advisor';
-    if (!isCommanderTarget || isWaterAt(state, unit.x, unit.y)) {
+    if (!isCommanderTarget(unit) || isWaterAt(state, unit.x, unit.y)) {
         return;
     }
     const body = { ...unit, hp: 0 };

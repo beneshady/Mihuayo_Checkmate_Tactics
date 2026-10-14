@@ -154,9 +154,9 @@ export function constructLevel(source: BattleState | null, level: LevelSource, o
 }
 
 /**
- * 布阵确认（对齐原型 confirmDeployment 的战斗子集；P1 由视图自动调用）：
+ * 布阵确认（对齐原型 confirmDeployment）：
  * 我方全员必须界内、不在山/水、y<4（我方半场）、帅在出生位、士在宫内、无重叠；
- * 通过后 phase 进 player 并重设双快照。不合法时原样返回。
+ * 通过后 phase 进 commander（P3 帅增益三选一阶段）并重设双快照。不合法时原样返回。
  */
 export function confirmDeployment(state: BattleState): BattleState {
     if (state.turn.phase !== 'deploy') {
@@ -178,7 +178,7 @@ export function confirmDeployment(state: BattleState): BattleState {
         return state;
     }
     const next = deepCopy(state);
-    next.turn.phase = 'player';
+    next.turn.phase = 'commander';
     next.entrySnapshot = deepCopy(next);
     next.levelSnapshot = deepCopy(next);
     return next;
@@ -234,7 +234,8 @@ export const SHOP_KINDS = ['pawn', 'rook', 'horse', 'cannon'] as const;
 export type ShopKind = (typeof SHOP_KINDS)[number];
 
 export function shopPrice(kind: ShopKind): number {
-    return kind === 'pawn' ? 3 : 5;
+    // 价格单一事实源在 CONFIG.price（UnitDefs.KIND_DEFS 同源引用）；对齐原型 buy：兵 3、其余 5
+    return CONFIG.price[kind];
 }
 
 function partyUnitOf(state: BattleState, id: string): BattleUnit | undefined {

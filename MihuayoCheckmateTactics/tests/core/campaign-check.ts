@@ -114,8 +114,8 @@ function loadLevelJson(id: string): { map: { name?: string; tiles: Record<string
 
 {
     const state = confirmDeployment(constructLevel(null, loadLevelJson('level-01') as never));
-    eq(state.turn.phase, 'player', 'T3 合法布阵确认 → player');
-    assert(!!state.entrySnapshot && state.entrySnapshot!.turn.phase === 'player', 'T3 确认后快照更新为 player 态');
+    eq(state.turn.phase, 'commander', 'T3 合法布阵确认 → commander（P3 帅增益阶段）');
+    assert(!!state.entrySnapshot && state.entrySnapshot!.turn.phase === 'commander', 'T3 确认后快照更新为 commander 态');
     const broken = constructLevel(null, loadLevelJson('level-01') as never);
     const king = broken.units.find((u) => u.kind === 'king' && u.side === 'player')!;
     king.x = 0;

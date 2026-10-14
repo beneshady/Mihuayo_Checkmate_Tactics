@@ -1,0 +1,85 @@
+{
+  "name": "CommanderPanel",
+  "nodes": [
+    {
+      "path": "Main/Canvas/UI/CommanderPanel",
+      "active": false,
+      "components": [
+        {
+          "type": "UITransform",
+          "properties": { "contentSize": { "width": 480, "height": 400 } }
+        }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/TitleLabel",
+      "position": { "x": 0, "y": 160 },
+      "components": [
+        {
+          "type": "Label",
+          "properties": { "string": "选择帅增益", "fontSize": 38 }
+        }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/BuffHealthButton",
+      "position": { "x": 0, "y": 60 },
+      "components": [
+        {
+          "type": "UITransform",
+          "properties": { "contentSize": { "width": 380, "height": 64 } }
+        },
+        { "type": "Button" }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/BuffHealthButton/Label",
+      "components": [
+        {
+          "type": "Label",
+          "properties": { "string": "生命：全员生命上限 +1", "fontSize": 24 }
+        }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/BuffMoveButton",
+      "position": { "x": 0, "y": -30 },
+      "components": [
+        {
+          "type": "UITransform",
+          "properties": { "contentSize": { "width": 380, "height": 64 } }
+        },
+        { "type": "Button" }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/BuffMoveButton/Label",
+      "components": [
+        {
+          "type": "Label",
+          "properties": { "string": "机动：车/炮/兵移动 +1", "fontSize": 24 }
+        }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/BuffRescueButton",
+      "position": { "x": 0, "y": -120 },
+      "components": [
+        {
+          "type": "UITransform",
+          "properties": { "contentSize": { "width": 380, "height": 64 } }
+        },
+        { "type": "Button" }
+      ]
+    },
+    {
+      "path": "Main/Canvas/UI/CommanderPanel/BuffRescueButton/Label",
+      "components": [
+        {
+          "type": "Label",
+          "properties": { "string": "救援：每关一次救活或复活", "fontSize": 24 }
+        }
+      ]
+    }
+  ]
+}

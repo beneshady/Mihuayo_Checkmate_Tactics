@@ -143,9 +143,9 @@ function constructLevel(source, level, options) {
     return state;
 }
 /**
- * 布阵确认（对齐原型 confirmDeployment 的战斗子集；P1 由视图自动调用）：
+ * 布阵确认（对齐原型 confirmDeployment）：
  * 我方全员必须界内、不在山/水、y<4（我方半场）、帅在出生位、士在宫内、无重叠；
- * 通过后 phase 进 player 并重设双快照。不合法时原样返回。
+ * 通过后 phase 进 commander（P3 帅增益三选一阶段）并重设双快照。不合法时原样返回。
  */
 function confirmDeployment(state) {
     if (state.turn.phase !== 'deploy') {
@@ -167,7 +167,7 @@ function confirmDeployment(state) {
         return state;
     }
     const next = (0, Rules_1.deepCopy)(state);
-    next.turn.phase = 'player';
+    next.turn.phase = 'commander';
     next.entrySnapshot = (0, Rules_1.deepCopy)(next);
     next.levelSnapshot = (0, Rules_1.deepCopy)(next);
     return next;
@@ -204,7 +204,8 @@ function campaignSourceFrom(save) {
 /** 商店在售棋种与价格（对齐原型 buy：兵 3、其余 5；只卖基础版） */
 exports.SHOP_KINDS = ['pawn', 'rook', 'horse', 'cannon'];
 function shopPrice(kind) {
-    return kind === 'pawn' ? 3 : 5;
+    // 价格单一事实源在 CONFIG.price（UnitDefs.KIND_DEFS 同源引用）；对齐原型 buy：兵 3、其余 5
+    return Config_1.CONFIG.price[kind];
 }
 function partyUnitOf(state, id) {
     return (state.party ?? []).find((u) => u.id === id);

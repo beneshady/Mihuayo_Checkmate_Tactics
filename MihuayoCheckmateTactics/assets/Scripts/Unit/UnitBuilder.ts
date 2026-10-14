@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Graphics, Node, Prefab, Sprite, Tween, UITransform, Vec3, error, instantiate, tween, warn } from 'cc';
+import { _decorator, Color, Component, Graphics, Label, Node, Prefab, Sprite, Tween, UITransform, Vec3, error, instantiate, tween, warn } from 'cc';
 import { BattleState, BattleUnit, gridToIso } from '../Core/BattleState';
 import { IsoLayout } from '../Map/IsoLayout';
 import { Unit } from './Unit';
@@ -49,9 +49,69 @@ export class UnitBuilder extends Component {
     /** unitId → 棋子节点注册表（运行期定位视图；重开局时随 buildUnits 重建） */
     private unitNodes = new Map<string, Node>();
 
+    /** corpseId → 尸体节点注册表（syncCorpseViews 增量对齐 state.corpses） */
+    private corpseNodes = new Map<string, Node>();
+
     /** 按 unitId 取棋子节点（不存在时返回 undefined） */
     public getUnitNode(unitId: string): Node | undefined {
         return this.unitNodes.get(unitId);
+    }
+
+    /**
+     * 尸体视图对齐（P5，对齐原型 renderPieces 的 corpses 重画，改为增量同步）：
+     * state.corpses 新增 → 建灰底「尸」标记节点；位置变化（推尸/牵引）→ 平滑移动；
+     * 消失（推入水销毁 / 救援复活）→ 移除节点。不动其余棋子视图。
+     */
+    public syncCorpseViews(state: BattleState, layout: IsoLayout): void {
+        const corpses = state.corpses ?? [];
+        const alive = new Set(corpses.map((c) => c.id));
+        for (const corpse of corpses) {
+            const existing = this.corpseNodes.get(corpse.id);
+            const { isoX, isoY } = gridToIso(corpse.x, corpse.y, layout);
+            if (existing) {
+                if (Math.abs(existing.position.x - isoX) > 0.5 || Math.abs(existing.position.y - isoY) > 0.5) {
+                    Tween.stopAllByTarget(existing);
+                    tween(existing)
+                        .to(this.unitMoveDuration, { position: new Vec3(isoX, isoY, 0) }, { easing: 'quadOut' })
+                        .start();
+                }
+                continue;
+            }
+            // 一个节点只允许一个 UIRenderer：底座（Graphics）与「尸」字（Label）分父子节点
+            const node = new Node(`corpse_${corpse.id}`);
+            node.addComponent(UITransform).setContentSize(layout.halfTileW, layout.halfTileH);
+            const bg = new Node('bg');
+            bg.addComponent(UITransform).setContentSize(layout.halfTileW, layout.halfTileH);
+            const g = bg.addComponent(Graphics);
+            g.fillColor = new Color(119, 123, 131, 235); // 灰底座（对齐原型 corpseMesh 0x777b83）
+            g.circle(0, 0, layout.halfTileW * 0.3);
+            g.fill();
+            node.addChild(bg);
+            const labelNode = new Node('label');
+            labelNode.addComponent(UITransform).setContentSize(layout.halfTileW, layout.halfTileH);
+            const label = labelNode.addComponent(Label);
+            label.string = '尸';
+            label.fontSize = Math.round(layout.halfTileW * 0.3);
+            label.color = new Color(216, 216, 216, 255);
+            node.addChild(labelNode);
+            node.setPosition(isoX, isoY, 0);
+            this.node.addChild(node);
+            this.corpseNodes.set(corpse.id, node);
+        }
+        for (const [id, node] of [...this.corpseNodes]) {
+            if (alive.has(id)) continue;
+            this.corpseNodes.delete(id);
+            Tween.stopAllByTarget(node);
+            node.destroy();
+        }
+    }
+
+    /** 清空全部尸体节点（重开局 / 换关时随 buildUnits 一起重置） */
+    public clearCorpseViews(): void {
+        for (const node of this.corpseNodes.values()) {
+            node.destroy();
+        }
+        this.corpseNodes.clear();
     }
 
     /**
@@ -128,6 +188,71 @@ export class UnitBuilder extends Component {
     }
 
     /**
+     * 转职刷新（P3）：按新 kind 重设棋子外观（贴图映射走 Unit.setUnit 同款）。
+     * 逻辑状态已由协调者改好；找不到视图时忽略（不重建）。
+     */
+    public refreshUnitKind(unit: BattleUnit): void {
+        const node = this.unitNodes.get(unit.id);
+        if (!node) {
+            return;
+        }
+        node.getComponent(Unit)?.setUnit(unit.id, unit.side, unit.kind);
+    }
+
+    /** 单节点创建（buildUnits 与 syncNewUnits 共用）：贴图/锚点/等高缩放/阵营标记/注册 */
+    private createUnitNode(unit: BattleUnit, layout: IsoLayout): Node {
+        const node = instantiate(this.unitPrefab!);
+        this.node.addChild(node);
+        node.name = `unit_${unit.id}_${unit.side}`;
+        const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
+        node.getComponent(Unit)!.setUnit(unit.id, unit.side, unit.kind);
+        // 底边中心锚点：棋子底座底边顶在顶面中心
+        node.getComponent(UITransform)?.setAnchorPoint(0.5, 0);
+        // 尺寸归一：按裁剪后高度统一世界高度（各棋子等高；缺帧回退布局缩放）
+        const sprite = node.getComponent(Sprite);
+        const frame = sprite?.spriteFrame ?? null;
+        const contentH = frame ? frame.rect.height : 0;
+        const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : 1;
+        node.setScale(unitScale, unitScale, 1);
+        // 阵营标记：我方金、敌方红
+        this.addSideMarker(node, unit.side);
+        this.unitNodes.set(unit.id, node);
+        node.setPosition(isoX, isoY, 0);
+        return node;
+    }
+
+    /** 增量补建棋子视图（P6：第二波入场 / 救援复活的新单位）；已有视图的忽略 */
+    public syncNewUnits(state: BattleState, layout: IsoLayout): void {
+        if (!this.unitPrefab) {
+            return;
+        }
+        for (const unit of state.units) {
+            if (this.unitNodes.has(unit.id)) {
+                continue;
+            }
+            const node = this.createUnitNode(unit, layout);
+            const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
+            const sprite = node.getComponent(Sprite);
+            node.active = false;
+            if (sprite) sprite.color = new Color(255, 255, 255, 0);
+            const finalPos = new Vec3(isoX, isoY, 0);
+            const beginY = isoY + UNIT_DROP_Y;
+            this.scheduleOnce(() => {
+                node.active = true;
+                node.setPosition(isoX, beginY, 0);
+                tween(node)
+                    .to(this.unitRevealDuration, { position: finalPos }, { easing: 'quadOut' })
+                    .start();
+                if (sprite) {
+                    tween(sprite)
+                        .to(this.unitRevealDuration, { color: new Color(255, 255, 255, 255) }, { easing: 'quadOut' })
+                        .start();
+                }
+            }, 0);
+        }
+    }
+
+    /**
      * 按战局状态生成棋子：逐枚从上方落下（depth 顺序）。
      * 全部落位后调用 onComplete（供后续启用交互等流程）。
      */
@@ -148,36 +273,19 @@ export class UnitBuilder extends Component {
 
         // 重建注册表：buildUnits 可能在重开局时再次调用
         this.unitNodes.clear();
+        this.clearCorpseViews(); // 新开局无尸体；顺带清掉上一局的尸体节点
 
         let index = 0;
         for (const unit of units) {
-            const node = instantiate(this.unitPrefab);
-            this.node.addChild(node);
-            node.name = `unit_${unit.id}_${unit.side}`;
+            const node = this.createUnitNode(unit, layout);
             const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
-            const finalY = isoY;
-            node.getComponent(Unit)!.setUnit(unit.id, unit.side, unit.kind);
-
-            // 底边中心锚点：棋子底座底边顶在顶面中心
-            node.getComponent(UITransform)?.setAnchorPoint(0.5, 0);
-
-            // 尺寸归一：按裁剪后高度统一世界高度（各棋子等高；缺帧回退布局缩放）
             const sprite = node.getComponent(Sprite);
-            const frame = sprite?.spriteFrame ?? null;
-            const contentH = frame ? frame.rect.height : 0;
-            const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : 1;
-            node.setScale(unitScale, unitScale, 1);
-
-            // 阵营标记：我方金、敌方红
-            this.addSideMarker(node, unit.side);
-
-            this.unitNodes.set(unit.id, node);
 
             // 未轮到不显形：先隐藏（保持全尺寸）；到点时由 scheduleOnce 激活，再从上方落下并淡入。
             node.active = false;
             if (sprite) sprite.color = new Color(255, 255, 255, 0); // 从透明开始，下落时淡入
-            const finalPos = new Vec3(isoX, finalY, 0);
-            const beginY = finalY + UNIT_DROP_Y;
+            const finalPos = new Vec3(isoX, isoY, 0);
+            const beginY = isoY + UNIT_DROP_Y;
             this.scheduleOnce(() => {
                 node.active = true;
                 node.setPosition(isoX, beginY, 0);

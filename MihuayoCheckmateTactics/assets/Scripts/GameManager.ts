@@ -1,9 +1,12 @@
 import { _decorator, AudioClip, AudioSource, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Label, Node, director, resources, Vec3, error, log, tween, warn } from 'cc';
 import { BattleState, GridPos, gridToIso, isoToGrid } from './Core/BattleState';
+import { corpseAt, unitAt } from './Core/Terrain';
 import { CONFIG } from './Core/Config';
 import { UnitAction, legalActions, unitHasAp } from './Core/Actions';
 import { checkTerminal, deepCopy, resetAllTurns, retryLevel, startBattle, submitAction } from './Core/Rules';
-import { buyRecruit, campaignSourceFrom, confirmDeployment, constructLevel, deployUnit, ShopKind } from './Core/Campaign';
+import { buyRecruit, campaignSourceFrom, confirmDeployment, constructLevel, deployUnit, LevelSource, ShopKind } from './Core/Campaign';
+import { chooseCommanderBuff, CommanderBuffKind, purchaseUpgrade, rescue, skillOfferings } from './Core/Growth';
+import { advanceTurn } from './Core/Waves';
 import {
     EnemyIntentEffect,
     applyEnemyIntent,
@@ -24,6 +27,8 @@ import { ThreatMark, ThreatOverlay } from './Map/ThreatOverlay';
 import { UnitBuilder } from './Unit/UnitBuilder';
 import { ResultPanel } from './UI/ResultPanel';
 import { IntermissionPanel } from './UI/IntermissionPanel';
+import { CommanderPanel } from './UI/CommanderPanel';
+import { SkillPanel } from './UI/SkillPanel';
 import { UnitInfoPanel } from './UI/UnitInfoPanel';
 import { loadProfile, saveProfile } from './UI/ProfileStore';
 
@@ -35,7 +40,7 @@ const { ccclass, property } = _decorator;
  * 再交给我方行动（playerTurn）；我方结束回合后敌方按序执行冻结攻击（enemyAttack），
  * 结算完毕进入下一轮准备。不再有独立的敌方行动回合。
  */
-export type FlowStage = 'generating' | 'intermission' | 'deploy' | 'enemyPrep' | 'playerTurn' | 'enemyAttack' | 'ended';
+export type FlowStage = 'generating' | 'intermission' | 'deploy' | 'commander' | 'enemyPrep' | 'playerTurn' | 'enemyAttack' | 'rescuePhase' | 'ended';
 
 /** 棋子交互子状态：无选中 → 已选中（显示「行动」）→ 目标选择（显示「取消」+ 高亮可走格） */
 export type InteractStage = 'idle' | 'selected' | 'targeting';
@@ -141,8 +146,20 @@ export class GameManager extends Component {
     private intermissionPanel: IntermissionPanel | null = null;
     /** 布阵确认按钮节点（场景 UI/DeployConfirmButton 自发现） */
     private deployConfirmNode: Node | null = null;
+    /** 升级按钮节点（场景 UI/UnitOperationPanel/SkillButton 自发现；选中我方棋子后弹出技能面板） */
+    private skillButtonNode: Node | null = null;
+    /** 技能面板是否弹出：弹出期间整个操作面板隐藏，升级成功或点击其他位置后关闭 */
+    private skillPanelOpen = false;
     /** 布阵阶段已选中的我方单位 id */
     private deploySelection: string | null = null;
+    /** 帅增益面板节点（场景 UI/CommanderPanel 自发现；缺失时降级为自动选「生命」保流程可跑） */
+    private commanderNode: Node | null = null;
+    /** 帅增益面板组件（节点上已挂则复用；否则首次打开时动态 addComponent） */
+    private commanderPanel: CommanderPanel | null = null;
+    /** 技能成长面板节点（场景 UI/SkillPanel 自发现；缺失时选中棋子无成长入口，仅日志） */
+    private skillPanelNode: Node | null = null;
+    /** 技能成长面板组件（节点上已挂则复用；否则首次打开时动态 addComponent） */
+    private skillPanel: SkillPanel | null = null;
 
     /** 只读访问当前战局状态（未初始化时为 null） */
     public get battleState(): BattleState | null {
@@ -230,6 +247,31 @@ export class GameManager extends Component {
         } else {
             this.deployConfirmNode.active = false;
             this.deployConfirmNode.on(Button.EventType.CLICK, this.onDeployConfirmClicked, this);
+        }
+        // 升级按钮：UnitOperationPanel 内第四按钮（缺失时选中棋子无技能入口，仅日志）
+        const skillButton = uiRoot?.getChildByName('UnitOperationPanel')?.getChildByName('SkillButton') ?? null;
+        if (!skillButton || !skillButton.getComponent(Button)) {
+            warn('[GameManager] 未找到 UnitOperationPanel/SkillButton：选中棋子后无升级入口。请在操作面板下加 SkillButton（挂 Button，子 Label「升级」）');
+        } else {
+            this.skillButtonNode = skillButton;
+            skillButton.active = false;
+            skillButton.on(Button.EventType.CLICK, this.onSkillClicked, this);
+        }
+        // P3 帅增益面板：按名称自发现（缺失时布阵确认后自动选「生命」降级，不卡流程）
+        this.commanderNode = uiRoot?.getChildByName('CommanderPanel') ?? null;
+        this.commanderPanel = this.commanderNode?.getComponent(CommanderPanel) ?? null;
+        if (!this.commanderNode) {
+            warn('[GameManager] 未找到 CommanderPanel：布阵确认后将自动选「生命」增益。请在 Canvas/UI 下建 CommanderPanel（子节点 TitleLabel/BuffHealthButton/BuffMoveButton/BuffRescueButton）');
+        } else {
+            this.commanderNode.active = false;
+        }
+        // P3 技能成长面板：按名称自发现（缺失时选中棋子无成长入口，仅日志）
+        this.skillPanelNode = uiRoot?.getChildByName('SkillPanel') ?? null;
+        this.skillPanel = this.skillPanelNode?.getComponent(SkillPanel) ?? null;
+        if (!this.skillPanelNode) {
+            warn('[GameManager] 未找到 SkillPanel：选中棋子无技能成长入口。请在 Canvas/UI 下建 SkillPanel（子节点 TitleLabel/ListRoot）');
+        } else {
+            this.skillPanelNode.active = false;
         }
 
         // 关卡列表：配置表决定"有哪些关"，存档决定"这次进哪关"（currentLevelId 非法回落第 1 关）
@@ -346,6 +388,10 @@ export class GameManager extends Component {
         }
 
         resetAllTurns(this.state); // 敌方无额度概念（意图驱动），只重置我方
+        if (this.layout) {
+            this.unitBuilder?.syncCorpseViews(this.state, this.layout); // 回合开局对齐尸体（波次入场/救援后的变化）
+            this.unitBuilder?.syncNewUnits(this.state, this.layout); // 第二波入场 / 复活的新单位补建视图（P6）
+        }
         this.flowStage = 'enemyPrep';
         this.updateButton();
         log(`[流程] 第 ${this.state.turn.round} 轮 — 敌方准备`);
@@ -441,7 +487,50 @@ export class GameManager extends Component {
             this.enterEnded({ winner: 'player', reason: `第 ${CONFIG.maxRounds} 轮坚守终局` });
             return;
         }
-        this.state.turn.round += 1;
+        const advanced = advanceTurn(this.state);
+        if (advanced === this.state) {
+            // 防御：phase 异常导致推进被拒时按原节奏继续（不卡回合循环）
+            this.enterTurn();
+            return;
+        }
+        this.state = advanced;
+        if (this.state.turn.phase === 'rescue') {
+            this.enterRescuePhase();
+            return;
+        }
+        this.enterTurn();
+    }
+
+    /** 救援阶段（P6）：提示点选我方棋子救活（或尸体格复活）；选完由 Core 进第二波并回到回合循环 */
+    private enterRescuePhase(): void {
+        if (!this.state) return;
+        this.flowStage = 'rescuePhase';
+        this.cancelSelection();
+        this.updateButton();
+        log('[流程] 救援阶段：点选一名队友救援（或其尸体格复活）');
+        this.floatHint({ x: 4, y: 4 }, '选择队友救援', new Color(120, 220, 160, 255));
+    }
+
+    /** 救援阶段棋盘点击（P6）：Core.rescue 校验并迁移；成功后同步尸体/新单位视图并回回合循环 */
+    private onRescueTap(grid: GridPos): void {
+        if (!this.state || !this.layout) return;
+        const live = unitAt(this.state, grid.x, grid.y);
+        const targetId = (live && live.side === 'player' && live.kind !== 'king' && live.kind !== 'advisor')
+            ? live.id
+            : corpseAt(this.state, grid.x, grid.y)?.unit?.id;
+        if (!targetId) {
+            log('[流程] 救援阶段：请点选我方棋子（非帅）或其尸体格');
+            return;
+        }
+        const next = rescue(this.state, targetId);
+        if (next === this.state) {
+            warn('[流程] 救援不可用（无 buff / 已用 / 目标不合法）');
+            return;
+        }
+        this.state = next;
+        this.floatHint(grid, '救援成功', new Color(120, 220, 160, 255));
+        this.unitBuilder?.syncCorpseViews(this.state, this.layout); // 被复活者的尸体消失
+        this.unitBuilder?.syncNewUnits(this.state, this.layout); // 尸体复活 → 补建棋子视图
         this.enterTurn();
     }
 
@@ -454,7 +543,8 @@ export class GameManager extends Component {
             return {
                 actorId: intent.actorId,
                 order: intent.order,
-                status: forecast.status,
+                // 预测失效（cancelled）在威胁层按 invalid 处理：不画有效威胁
+                status: forecast.status === 'cancelled' ? 'invalid' : forecast.status,
                 fromPos: attacker ? { x: attacker.x, y: attacker.y } : null,
                 toPos: intent.type === 'standby' ? null : intentTarget(this.state!, intent),
                 path: forecast.effect?.path ?? intent.path ?? [],
@@ -469,7 +559,14 @@ export class GameManager extends Component {
         if (result.status === 'success' && result.effect) {
             const effect = result.effect;
             if (!effect.actorDead) {
-                this.unitBuilder?.moveUnitView(effect.actor, effect.to.x, effect.to.y, this.layout!);
+                // 敌方冲锋/攻击落点同样以结算后的实际位置为准
+                const actorNow = this.state!.units.find((u) => u.id === effect.actor);
+                if (actorNow) {
+                    this.unitBuilder?.moveUnitView(effect.actor, actorNow.x, actorNow.y, this.layout!);
+                }
+            }
+            if (effect.pushed) {
+                this.unitBuilder?.moveUnitView(effect.pushed.id, effect.pushed.to.x, effect.pushed.to.y, this.layout!);
             }
             const shaken = new Set<string>();
             for (const h of effect.hits) {
@@ -489,12 +586,15 @@ export class GameManager extends Component {
                     log(`[敌方] ${label} 击杀 ${v}`);
                 }
             }
+            if (this.layout && this.state) {
+                this.unitBuilder?.syncCorpseViews(this.state, this.layout); // 敌方击杀留尸 / 推尸（P5）
+            }
             return;
         }
         if (result.status === 'miss') {
             log(`[敌方] ${label} ${result.reason ?? '落空'}`);
             this.floatHint(result.to, '落空', new Color(205, 165, 255, 255));
-        } else if (result.status === 'invalid') {
+        } else if (result.status === 'cancelled') {
             log(`[敌方] ${label} 攻击失效：${result.reason}`);
             this.floatHint(result.to, `失效：${result.reason ?? ''}`, new Color(255, 176, 90, 255));
         } else if (result.status === 'standby') {
@@ -558,14 +658,17 @@ export class GameManager extends Component {
         }
     }
 
-    /** 按交互子状态切换行动/取消按钮：selected → 行动+攻击，targeting → 取消；无额度的按钮置灰 */
+    /** 按交互子状态切换行动/取消按钮：selected → 行动+攻击+升级，targeting → 取消；无额度的按钮置灰 */
     private updateActionButtons(): void {
-        const selected = this.interactStage === 'selected';
+        const selected = this.interactStage === 'selected' && !this.skillPanelOpen; // 技能面板弹出期间隐藏操作按钮组
         if (this.actionButton) {
             this.actionButton.node.active = selected;
         }
         if (this.attackButton) {
             this.attackButton.node.active = selected;
+        }
+        if (this.skillButtonNode) {
+            this.skillButtonNode.active = selected;
         }
         if (this.cancelButton) {
             this.cancelButton.node.active = this.interactStage === 'targeting';
@@ -577,7 +680,8 @@ export class GameManager extends Component {
             if (this.attackButton) this.attackButton.interactable = true;
             return;
         }
-        // 额度门控：选中棋子无任何可用额度（ap / 车炮双槽）时置灰
+        // 额度门控：选中棋子无任何可用额度（ap / 车炮双槽）时置灰。
+        // 升级按钮不置灰：始终可点，面板内展示「缺 x SP / 已满」（用户交互定稿）
         const unit = this.state?.units.find((u) => u.id === this.selectedUnitId);
         const hasAp = !!unit && unitHasAp(unit);
         if (this.actionButton) {
@@ -597,6 +701,8 @@ export class GameManager extends Component {
         this.highlighter?.clear();
         this.updateActionButtons();
         this.hideUnitInfo();
+        this.skillPanelOpen = false;
+        this.skillPanel?.hide();
     }
 
     // ---------- 棋盘触摸拾取 ----------
@@ -629,9 +735,25 @@ export class GameManager extends Component {
             return;
         }
 
+        // P6 救援阶段：点我方棋子（非帅士）或其尸体格救援（在 playerTurn 门控之前）
+        if (this.flowStage === 'rescuePhase') {
+            if (grid) {
+                this.onRescueTap(grid);
+            }
+            return;
+        }
+
         // US-006：仅我方回合响应棋盘（准备/攻击阶段输入屏蔽，威胁已整格预告在棋盘上）
         const canOperate = this.flowStage === 'playerTurn';
         if (!canOperate) return;
+
+        // 技能面板弹出期间点击棋盘：先关面板。点中棋子则继续走下方切换选中；点空白/地块只关面板、
+        // 保持当前选中态（否则会落入取消选中路径，操作面板回不来——用户交互定稿）
+        if (this.skillPanelOpen) {
+            this.closeSkillPanel();
+            const tappedId = this.unitBuilder?.hitUnitAt(local.x, local.y, this.state.units);
+            if (!tappedId) return;
+        }
 
         if (this.interactStage !== 'targeting') {
             // 棋子命中（旗子内容矩形，地图本地空间）：查看信息（任意棋子）/ 选中（仅我方回合）
@@ -679,7 +801,7 @@ export class GameManager extends Component {
     /** 命中节点或其祖先落在交互按钮上时不算棋盘点击（按钮自身逻辑照常触发） */
     private isUiTap(target: Node | null): boolean {
         // 操作面板容器（背板）也算 UI：点面板空白/信息区不透传到棋盘
-        const uiNodes = [this.turnEndButton?.node, this.actionButton?.node, this.attackButton?.node, this.cancelButton?.node, this.deployConfirmNode, this.unitInfoPanel?.node.parent ?? null];
+        const uiNodes = [this.turnEndButton?.node, this.actionButton?.node, this.attackButton?.node, this.cancelButton?.node, this.deployConfirmNode, this.skillButtonNode, this.commanderNode, this.skillPanelNode, this.unitInfoPanel?.node.parent ?? null];
         let node: Node | null = target;
         while (node) {
             if (uiNodes.indexOf(node) !== -1) return true;
@@ -743,7 +865,7 @@ export class GameManager extends Component {
             }
             case 'miss':
                 return [forecast.reason ?? '落空'];
-            case 'invalid':
+            case 'cancelled':
                 return [`攻击失效：${forecast.reason}`];
             case 'standby':
                 return ['待机（当前无合法攻击）'];
@@ -769,9 +891,11 @@ export class GameManager extends Component {
     private syncOperationPanel(): void {
         const panel = this.unitInfoPanel?.node.parent;
         if (!panel) return;
-        panel.active = this.interactStage === 'selected'
-            || this.interactStage === 'targeting'
-            || this.unitInfoPanel!.node.active;
+        // 升级面板弹出期间整个操作面板（含信息面板）隐藏（用户交互定稿）
+        panel.active = !this.skillPanelOpen
+            && (this.interactStage === 'selected'
+                || this.interactStage === 'targeting'
+                || this.unitInfoPanel!.node.active);
     }
 
     // ---------- 交互子状态转移 ----------
@@ -788,6 +912,78 @@ export class GameManager extends Component {
         this.interactStage = 'selected';
         this.updateActionButtons();
         log(`[交互] 选中 ${unitId}（${unit.kind}）`);
+    }
+
+    /** 点「升级」按钮（P3/用户交互定稿）：隐藏操作按钮组，弹出选中棋子的技能面板 */
+    private onSkillClicked(): void {
+        if (!this.state || this.flowStage !== 'playerTurn' || !this.selectedUnitId) return;
+        this.skillPanelOpen = true;
+        this.updateActionButtons(); // 操作按钮组隐藏
+        this.showSkillPanel(this.selectedUnitId);
+        log(`[交互] 打开技能面板：${this.selectedUnitId}`);
+    }
+
+    /** 关闭技能面板：回到操作按钮组（棋子保持选中态） */
+    private closeSkillPanel(): void {
+        if (!this.skillPanelOpen) {
+            return;
+        }
+        this.skillPanelOpen = false;
+        this.skillPanel?.hide();
+        this.updateActionButtons();
+    }
+
+    /** 技能成长面板（P3）：列出选中单位的技能项；购买走 Core.purchaseUpgrade（不消耗行动） */
+    private showSkillPanel(unitId: string): void {
+        const panel = this.ensureSkillPanel();
+        if (!panel || !this.state) {
+            return;
+        }
+        const unit = this.state.units.find((u) => u.id === unitId);
+        if (!unit || unit.side !== 'player') {
+            return;
+        }
+        panel.onBuy = (skill, index) => this.buySkill(unitId, skill, index);
+        const offerings = skillOfferings(this.state, unitId);
+        if (!offerings.length) {
+            panel.hide();
+            return;
+        }
+        panel.show(`${unit.kind}（${unitId}）`, unit.sp, offerings);
+    }
+
+    /** 组件挂载兜底：场景未挂 SkillPanel 组件时动态挂（编辑器无需手动挂组件） */
+    private ensureSkillPanel(): SkillPanel | null {
+        if (!this.skillPanelNode) {
+            return null;
+        }
+        let panel = this.skillPanelNode.getComponent(SkillPanel);
+        if (!panel) {
+            panel = this.skillPanelNode.addComponent(SkillPanel);
+        }
+        this.skillPanel = panel;
+        return panel;
+    }
+
+    /** 购买技能：Core 迁移成功后刷新面板与棋子外观（转职换图），失败仅提示 */
+    private buySkill(unitId: string, skill: string, index?: number): void {
+        if (!this.state) {
+            return;
+        }
+        const before = this.state.units.find((u) => u.id === unitId);
+        const next = purchaseUpgrade(this.state, unitId, skill, index);
+        if (next === this.state) {
+            warn(`[成长] ${skill} 不可购买（阶段/SP/上限）`);
+            return;
+        }
+        this.state = next;
+        const unit = this.state.units.find((u) => u.id === unitId)!;
+        if (before && before.kind !== unit.kind) {
+            this.unitBuilder?.refreshUnitKind(unit);
+            log(`[成长] ${unitId} 转职 → ${unit.kind}`);
+        }
+        log(`[成长] ${unitId} 学会 ${skill}${index !== undefined ? `#${index}` : ''}`);
+        this.closeSkillPanel(); // 升级完成：面板关闭，回到操作按钮组（用户交互定稿）
     }
 
     /** 点「行动」：枚举移动类动作 → 高亮目标格，进入目标选择 */
@@ -889,8 +1085,31 @@ export class GameManager extends Component {
         this.state = result.state;
         const effect = result.effect;
         if (!effect.actorDead) {
-            this.unitBuilder?.moveUnitView(effect.actor, effect.to.x, effect.to.y, this.layout);
-            log(`[交互] ${effect.actor} 行动 → (${effect.to.x}, ${effect.to.y})`);
+            // 落点以结算后的实际位置为准（冲锋近身/水中断/牵引车不动等，effect.to 仅 move 类可信）
+            const actorNow = this.state.units.find((u) => u.id === effect.actor);
+            if (actorNow) {
+                this.unitBuilder?.moveUnitView(effect.actor, actorNow.x, actorNow.y, this.layout);
+                log(`[交互] ${effect.actor} 行动 → (${actorNow.x}, ${actorNow.y})`);
+            }
+        }
+        if (effect.pushed) {
+            // 被震退/被拉的第三方位移（尸体无视图，moveUnitView 内部忽略）
+            this.unitBuilder?.moveUnitView(effect.pushed.id, effect.pushed.to.x, effect.pushed.to.y, this.layout);
+        }
+        if (effect.pushStatus) {
+            const hints: Record<string, string> = {
+                pushed: '震退',
+                pulled: '牵引',
+                water: '落水',
+                'water-interrupted': '受阻',
+                outside: '出界',
+                palace: '宫禁',
+                collision: '相撞',
+                'collision-mountain': '撞山',
+                'collision-corpse': '撞尸',
+                corpse: '尸阻',
+            };
+            this.floatHint(effect.to, hints[effect.pushStatus] ?? effect.pushStatus, new Color(255, 210, 120, 255));
         }
         const shaken = new Set<string>();
         for (const h of effect.hits) {
@@ -910,6 +1129,7 @@ export class GameManager extends Component {
                 log(`[战斗] ${effect.actor} 击杀 ${v}`);
             }
         }
+        this.unitBuilder?.syncCorpseViews(this.state, this.layout); // 尸体出现/移动/销毁（P5）
         this.refreshThreats(); // 局面已变：立即刷新敌方意图预测（US-006 §3）
         this.cancelSelection();
         this.checkBattleEnd();
@@ -1031,14 +1251,14 @@ export class GameManager extends Component {
         this.intermissionPanel?.hide();
         const fileName = nextEntry.file ?? nextEntry.id;
         resources.load(`Levels/${fileName}`, JsonAsset, (err, asset) => {
-            if (err || !asset) {
+            if (err || !asset || !asset.json) {
                 error(`[GameManager] 下一关战局加载失败：Levels/${fileName} —— ${err ? err.message : '资源为空'}`);
                 director.loadScene('Home');
                 return;
             }
             let next: BattleState;
             try {
-                next = constructLevel(source, asset.json, { next: true });
+                next = constructLevel(source, asset.json as LevelSource, { next: true });
             } catch (buildErr) {
                 error(`[GameManager] 下一关构造失败 —— ${(buildErr as Error).message}`);
                 director.loadScene('Home');
@@ -1108,6 +1328,56 @@ export class GameManager extends Component {
         this.deploySelection = null;
         this.highlighter?.clear();
         this.state = confirmed;
+        this.showCommanderPhase();
+    }
+
+    /** 帅增益阶段（P3）：弹三选一面板；缺面板时降级自动选「生命」，选完进回合循环 */
+    private showCommanderPhase(): void {
+        const state = this.state;
+        if (!state || state.turn.phase !== 'commander') {
+            this.beginFlow();
+            return;
+        }
+        this.flowStage = 'commander';
+        this.updateButton();
+        const panel = this.ensureCommanderPanel();
+        if (!panel) {
+            warn('[GameManager] 无 CommanderPanel：自动选「生命」增益');
+            this.pickCommanderBuff('health');
+            return;
+        }
+        panel.setTitle(`第 ${state.level ?? 1} 关 — 选择帅增益`);
+        panel.show();
+        log('[流程] 帅增益阶段：三选一（生命/机动/救援）');
+    }
+
+    /** 组件挂载兜底：场景未挂 CommanderPanel 组件时动态挂（编辑器无需手动挂组件） */
+    private ensureCommanderPanel(): CommanderPanel | null {
+        if (!this.commanderNode) {
+            return null;
+        }
+        let panel = this.commanderNode.getComponent(CommanderPanel);
+        if (!panel) {
+            panel = this.commanderNode.addComponent(CommanderPanel);
+        }
+        panel.onPick = (kind) => this.pickCommanderBuff(kind);
+        this.commanderPanel = panel;
+        return panel;
+    }
+
+    /** 选定帅增益：Core.chooseCommanderBuff 迁移状态（commander → player），随后进回合循环 */
+    private pickCommanderBuff(kind: CommanderBuffKind): void {
+        if (!this.state || this.state.turn.phase !== 'commander') {
+            return;
+        }
+        const next = chooseCommanderBuff(this.state, kind);
+        if (next === this.state) {
+            warn(`[GameManager] 增益 ${kind} 未生效（阶段/参数校验拒绝）`);
+            return;
+        }
+        this.state = next;
+        this.commanderPanel?.hide();
+        log(`[流程] 帅增益已选：${kind}，开战`);
         this.beginFlow();
     }
 

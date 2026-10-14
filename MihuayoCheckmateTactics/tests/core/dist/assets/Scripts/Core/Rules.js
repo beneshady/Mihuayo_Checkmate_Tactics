@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseBattleState = void 0;
 exports.deepCopy = deepCopy;
+exports.removeDead = removeDead;
 exports.finishVictory = finishVictory;
 exports.checkTerminal = checkTerminal;
 exports.syncParty = syncParty;
@@ -87,6 +88,7 @@ function recordKill(state, actor, dead) {
     state.highestLevel = Math.max(state.highestLevel ?? 1, actor.level);
 }
 /** 死亡统一处理：留尸、移除、击杀记账（对齐原型 removeDead）；返回本次死亡 id */
+/** 结算并移除阵亡单位（生成尸体 / 水面销尸）；Waves.attemptSpawns 也使用 */
 function removeDead(state, actor) {
     const dead = state.units.filter((u) => u.hp <= 0);
     dead.forEach((u) => (0, Terrain_1.leaveCorpse)(state, u));
@@ -174,6 +176,7 @@ function retryLevel(state) {
     }
     const next = deepCopy(state.levelSnapshot);
     next.turn.phase = 'deploy';
+    next.commanderBuff = null;
     next.result = null;
     next.intents = [];
     next.revision = (state.revision ?? 0) + 1;
@@ -319,15 +322,18 @@ function applyPushCorpse(state, unit, action, effect) {
 /** 牵引结算（对齐原型 applyPull） */
 function applyPull(state, unit, action, effect) {
     const target = (0, Terrain_1.unitAt)(state, action.to.x, action.to.y) ?? (0, Terrain_1.corpseAt)(state, action.to.x, action.to.y);
-    if (!target || !action.targetTo) {
+    if (!target) {
         return;
     }
     if (action.type === 'pull-collision') {
-        // 贴身强拉例外：目标必为敌活子，双方各 -1 不换位
+        // 贴身强拉例外：目标必为敌活子，双方各 -1 不换位（无需 targetTo，对齐原型）
         hitRecord(effect, unit, 1, 'collision');
         hitRecord(effect, target, 1, 'collision');
         effect.victims = removeDead(state, unit);
         effect.pushStatus = 'collision';
+        return;
+    }
+    if (!action.targetTo) {
         return;
     }
     if (!(0, Terrain_1.unitAt)(state, target.x, target.y)) {

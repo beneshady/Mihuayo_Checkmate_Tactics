@@ -145,7 +145,8 @@ function recordKill(state: BattleState, actor: BattleUnit | undefined, dead: Bat
 }
 
 /** 死亡统一处理：留尸、移除、击杀记账（对齐原型 removeDead）；返回本次死亡 id */
-function removeDead(state: BattleState, actor: BattleUnit | undefined): string[] {
+/** 结算并移除阵亡单位（生成尸体 / 水面销尸）；Waves.attemptSpawns 也使用 */
+export function removeDead(state: BattleState, actor: BattleUnit | undefined): string[] {
     const dead = state.units.filter((u) => u.hp <= 0);
     dead.forEach((u) => leaveCorpse(state, u));
     state.units = state.units.filter((u) => u.hp > 0);
@@ -235,6 +236,7 @@ export function retryLevel(state: BattleState): BattleState {
     }
     const next = deepCopy(state.levelSnapshot);
     next.turn.phase = 'deploy';
+    next.commanderBuff = null;
     next.result = null;
     next.intents = [];
     next.revision = (state.revision ?? 0) + 1;
@@ -381,15 +383,18 @@ function applyPushCorpse(state: BattleState, unit: BattleUnit, action: UnitActio
 /** 牵引结算（对齐原型 applyPull） */
 function applyPull(state: BattleState, unit: BattleUnit, action: UnitAction, effect: Effect): void {
     const target = unitAt(state, action.to.x, action.to.y) ?? corpseAt(state, action.to.x, action.to.y);
-    if (!target || !action.targetTo) {
+    if (!target) {
         return;
     }
     if (action.type === 'pull-collision') {
-        // 贴身强拉例外：目标必为敌活子，双方各 -1 不换位
+        // 贴身强拉例外：目标必为敌活子，双方各 -1 不换位（无需 targetTo，对齐原型）
         hitRecord(effect, unit, 1, 'collision');
         hitRecord(effect, target as BattleUnit, 1, 'collision');
         effect.victims = removeDead(state, unit);
         effect.pushStatus = 'collision';
+        return;
+    }
+    if (!action.targetTo) {
         return;
     }
     if (!unitAt(state, target.x, target.y)) {

@@ -41,7 +41,7 @@ export class ResultPanel extends Component {
             retryButton.node.on(Button.EventType.CLICK, () => this.onRetry?.(), this);
         }
         if (this.backSfx) {
-            this.sfxSource = this.addComponent(AudioSource);
+            this.sfxSource = this.addComponent(AudioSource)!;
             this.sfxSource.playOnAwake = false;
         }
     }
