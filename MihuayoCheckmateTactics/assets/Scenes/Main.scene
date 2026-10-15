@@ -96,7 +96,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 640,
-      "y": 360.00000000000006,
+      "y": 359.99999999999994,
       "z": 0
     },
     "_lrot": {
@@ -181,7 +181,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 360,
+    "_orthoHeight": 359.99999999999994,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -338,14 +338,32 @@
     "tileRevealDuration": 0.2,
     "tileRevealExponent": 1,
     "forestDecorSprite": {
-      "__uuid__": "56f12a77-f7c2-4e21-a0d5-ac95b8c245f7@f9941",
+      "__uuid__": "456434ec-3e8e-4399-9afa-726dd73240ab@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "mountainDecorSprite": {
+      "__uuid__": "997c1764-18fc-46be-b7ed-955784dd37c2@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "mountainCrackedDecorSprite": {
+      "__uuid__": "e2d659e3-b383-4810-9681-c367f2f29376@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "mountainRubbleSprite": {
+      "__uuid__": "e6a1edfe-38da-449f-914e-e2bf27d0d3d4@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "bridgeDecorSprite": {
+      "__uuid__": "c98c6c15-896e-435a-97f7-c499532efd60@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "forestDecorWorldHeight": 200,
+    "mountainDecorWidthRatio": 0.6,
     "forestDecorOffsetX": 0,
     "forestDecorOffsetY": 30,
     "mapBaseSprite": null,
     "tileThickness": 230,
+    "waterSurfaceDrop": 70,
     "_id": "96oe3tcelMuapvzflvcrJm"
   },
   {
@@ -897,7 +915,7 @@
     "_string": "结束回合",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30.243055555555554,
+    "_actualFontSize": 27.71527777777778,
     "_fontSize": 26,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -7195,7 +7213,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 1280,
-      "height": 720
+      "height": 719.9999999999998
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

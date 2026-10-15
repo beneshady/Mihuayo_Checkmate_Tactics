@@ -1,7 +1,7 @@
-import { _decorator, Color, Component, Graphics, Label, Node, Prefab, Sprite, Tween, UITransform, Vec3, error, instantiate, tween, warn } from 'cc';
+import { _decorator, Color, Component, Graphics, Label, Node, Prefab, Sprite, Tween, UITransform, Vec3, error, instantiate, log, tween, warn } from 'cc';
 import { BattleState, BattleUnit, gridToIso } from '../Core/BattleState';
-import { IsoLayout } from '../Map/IsoLayout';
-import { Unit } from './Unit';
+import { IsoLayout, surfaceDropAt } from '../Map/IsoLayout';
+import { Unit, UnitFacing } from './Unit';
 
 const { ccclass, property } = _decorator;
 
@@ -14,6 +14,9 @@ const { ccclass, property } = _decorator;
 
 /** 棋子从格点上方多少世界单位落下（+y 向上，起点高于终点） */
 const UNIT_DROP_Y = 140;
+
+/** 朝向/偏移诊断日志：每个棋种只打一次（验证 prefab 条目数据是否进运行时） */
+const loggedFacingDiag = new Set<string>();
 
 /**
  * 按战局状态的 units 生成棋子视图（M1：按棋子类型选择贴图，含阵营标记）。
@@ -68,11 +71,12 @@ export class UnitBuilder extends Component {
         for (const corpse of corpses) {
             const existing = this.corpseNodes.get(corpse.id);
             const { isoX, isoY } = gridToIso(corpse.x, corpse.y, layout);
+            const surfaceY = isoY - surfaceDropAt(state, corpse.x, corpse.y, layout); // 尸体可在水格（推尸入水）
             if (existing) {
-                if (Math.abs(existing.position.x - isoX) > 0.5 || Math.abs(existing.position.y - isoY) > 0.5) {
+                if (Math.abs(existing.position.x - isoX) > 0.5 || Math.abs(existing.position.y - surfaceY) > 0.5) {
                     Tween.stopAllByTarget(existing);
                     tween(existing)
-                        .to(this.unitMoveDuration, { position: new Vec3(isoX, isoY, 0) }, { easing: 'quadOut' })
+                        .to(this.unitMoveDuration, { position: new Vec3(isoX, surfaceY, 0) }, { easing: 'quadOut' })
                         .start();
                 }
                 continue;
@@ -94,7 +98,7 @@ export class UnitBuilder extends Component {
             label.fontSize = Math.round(layout.halfTileW * 0.3);
             label.color = new Color(216, 216, 216, 255);
             node.addChild(labelNode);
-            node.setPosition(isoX, isoY, 0);
+            node.setPosition(isoX, surfaceY, 0);
             this.node.addChild(node);
             this.corpseNodes.set(corpse.id, node);
         }
@@ -142,16 +146,23 @@ export class UnitBuilder extends Component {
 
     /**
      * 把棋子视图移动到目标格（逻辑状态已由协调者改好，这里只做表现投影）。
+     * 目标格是水面时落在下沉后的水面高度（震退入水演出会跟着沉下去）。
      * 复用落下的 quadOut 节奏；找不到该棋子视图时警告并忽略。
      */
-    public moveUnitView(unitId: string, x: number, y: number, layout: IsoLayout): void {
+    public moveUnitView(unitId: string, x: number, y: number, layout: IsoLayout, state?: BattleState | null): void {
         const node = this.unitNodes.get(unitId);
         if (!node) {
             warn(`[UnitBuilder] 找不到棋子视图：${unitId}，跳过移动表现`);
             return;
         }
         const { isoX, isoY } = gridToIso(x, y, layout);
-        const target = new Vec3(isoX, isoY, 0);
+        const drop = state ? surfaceDropAt(state, x, y, layout) : 0;
+        const unitComp = node.getComponent(Unit);
+        const target = new Vec3(
+            isoX + (unitComp?.spriteOffsetX ?? 0),
+            isoY - drop + (unitComp?.spriteOffsetY ?? 0),
+            0,
+        );
         Tween.stopAllByTarget(node); // 打断进行中的抖动/移动，防 tween 叠加冲突
         tween(node)
             .to(this.unitMoveDuration, { position: target }, { easing: 'quadOut' })
@@ -200,24 +211,34 @@ export class UnitBuilder extends Component {
     }
 
     /** 单节点创建（buildUnits 与 syncNewUnits 共用）：贴图/锚点/等高缩放/阵营标记/注册 */
-    private createUnitNode(unit: BattleUnit, layout: IsoLayout): Node {
+    private createUnitNode(unit: BattleUnit, layout: IsoLayout, state?: BattleState | null): Node {
         const node = instantiate(this.unitPrefab!);
         this.node.addChild(node);
         node.name = `unit_${unit.id}_${unit.side}`;
         const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
-        node.getComponent(Unit)!.setUnit(unit.id, unit.side, unit.kind);
+        const surfaceY = isoY - (state ? surfaceDropAt(state, unit.x, unit.y, layout) : 0);
+        const unitComp = node.getComponent(Unit)!;
+        unitComp.facing = unit.side === 'player' ? UnitFacing.Up : UnitFacing.Down; // 敌我相向（视图默认朝向）
+        unitComp.setUnit(unit.id, unit.side, unit.kind);
         // 底边中心锚点：棋子底座底边顶在顶面中心
         node.getComponent(UITransform)?.setAnchorPoint(0.5, 0);
-        // 尺寸归一：按裁剪后高度统一世界高度（各棋子等高；缺帧回退布局缩放）
+        // 尺寸归一：按裁剪后高度统一世界高度（各棋子等高；缺帧回退布局缩放），
+        // 再乘棋种的高度倍率（素材留白多、主体偏小的棋种在 prefab 条目上单独放大）。
+        // 经 Unit.applyScale 设置（镜像以 x 负值叠加，统一由 Unit 管理避免覆盖）
         const sprite = node.getComponent(Sprite);
         const frame = sprite?.spriteFrame ?? null;
         const contentH = frame ? frame.rect.height : 0;
-        const unitScale = contentH > 0 ? this.unitWorldHeight / contentH : 1;
-        node.setScale(unitScale, unitScale, 1);
+        const unitScale = (contentH > 0 ? this.unitWorldHeight / contentH : 1) * unitComp.spriteHeightScale;
+        unitComp.applyScale(unitScale);
+        if (!loggedFacingDiag.has(unit.kind)) {
+            loggedFacingDiag.add(unit.kind);
+            log(`[UnitBuilder] ${unit.id}（${unit.kind}）facing=${unitComp.facing} scale=${unitScale.toFixed(3)} offset=(${unitComp.spriteOffsetX}, ${unitComp.spriteOffsetY})`);
+        }
         // 阵营标记：我方金、敌方红
         this.addSideMarker(node, unit.side);
         this.unitNodes.set(unit.id, node);
-        node.setPosition(isoX, isoY, 0);
+        // 摆位 = 格心 + 素材内容偏移（素材主体不在画布正中时由条目 offsetX/offsetY 修正）
+        node.setPosition(isoX + unitComp.spriteOffsetX, surfaceY + unitComp.spriteOffsetY, 0);
         return node;
     }
 
@@ -230,16 +251,20 @@ export class UnitBuilder extends Component {
             if (this.unitNodes.has(unit.id)) {
                 continue;
             }
-            const node = this.createUnitNode(unit, layout);
+            const node = this.createUnitNode(unit, layout, state);
             const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
+            const surfaceY = isoY - surfaceDropAt(state, unit.x, unit.y, layout);
             const sprite = node.getComponent(Sprite);
             node.active = false;
             if (sprite) sprite.color = new Color(255, 255, 255, 0);
-            const finalPos = new Vec3(isoX, isoY, 0);
-            const beginY = isoY + UNIT_DROP_Y;
+            const unitComp = node.getComponent(Unit);
+            const posX = isoX + (unitComp?.spriteOffsetX ?? 0);
+            const posY = surfaceY + (unitComp?.spriteOffsetY ?? 0);
+            const finalPos = new Vec3(posX, posY, 0);
+            const beginY = posY + UNIT_DROP_Y;
             this.scheduleOnce(() => {
                 node.active = true;
-                node.setPosition(isoX, beginY, 0);
+                node.setPosition(posX, beginY, 0);
                 tween(node)
                     .to(this.unitRevealDuration, { position: finalPos }, { easing: 'quadOut' })
                     .start();
@@ -277,18 +302,22 @@ export class UnitBuilder extends Component {
 
         let index = 0;
         for (const unit of units) {
-            const node = this.createUnitNode(unit, layout);
+            const node = this.createUnitNode(unit, layout, state);
             const { isoX, isoY } = gridToIso(unit.x, unit.y, layout);
+            const surfaceY = isoY - surfaceDropAt(state, unit.x, unit.y, layout);
             const sprite = node.getComponent(Sprite);
 
             // 未轮到不显形：先隐藏（保持全尺寸）；到点时由 scheduleOnce 激活，再从上方落下并淡入。
             node.active = false;
             if (sprite) sprite.color = new Color(255, 255, 255, 0); // 从透明开始，下落时淡入
-            const finalPos = new Vec3(isoX, isoY, 0);
-            const beginY = isoY + UNIT_DROP_Y;
+            const unitComp = node.getComponent(Unit);
+            const posX = isoX + (unitComp?.spriteOffsetX ?? 0);
+            const posY = surfaceY + (unitComp?.spriteOffsetY ?? 0);
+            const finalPos = new Vec3(posX, posY, 0);
+            const beginY = posY + UNIT_DROP_Y;
             this.scheduleOnce(() => {
                 node.active = true;
-                node.setPosition(isoX, beginY, 0);
+                node.setPosition(posX, beginY, 0);
                 tween(node)
                     .to(this.unitRevealDuration, { position: finalPos }, { easing: 'quadOut' })
                     .start();

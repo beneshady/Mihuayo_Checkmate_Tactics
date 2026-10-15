@@ -19,6 +19,7 @@ function updateVertexData(sprite: SideWallSprite): void {
     const top = uiTrans.height / 2;
     const rise = sprite.sideTopRise;
     const thick = sprite.sideThickness;
+    const drop = sprite.sideTopDrop; // 顶边随水面下沉（水格）：底边保持块体底不变
     const s = sprite.flipX ? -1 : 1; // 左壁整体水平镜像（纹理随之翻转，土层纹理无方向性，视觉等价）
 
     const dataList = renderData.data;
@@ -27,9 +28,9 @@ function updateVertexData(sprite: SideWallSprite): void {
     dataList[1].x = hw * s;
     dataList[1].y = top - thick;
     dataList[2].x = -hw * s;
-    dataList[2].y = top - rise;
+    dataList[2].y = top - rise - drop;
     dataList[3].x = hw * s;
-    dataList[3].y = top;
+    dataList[3].y = top - drop;
     renderData.vertDirty = true;
 }
 
@@ -154,6 +155,9 @@ const sideQuadAssembler = {
 export class SideWallSprite extends Sprite {
     @property({ tooltip: '顶边竖直落差（= halfTileH，等距 1:2 斜边）' })
     public sideTopRise = 100;
+
+    @property({ tooltip: '顶边整体下沉量（世界单位）。水格用：顶边随下沉的水面移动，底边保持块体底，形成「块体内凹的水面」' })
+    public sideTopDrop = 0;
 
     @property({ tooltip: '侧壁厚度（竖直边长，世界单位）' })
     public sideThickness = 80;

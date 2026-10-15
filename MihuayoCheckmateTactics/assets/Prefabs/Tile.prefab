@@ -162,6 +162,9 @@
       },
       {
         "__id__": 12
+      },
+      {
+        "__id__": 14
       }
     ],
     "terrainId": "",
@@ -199,7 +202,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "forest",
     "spriteFrame": {
-      "__uuid__": "8d3a5f21-94c7-4b1e-a6d2-3f8b0c5e7a91@f9941",
+      "__uuid__": "c5e1eb1e-8dfc-42b8-bedb-f1af17eeb77c@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "sideFrame": {
@@ -211,7 +214,7 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "mountain",
     "spriteFrame": {
-      "__uuid__": "b1e94c67-2d5a-4f83-9c0e-6a71d8b2f4e2@f9941",
+      "__uuid__": "c5e1eb1e-8dfc-42b8-bedb-f1af17eeb77c@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "sideFrame": {
@@ -223,11 +226,11 @@
     "__type__": "TerrainSpriteEntry",
     "terrainId": "bridge",
     "spriteFrame": {
-      "__uuid__": "cf2a7d35-8b16-4e92-b7a4-90d3e1f6c8b5@f9941",
+      "__uuid__": "0506c258-251d-4bb4-b753-fc3c035fceb1@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "sideFrame": {
-      "__uuid__": "2baed6d3-17ab-4598-9a18-57b51661e968@f9941",
+      "__uuid__": "651b291a-fcae-4605-81f2-690d644766c7@f9941",
       "__expectedType__": "cc.SpriteFrame"
     }
   },
@@ -242,5 +245,17 @@
     "fileId": "35ZlL4hZZM2r8hlRlp3h2T",
     "instance": null,
     "targetOverrides": null
+  },
+  {
+    "__type__": "TerrainSpriteEntry",
+    "terrainId": "cracked",
+    "spriteFrame": {
+      "__uuid__": "c5e1eb1e-8dfc-42b8-bedb-f1af17eeb77c@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "sideFrame": {
+      "__uuid__": "2baed6d3-17ab-4598-9a18-57b51661e968@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    }
   }
 ]

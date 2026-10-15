@@ -1,5 +1,5 @@
 import { _decorator, AudioClip, AudioSource, Button, Camera, Canvas, Color, Component, EventTouch, JsonAsset, Label, Node, director, resources, Vec3, error, log, tween, warn } from 'cc';
-import { BattleState, GridPos, gridToIso, isoToGrid } from './Core/BattleState';
+import { BattleState, GridPos, gridToIso, isoToGrid, terrainAt } from './Core/BattleState';
 import { corpseAt, unitAt } from './Core/Terrain';
 import { CONFIG } from './Core/Config';
 import { UnitAction, legalActions, unitHasAp } from './Core/Actions';
@@ -20,7 +20,7 @@ import { getLevelEntry, LevelEntry, LevelList, parseLevelList } from './Core/Lev
 import { grantBattleReward } from './Core/PlayerProfile';
 import { getUnitInfo } from './Core/UnitInfo';
 import { BoardCamera } from './Map/BoardCamera';
-import { IsoLayout } from './Map/IsoLayout';
+import { IsoLayout, surfaceDropAt } from './Map/IsoLayout';
 import { MapBuilder } from './Map/MapBuilder';
 import { MoveHighlighter } from './Map/MoveHighlighter';
 import { ThreatMark, ThreatOverlay } from './Map/ThreatOverlay';
@@ -436,7 +436,7 @@ export class GameManager extends Component {
             try {
                 if (move.ready || applyPrepMove(this.state, move.unitId, move.to)) {
                     if (!move.ready) {
-                        this.unitBuilder?.moveUnitView(move.unitId, move.to.x, move.to.y, this.layout);
+                        this.unitBuilder?.moveUnitView(move.unitId, move.to.x, move.to.y, this.layout, this.state);
                     }
                     log(`[敌方] ${move.unitId} 准备移动 (${move.from.x},${move.from.y})→(${move.to.x},${move.to.y})：${move.reason}`);
                 } else {
@@ -562,11 +562,11 @@ export class GameManager extends Component {
                 // 敌方冲锋/攻击落点同样以结算后的实际位置为准
                 const actorNow = this.state!.units.find((u) => u.id === effect.actor);
                 if (actorNow) {
-                    this.unitBuilder?.moveUnitView(effect.actor, actorNow.x, actorNow.y, this.layout!);
+                    this.unitBuilder?.moveUnitView(effect.actor, actorNow.x, actorNow.y, this.layout!, this.state);
                 }
             }
             if (effect.pushed) {
-                this.unitBuilder?.moveUnitView(effect.pushed.id, effect.pushed.to.x, effect.pushed.to.y, this.layout!);
+                this.unitBuilder?.moveUnitView(effect.pushed.id, effect.pushed.to.x, effect.pushed.to.y, this.layout!, this.state);
             }
             const shaken = new Set<string>();
             for (const h of effect.hits) {
@@ -588,6 +588,9 @@ export class GameManager extends Component {
             }
             if (this.layout && this.state) {
                 this.unitBuilder?.syncCorpseViews(this.state, this.layout); // 敌方击杀留尸 / 推尸（P5）
+                for (const m of effect.mountains ?? []) {
+                    this.mapBuilder?.refreshMountainDecor(m.x, m.y, terrainAt(this.state.map, m.x, m.y)); // 敌方炮碎山
+                }
             }
             return;
         }
@@ -610,11 +613,12 @@ export class GameManager extends Component {
      * 纯 Label 无纹理依赖，创建/销毁零残留。
      */
     private floatHint(cell: GridPos | null, text: string, color: Color): void {
-        if (!cell || !this.layout) return;
+        if (!cell || !this.layout || !this.state) return;
         const { isoX, isoY } = gridToIso(cell.x, cell.y, this.layout);
+        const surfaceY = isoY - surfaceDropAt(this.state, cell.x, cell.y, this.layout); // 浮字跟水面走
         const node = new Node(`enemy_hint_${cell.x}_${cell.y}`);
         this.node.addChild(node);
-        node.setPosition(isoX, isoY + this.layout.halfTileH * 1.6, 0);
+        node.setPosition(isoX, surfaceY + this.layout.halfTileH * 1.6, 0);
         node.setSiblingIndex(this.node.children.length - 1); // 浮字置顶
         const label = node.addComponent(Label);
         label.string = text;
@@ -1073,7 +1077,8 @@ export class GameManager extends Component {
     /**
      * 执行一次动作：Core.submitAction（额度 + 合法性 + revision 校验，深拷贝返回新状态）
      * → 替换状态 → 投影视图（移动/受击/阵亡）→ 刷新威胁预测 → 清交互态 → 即时胜负判定。
-     * 已知限制：山被打碎（mountain→cracked→land）后地块贴图不刷新（P0 polish 再补）。
+     * 山的三态表现（完整→碎→渣淡出）由 refreshMountainDecor 消费 effect.mountains 完成；
+     * 山/cracked 顶面与平地同图（山体立体感全部来自装饰），地形切换无需刷新地块贴图。
      */
     private executeAction(action: UnitAction): void {
         if (!this.state || !this.layout) return;
@@ -1088,13 +1093,13 @@ export class GameManager extends Component {
             // 落点以结算后的实际位置为准（冲锋近身/水中断/牵引车不动等，effect.to 仅 move 类可信）
             const actorNow = this.state.units.find((u) => u.id === effect.actor);
             if (actorNow) {
-                this.unitBuilder?.moveUnitView(effect.actor, actorNow.x, actorNow.y, this.layout);
+                this.unitBuilder?.moveUnitView(effect.actor, actorNow.x, actorNow.y, this.layout, this.state);
                 log(`[交互] ${effect.actor} 行动 → (${actorNow.x}, ${actorNow.y})`);
             }
         }
         if (effect.pushed) {
             // 被震退/被拉的第三方位移（尸体无视图，moveUnitView 内部忽略）
-            this.unitBuilder?.moveUnitView(effect.pushed.id, effect.pushed.to.x, effect.pushed.to.y, this.layout);
+            this.unitBuilder?.moveUnitView(effect.pushed.id, effect.pushed.to.x, effect.pushed.to.y, this.layout, this.state);
         }
         if (effect.pushStatus) {
             const hints: Record<string, string> = {
@@ -1130,6 +1135,9 @@ export class GameManager extends Component {
             }
         }
         this.unitBuilder?.syncCorpseViews(this.state, this.layout); // 尸体出现/移动/销毁（P5）
+        for (const m of effect.mountains ?? []) {
+            this.mapBuilder?.refreshMountainDecor(m.x, m.y, terrainAt(this.state.map, m.x, m.y)); // 山受击三态（完整→碎→渣）
+        }
         this.refreshThreats(); // 局面已变：立即刷新敌方意图预测（US-006 §3）
         this.cancelSelection();
         this.checkBattleEnd();
@@ -1401,7 +1409,7 @@ export class GameManager extends Component {
             const next = deployUnit(state, this.deploySelection, grid);
             if (next !== state) {
                 this.state = next;
-                this.unitBuilder?.moveUnitView(this.deploySelection, grid.x, grid.y, this.layout);
+                this.unitBuilder?.moveUnitView(this.deploySelection, grid.x, grid.y, this.layout, this.state);
                 log(`[布阵] ${this.deploySelection} → (${grid.x},${grid.y})`);
             } else {
                 warn(`[布阵] (${grid.x},${grid.y}) 不可落位（占用/水/越界）`);

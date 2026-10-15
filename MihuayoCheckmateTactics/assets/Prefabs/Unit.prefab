@@ -181,7 +181,11 @@
     "spriteFrame": {
       "__uuid__": "72db0d4d-cde7-4d65-abb1-a1b70c611b1a@f9941",
       "__expectedType__": "cc.SpriteFrame"
-    }
+    },
+    "backSprite": null,
+    "heightScale": 1,
+    "offsetX": 0,
+    "offsetY": 0
   },
   {
     "__type__": "UnitTypeSpriteEntry",
@@ -189,7 +193,11 @@
     "spriteFrame": {
       "__uuid__": "2ab9e5ae-c980-4a7b-84ae-dd70eccb1c96@f9941",
       "__expectedType__": "cc.SpriteFrame"
-    }
+    },
+    "backSprite": null,
+    "heightScale": 1,
+    "offsetX": 0,
+    "offsetY": 0
   },
   {
     "__type__": "UnitTypeSpriteEntry",
@@ -197,7 +205,11 @@
     "spriteFrame": {
       "__uuid__": "7ceed788-0a93-4dcc-882a-0d9d864c46d7@f9941",
       "__expectedType__": "cc.SpriteFrame"
-    }
+    },
+    "backSprite": null,
+    "heightScale": 1,
+    "offsetX": 0,
+    "offsetY": 0
   },
   {
     "__type__": "UnitTypeSpriteEntry",
@@ -205,7 +217,11 @@
     "spriteFrame": {
       "__uuid__": "3e5d2b92-d757-4566-92a9-e66324f2eab2@f9941",
       "__expectedType__": "cc.SpriteFrame"
-    }
+    },
+    "backSprite": null,
+    "heightScale": 1,
+    "offsetX": 0,
+    "offsetY": 0
   },
   {
     "__type__": "UnitTypeSpriteEntry",
@@ -213,12 +229,26 @@
     "spriteFrame": {
       "__uuid__": "e992e366-831c-454e-b08f-3a3f768536fa@f9941",
       "__expectedType__": "cc.SpriteFrame"
-    }
+    },
+    "backSprite": null,
+    "heightScale": 1,
+    "offsetX": 0,
+    "offsetY": 0
   },
   {
     "__type__": "UnitTypeSpriteEntry",
     "defId": "shi",
-    "spriteFrame": null
+    "spriteFrame": {
+      "__uuid__": "c52e26ca-2445-4025-af3d-759114ce1b8c@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "backSprite": {
+      "__uuid__": "a95a78ea-9b40-46e5-b946-93528c2ded3b@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
+    "heightScale": 3,
+    "offsetX": 0,
+    "offsetY": -70
   },
   {
     "__type__": "UnitTypeSpriteEntry",
@@ -226,7 +256,11 @@
     "spriteFrame": {
       "__uuid__": "4ecff56f-64eb-4155-b4c8-1221086a2298@f9941",
       "__expectedType__": "cc.SpriteFrame"
-    }
+    },
+    "backSprite": null,
+    "heightScale": 1,
+    "offsetX": 0,
+    "offsetY": 0
   },
   {
     "__type__": "cc.PrefabInfo",
