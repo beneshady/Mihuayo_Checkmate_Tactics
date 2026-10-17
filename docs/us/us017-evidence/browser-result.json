@@ -1,0 +1,62 @@
+{
+  "normal": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "killActor": "starting-pawn",
+      "recipient": "rook",
+      "recipientKills": 0,
+      "earned": 1,
+      "spent": 1,
+      "after": 0,
+      "upgrade": "fortify",
+      "upgradeUndoBoundary": "PASS",
+      "modeSwitch": "PASS"
+    },
+    {
+      "scope": "实际首关两波→商店→下关→真实失败重试",
+      "kills": 4,
+      "earned": 4,
+      "spent": 2,
+      "pool": 2,
+      "gold": 4
+    },
+    {
+      "scope": "同页新旅程确认重置公共池与升级",
+      "teamSp": 0
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "killActor": "starting-pawn",
+      "recipient": "rook",
+      "recipientKills": 0,
+      "earned": 1,
+      "spent": 1,
+      "after": 0,
+      "upgrade": "fortify",
+      "upgradeUndoBoundary": "PASS",
+      "modeSwitch": "PASS"
+    },
+    {
+      "scope": "file://独立加载/公共SP显示冒烟",
+      "url": "file:///D:/Projects/mihuayou/gamehack2026/web/index.html",
+      "teamSp": 0
+    }
+  ],
+  "isolated": [
+    {
+      "scope": "debug旧状态真实入口专项，非正常资源流程",
+      "authoritative": "units rook2 overrides party99",
+      "teamSp": 2,
+      "repeat": "unchanged"
+    }
+  ],
+  "errors": [],
+  "result": "PASS",
+  "finishedAt": "2026-10-15T15:03:44.983Z"
+}

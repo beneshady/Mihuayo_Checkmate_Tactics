@@ -1,0 +1,117 @@
+{
+  "recordedAt": "2026-10-15T23:05:55.938416+08:00",
+  "branch": "codex/web-gameplay-validation",
+  "head": "efdad8467441e3b7ffa5e4178f39ccb46276ac29",
+  "workingTree": "US017 + 全部既有未提交改动，未提交推送部署",
+  "versions": {
+    "web/index.html": "4975f872053f672bcbdb2c230317ca167dd511acd5fc23261711bf9d95778e96",
+    "web/desktop.css": "8986eadfc1dea0eafe47c628c59df8e33daf18f0429c39ca90502adac42be38b",
+    "web/js/rules.js": "c3acbfac05d3261762439300d82de29b46a23feae5e0fab2901e5fd021009f91",
+    "web/js/app.js": "4bfb00fa061e0f6934599cd87e48204309134258ce1a58fe86dfcde92e63afe8",
+    "web/js/ui.js": "e3db77cb508cd442e55bde72ade2d4d2d5ec781659cf64a836367cb419a50015",
+    "web/js/campaign.js": "eeb90db421a429ba1fc70d1f1b6a056648fb6b2c2e6d1d38461d61bc445665f1",
+    "web/display.css": "79f2f1286cff175e4c99acd7d82db758861a035d489fda46bbdef10e18a0416a",
+    "web/js/display.js": "a73c99c48638e011e7a98a6c2f46cbab2c6320ca5c4d142078a4f7d64f4c2932",
+    "web/mobile.css": "50562405350bfb494dcf81eebcba01f9f5cab3bed8d126ddc05c69805b9f8f55",
+    "web/campaign.css": "936d4c24a440cacc7865f87c46c0fed776d902957db023ab612d06a045259429",
+    "web/ui.css": "716729508e3eb46f0a90e8b42a4d8874a23f6cb70b283bb97c6864cae4cd9bd8",
+    "web/js/maps.js": "878d29b09826a7e661c7d643ae784c916b920e9d6dc1c1e830d13195e69cd4bf",
+    "web/preview.html": "ad969f81faa59662d33f631f9d4225b039b055e2e88dce0ae4ae75354f5e2f88",
+    "web/preview.css": "4de2714e3348c40e4805a529e1546dd1a7aaced3e23b628307dd45f8ebdb54fc",
+    "web/js/preview.js": "4a695b4aafecd1766133fbe68726ca392c0642fe63eda21a5c4d80219f2d4191",
+    "web/vendor/three.min.js": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2",
+    "tests/shared-sp.test.cjs": "3b85545689265845ad9d3df52d4d4f8a6ff492990fbdc3bedd3bd72bfe53d1e8",
+    "tests/shared-sp-browser.cjs": "2b7fa82b1619f238dea7c066e0425626153d11c1d8eb5333e5fecbfe45e44b9c",
+    "tests/legacy-rules.test.cjs": "3add89476a472220a9dd4e74d00a0f55716d863ce4a27d4232580954edbba2bc",
+    "tests/v23-contract.test.cjs": "000e87ca899521dd46e19afea235cc64009b8a0d04135fc0016836565d48fc41",
+    "tests/terrain.test.cjs": "88391c157633ca9944c9e3bf5a6f2ec41613a73252487d1e7e07a2c81bafba2f",
+    "tests/maps.test.cjs": "66caa14171604b97eb01a395957897a179459d3b61cc3ed85950c109f6ee7143",
+    "tests/normal-playthrough.cjs": "f9d7c55c38f507224b22794394f6a703580acaa3dea93f144aa2deebff1945fb",
+    "tests/ui-headless.test.cjs": "1efee27e32b8ee7be3f830787e78ac26e76799fda44f9285770f5ce02afc3d95",
+    "tests/v1-flow-browser.cjs": "b2a5d9c07b5d9f5b965c4ffb56a8dfacc15e0ab5e55de6dce1ba19c2482834be",
+    "tests/terrain-editor-browser.cjs": "f6794828f590409576b0b397612e47d9cddfa8ff6425b1578859ba1235178ad8",
+    "tests/display-modes-browser.cjs": "457248378a63c988ccffaa94f127c0b4945e9b68bd3931a24c5e33ed7dd91da7",
+    "tests/cannon-purchase-browser.cjs": "07b552bf4a54db22b298f2a8bcf75a521132c385c3eac483429f56f43173b721",
+    "tests/cannon-purchase.test.cjs": "334db66bbfad9b3c2b74d2c38e7ddf99f4ced0404e1fb6a78e10fc3dcc90a066",
+    "tests/find-playthrough.cjs": "062fa58ec0333f003cd79b0d512ad2fcfaa6502025b40aff62a8bb11de99c483"
+  },
+  "checks": {
+    "newResourceGroups": 11,
+    "filteredLegacyGroups": [
+      28,
+      6,
+      1
+    ],
+    "browser": {
+      "normal": [
+        {
+          "viewport": {
+            "width": 1280,
+            "height": 900
+          },
+          "killActor": "starting-pawn",
+          "recipient": "rook",
+          "recipientKills": 0,
+          "earned": 1,
+          "spent": 1,
+          "after": 0,
+          "upgrade": "fortify",
+          "upgradeUndoBoundary": "PASS",
+          "modeSwitch": "PASS"
+        },
+        {
+          "scope": "实际首关两波→商店→下关→真实失败重试",
+          "kills": 4,
+          "earned": 4,
+          "spent": 2,
+          "pool": 2,
+          "gold": 4
+        },
+        {
+          "scope": "同页新旅程确认重置公共池与升级",
+          "teamSp": 0
+        },
+        {
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "killActor": "starting-pawn",
+          "recipient": "rook",
+          "recipientKills": 0,
+          "earned": 1,
+          "spent": 1,
+          "after": 0,
+          "upgrade": "fortify",
+          "upgradeUndoBoundary": "PASS",
+          "modeSwitch": "PASS"
+        },
+        {
+          "scope": "file://独立加载/公共SP显示冒烟",
+          "url": "file:///D:/Projects/mihuayou/gamehack2026/web/index.html",
+          "teamSp": 0
+        }
+      ],
+      "isolated": [
+        {
+          "scope": "debug旧状态真实入口专项，非正常资源流程",
+          "authoritative": "units rook2 overrides party99",
+          "teamSp": 2,
+          "repeat": "unchanged"
+        }
+      ],
+      "errors": [],
+      "result": "PASS",
+      "finishedAt": "2026-10-15T15:03:44.983Z"
+    },
+    "syntax": "PASS",
+    "diff": "PASS"
+  },
+  "migration": "实际debug/nextLevel/retry入口；live > corpse > party、bench仅身份引用；快照各自独立；已有pool不再加旧值；无磁盘旅程恢复/热更新",
+  "limits": [
+    "真机触控/其他浏览器未验",
+    "整体平衡未验",
+    "US015横版及既有容器语法问题未混入",
+    "未跑全量基础战斗/三关/旧完整UI回归"
+  ]
+}
