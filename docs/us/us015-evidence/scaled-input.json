@@ -1,0 +1,32 @@
+{
+  "result": "PASS",
+  "scope": "正常入口两个缩放模式鼠标实点，getState/getEpoch/screenPoint只读；非完整第二条战斗流程",
+  "phone": {
+    "mode": "mobile",
+    "display": {
+      "width": 448,
+      "height": 924,
+      "scale": 0.974025974025974
+    },
+    "to": {
+      "x": 0,
+      "y": 1
+    },
+    "revision": 1
+  },
+  "web": {
+    "mode": "desktop",
+    "display": {
+      "width": 1024,
+      "height": 844,
+      "scale": 0.380859375
+    },
+    "to": {
+      "x": 0,
+      "y": 2
+    },
+    "revision": 3
+  },
+  "epoch": 2,
+  "errors": []
+}

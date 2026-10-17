@@ -1,0 +1,479 @@
+{
+  "scope": "真实入口/焦点/scrollIntoView及模式续局，读取边界和状态，无资源/战局注入",
+  "checkpoints": [
+    {
+      "name": "1280x720 initial mobile",
+      "window": {
+        "width": 1280,
+        "height": 720,
+        "x": 0,
+        "y": 0
+      },
+      "elements": {
+        "display-stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "right": 1280,
+          "bottom": 720,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 720,
+          "scrollHeight": 924,
+          "clientWidth": 1280,
+          "scrollWidth": 1280
+        },
+        "game-shell": {
+          "x": 465.45452880859375,
+          "y": 102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 822,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "game-viewport": {
+          "x": 465.45452880859375,
+          "y": 102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 822,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        }
+      }
+    },
+    {
+      "name": "normal map",
+      "window": {
+        "width": 1280,
+        "height": 720,
+        "x": 0,
+        "y": 0
+      },
+      "elements": {
+        "display-stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "right": 1280,
+          "bottom": 720,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 720,
+          "scrollHeight": 924,
+          "clientWidth": 1280,
+          "scrollWidth": 1280
+        },
+        "game-shell": {
+          "x": 465.45452880859375,
+          "y": 102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 822,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "game-viewport": {
+          "x": 465.45452880859375,
+          "y": 102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 822,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        }
+      }
+    },
+    {
+      "name": "normal deployment",
+      "window": {
+        "width": 1280,
+        "height": 720,
+        "x": 0,
+        "y": 0
+      },
+      "elements": {
+        "display-stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "right": 1280,
+          "bottom": 720,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 720,
+          "scrollHeight": 924,
+          "clientWidth": 1280,
+          "scrollWidth": 1280
+        },
+        "game-shell": {
+          "x": 465.45452880859375,
+          "y": 102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 822,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "game-viewport": {
+          "x": 465.45452880859375,
+          "y": 102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 822,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "topbar": {
+          "x": 471.68829345703125,
+          "y": 108.2337646484375,
+          "width": 336.62335205078125,
+          "height": 31.1688232421875,
+          "right": 808.3116455078125,
+          "bottom": 139.402587890625,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 38,
+          "scrollHeight": 38,
+          "clientWidth": 430,
+          "scrollWidth": 430
+        },
+        "btn-deploy-confirm": {
+          "x": 620.1298828125,
+          "y": 698.1038818359375,
+          "width": 134.80517578125,
+          "height": 34.28570556640625,
+          "right": 754.93505859375,
+          "bottom": 732.3895874023438,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 42,
+          "scrollHeight": 42,
+          "clientWidth": 171,
+          "scrollWidth": 171
+        }
+      }
+    },
+    {
+      "name": "normal buff",
+      "window": {
+        "width": 1280,
+        "height": 720,
+        "x": 0,
+        "y": 0
+      },
+      "elements": {
+        "display-stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "right": 1280,
+          "bottom": 720,
+          "scrollTop": 12,
+          "scrollLeft": 0,
+          "clientHeight": 720,
+          "scrollHeight": 924,
+          "clientWidth": 1280,
+          "scrollWidth": 1280
+        },
+        "game-shell": {
+          "x": 465.45452880859375,
+          "y": 90,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 810,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "game-viewport": {
+          "x": 465.45452880859375,
+          "y": 90,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 810,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "btn-buff-health": {
+          "x": 703.8961181640625,
+          "y": 445.9334411621094,
+          "width": 77.9219970703125,
+          "height": 34.28570556640625,
+          "right": 781.818115234375,
+          "bottom": 480.2191467285156,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 42,
+          "scrollHeight": 42,
+          "clientWidth": 98,
+          "scrollWidth": 98
+        }
+      }
+    },
+    {
+      "name": "normal battle",
+      "window": {
+        "width": 1280,
+        "height": 720,
+        "x": 0,
+        "y": 0
+      },
+      "elements": {
+        "display-stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "right": 1280,
+          "bottom": 720,
+          "scrollTop": 12,
+          "scrollLeft": 0,
+          "clientHeight": 720,
+          "scrollHeight": 924,
+          "clientWidth": 1280,
+          "scrollWidth": 1280
+        },
+        "game-shell": {
+          "x": 465.45452880859375,
+          "y": 90,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 810,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "game-viewport": {
+          "x": 465.45452880859375,
+          "y": 90,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 810,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "topbar": {
+          "x": 471.68829345703125,
+          "y": 96.2337646484375,
+          "width": 336.62335205078125,
+          "height": 31.16883087158203,
+          "right": 808.3116455078125,
+          "bottom": 127.40259552001953,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 38,
+          "scrollHeight": 38,
+          "clientWidth": 430,
+          "scrollWidth": 430
+        },
+        "action-bar": {
+          "x": 471.68829345703125,
+          "y": 763.2467651367188,
+          "width": 336.62335205078125,
+          "height": 40.51947021484375,
+          "right": 808.3116455078125,
+          "bottom": 803.7662353515625,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 50,
+          "scrollHeight": 50,
+          "clientWidth": 430,
+          "scrollWidth": 430
+        },
+        "btn-end": {
+          "x": 677.402587890625,
+          "y": 766.3636474609375,
+          "width": 84.15582275390625,
+          "height": 34.28570556640625,
+          "right": 761.5584106445312,
+          "bottom": 800.6493530273438,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 42,
+          "scrollHeight": 42,
+          "clientWidth": 106,
+          "scrollWidth": 106
+        }
+      }
+    },
+    {
+      "name": "battle focus/scrollIntoView",
+      "window": {
+        "width": 1280,
+        "height": 720,
+        "x": 0,
+        "y": 0
+      },
+      "elements": {
+        "display-stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720,
+          "right": 1280,
+          "bottom": 720,
+          "scrollTop": 204,
+          "scrollLeft": 0,
+          "clientHeight": 720,
+          "scrollHeight": 924,
+          "clientWidth": 1280,
+          "scrollWidth": 1280
+        },
+        "game-shell": {
+          "x": 465.45452880859375,
+          "y": -102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 618,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "game-viewport": {
+          "x": 465.45452880859375,
+          "y": -102,
+          "width": 349.09088134765625,
+          "height": 720,
+          "right": 814.54541015625,
+          "bottom": 618,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 924,
+          "scrollHeight": 924,
+          "clientWidth": 448,
+          "scrollWidth": 448
+        },
+        "topbar": {
+          "x": 471.68829345703125,
+          "y": -95.7662353515625,
+          "width": 336.62335205078125,
+          "height": 31.16883087158203,
+          "right": 808.3116455078125,
+          "bottom": -64.59740447998047,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 38,
+          "scrollHeight": 38,
+          "clientWidth": 430,
+          "scrollWidth": 430
+        },
+        "action-bar": {
+          "x": 471.68829345703125,
+          "y": 571.2467651367188,
+          "width": 336.62335205078125,
+          "height": 40.51947021484375,
+          "right": 808.3116455078125,
+          "bottom": 611.7662353515625,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 50,
+          "scrollHeight": 50,
+          "clientWidth": 430,
+          "scrollWidth": 430
+        },
+        "btn-end": {
+          "x": 677.402587890625,
+          "y": 574.3636474609375,
+          "width": 84.15582275390625,
+          "height": 34.28570556640625,
+          "right": 761.5584106445312,
+          "bottom": 608.6493530273438,
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "clientHeight": 42,
+          "scrollHeight": 42,
+          "clientWidth": 106,
+          "scrollWidth": 106
+        }
+      }
+    }
+  ],
+  "failures": [
+    "1280x720 initial mobile: game-shell outside viewport {\"x\":465.45452880859375,\"y\":102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":822,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "1280x720 initial mobile: game-viewport outside viewport {\"x\":465.45452880859375,\"y\":102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":822,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "1280x720 initial mobile: outer layout overflow",
+    "normal map: game-shell outside viewport {\"x\":465.45452880859375,\"y\":102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":822,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal map: game-viewport outside viewport {\"x\":465.45452880859375,\"y\":102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":822,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal map: outer layout overflow",
+    "normal deployment: game-shell outside viewport {\"x\":465.45452880859375,\"y\":102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":822,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal deployment: game-viewport outside viewport {\"x\":465.45452880859375,\"y\":102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":822,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal deployment: btn-deploy-confirm outside viewport {\"x\":620.1298828125,\"y\":698.1038818359375,\"width\":134.80517578125,\"height\":34.28570556640625,\"right\":754.93505859375,\"bottom\":732.3895874023438,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":42,\"scrollHeight\":42,\"clientWidth\":171,\"scrollWidth\":171}",
+    "normal deployment: outer layout overflow",
+    "normal buff: game-shell outside viewport {\"x\":465.45452880859375,\"y\":90,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":810,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal buff: game-viewport outside viewport {\"x\":465.45452880859375,\"y\":90,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":810,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal buff: outer scroll offset",
+    "normal buff: outer layout overflow",
+    "normal battle: game-shell outside viewport {\"x\":465.45452880859375,\"y\":90,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":810,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal battle: game-viewport outside viewport {\"x\":465.45452880859375,\"y\":90,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":810,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "normal battle: action-bar outside viewport {\"x\":471.68829345703125,\"y\":763.2467651367188,\"width\":336.62335205078125,\"height\":40.51947021484375,\"right\":808.3116455078125,\"bottom\":803.7662353515625,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":50,\"scrollHeight\":50,\"clientWidth\":430,\"scrollWidth\":430}",
+    "normal battle: btn-end outside viewport {\"x\":677.402587890625,\"y\":766.3636474609375,\"width\":84.15582275390625,\"height\":34.28570556640625,\"right\":761.5584106445312,\"bottom\":800.6493530273438,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":42,\"scrollHeight\":42,\"clientWidth\":106,\"scrollWidth\":106}",
+    "normal battle: outer scroll offset",
+    "normal battle: outer layout overflow",
+    "battle focus/scrollIntoView: game-shell outside viewport {\"x\":465.45452880859375,\"y\":-102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":618,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "battle focus/scrollIntoView: game-viewport outside viewport {\"x\":465.45452880859375,\"y\":-102,\"width\":349.09088134765625,\"height\":720,\"right\":814.54541015625,\"bottom\":618,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":924,\"scrollHeight\":924,\"clientWidth\":448,\"scrollWidth\":448}",
+    "battle focus/scrollIntoView: topbar outside viewport {\"x\":471.68829345703125,\"y\":-95.7662353515625,\"width\":336.62335205078125,\"height\":31.16883087158203,\"right\":808.3116455078125,\"bottom\":-64.59740447998047,\"scrollTop\":0,\"scrollLeft\":0,\"clientHeight\":38,\"scrollHeight\":38,\"clientWidth\":430,\"scrollWidth\":430}",
+    "battle focus/scrollIntoView: outer scroll offset",
+    "battle focus/scrollIntoView: outer layout overflow"
+  ],
+  "errors": [],
+  "result": "FAIL",
+  "finishedAt": "2026-10-13T02:58:00.743Z"
+}

@@ -1,0 +1,76 @@
+{
+  "recordedAt": "2026-10-13T10:52:13.644801+08:00",
+  "branch": "codex/web-gameplay-validation",
+  "head": "efdad8467441e3b7ffa5e4178f39ccb46276ac29",
+  "workingTree": "US015 + 既有未提交改动；未提交推送部署",
+  "versions": {
+    "web/index.html": "c71c5e35ed5620626b933934ddd6f97b8fc54e3222ad4cd59f7ee2988ec51047",
+    "web/display.css": "f4f8d8faccd2ccfd17f0cd1a18363fbd77bb16f53ec71bd2ec4094bf4a30f3e8",
+    "web/ui.css": "716729508e3eb46f0a90e8b42a4d8874a23f6cb70b283bb97c6864cae4cd9bd8",
+    "web/mobile.css": "50562405350bfb494dcf81eebcba01f9f5cab3bed8d126ddc05c69805b9f8f55",
+    "web/desktop.css": "560750088a5b671c5ba62e604223dba13b5d18829e861807ea787d11e3ad8882",
+    "web/campaign.css": "936d4c24a440cacc7865f87c46c0fed776d902957db023ab612d06a045259429",
+    "web/js/display.js": "793d2e4fbe4ec10e3f0252557eb7faecc571adcea9c9a5ed7108efe05b863c1d",
+    "web/js/campaign.js": "a87a232328dc118726a90e8e8f4b56aea95d3db0713d6721367170f899b8bd38",
+    "web/js/app.js": "43abf184e456f6fd9fefe485c15f2668968431ecf8776cd18725bce2b00daa1f",
+    "web/js/ui.js": "0fe5519bba50ee1017e361044831e4d955675749721a1ee20ceeab8ac5dc4c56",
+    "web/js/rules.js": "06c5ec57f0cd094433ae4e7f266acf8eac2f01c98081a127de29b5d7c100cd16",
+    "web/js/maps.js": "878d29b09826a7e661c7d643ae784c916b920e9d6dc1c1e830d13195e69cd4bf",
+    "web/vendor/three.min.js": "9274bbcec8d96168626c732b5d31c775aa8cfb7eaa0599bec0c175908a2c1ce2",
+    "web/preview.html": "ad969f81faa59662d33f631f9d4225b039b055e2e88dce0ae4ae75354f5e2f88",
+    "web/preview.css": "4de2714e3348c40e4805a529e1546dd1a7aaced3e23b628307dd45f8ebdb54fc",
+    "web/js/preview.js": "4a695b4aafecd1766133fbe68726ca392c0642fe63eda21a5c4d80219f2d4191",
+    "tests/display-modes-browser.cjs": "59f3a1b480056f9d545ab0e2a8e3fc23fcf67093ed667b957d00a770a9db36d2",
+    "tests/display-scaled-input.cjs": "35acf191ab223addc38e78cd6ef4471afe15319876a7bbe1e9125c9ed338184d"
+  },
+  "checks": {
+    "flowCases": 7,
+    "browserErrors": [],
+    "firstLevel": {
+      "turn": 11,
+      "wave": 2,
+      "kills": 4,
+      "gold": 4
+    },
+    "scaledInput": {
+      "result": "PASS",
+      "scope": "正常入口两个缩放模式鼠标实点，getState/getEpoch/screenPoint只读；非完整第二条战斗流程",
+      "phone": {
+        "mode": "mobile",
+        "display": {
+          "width": 448,
+          "height": 924,
+          "scale": 0.974025974025974
+        },
+        "to": {
+          "x": 0,
+          "y": 1
+        },
+        "revision": 1
+      },
+      "web": {
+        "mode": "desktop",
+        "display": {
+          "width": 1024,
+          "height": 844,
+          "scale": 0.380859375
+        },
+        "to": {
+          "x": 0,
+          "y": 2
+        },
+        "revision": 3
+      },
+      "epoch": 2,
+      "errors": []
+    },
+    "syntax": "PASS",
+    "diff": "PASS",
+    "flowFinishedAt": "2026-10-13T02:51:10.935Z"
+  },
+  "limits": [
+    "仅桌面Chromium，不代表真机触控/其他浏览器",
+    "未重跑全套基础规则或完整三关",
+    "file入口独立实测，存储不可用用环境故障专项模拟"
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "scope": "US015 独立浏览器正常入口实点；file 与HTTP分开；debug只读，不注入资源/战局；非真机",
+  "cases": [
+    {
+      "name": "AC2 first Loading follows desktop/mobile viewport"
+    },
+    {
+      "name": "AC1/4 keyboard + web/mobile switches preserve turn/party/gold/intents and resize"
+    },
+    {
+      "name": "AC2/3 actual mobile first level two waves->earned shop->unlocked next map->level2 deployment",
+      "gold": 4,
+      "kills": 4,
+      "seen5": true,
+      "seen6": true
+    },
+    {
+      "name": "AC5 390x844 core controls/dialog/sheet reachable; manual choice survives resize"
+    },
+    {
+      "name": "AC5 448x924 core controls/dialog/sheet reachable; manual choice survives resize"
+    },
+    {
+      "name": "AC7 actual file index modes/first level with unavailable storage",
+      "url": "file:///D:/Projects/mihuayou/gamehack2026/web/index.html"
+    },
+    {
+      "name": "AC6 legacy preview/fixture/editor-test smoke; US013 no gift/8 retained"
+    }
+  ],
+  "steps": [
+    {
+      "turn": 1,
+      "actor": "starting-spearman",
+      "type": "directional",
+      "to": {
+        "x": 7,
+        "y": 4
+      },
+      "kills": 2
+    },
+    {
+      "turn": 4,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 0
+      },
+      "kills": 2
+    },
+    {
+      "turn": 5,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 1
+      },
+      "kills": 2
+    },
+    {
+      "turn": 6,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 4,
+        "y": 1
+      },
+      "kills": 2
+    },
+    {
+      "turn": 7,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 0
+      },
+      "kills": 2
+    },
+    {
+      "turn": 7,
+      "actor": "starting-spearman",
+      "type": "move",
+      "to": {
+        "x": 7,
+        "y": 4
+      },
+      "kills": 2
+    },
+    {
+      "turn": 8,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 1
+      },
+      "kills": 2
+    },
+    {
+      "turn": 8,
+      "actor": "rook",
+      "type": "rook-move",
+      "to": {
+        "x": 0,
+        "y": 1
+      },
+      "kills": 2
+    },
+    {
+      "turn": 8,
+      "actor": "starting-spearman",
+      "type": "move",
+      "to": {
+        "x": 7,
+        "y": 5
+      },
+      "kills": 2
+    },
+    {
+      "turn": 9,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 3,
+        "y": 2
+      },
+      "kills": 2
+    },
+    {
+      "turn": 9,
+      "actor": "rook",
+      "type": "attack",
+      "to": {
+        "x": 4,
+        "y": 1
+      },
+      "kills": 3
+    },
+    {
+      "turn": 9,
+      "actor": "starting-spearman",
+      "type": "directional",
+      "to": {
+        "x": 8,
+        "y": 5
+      },
+      "kills": 4
+    },
+    {
+      "turn": 10,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 4,
+        "y": 2
+      },
+      "kills": 4
+    },
+    {
+      "turn": 11,
+      "actor": "king",
+      "type": "move",
+      "to": {
+        "x": 5,
+        "y": 2
+      },
+      "kills": 4
+    },
+    {
+      "turn": 11,
+      "actor": "rook",
+      "type": "rook-move",
+      "to": {
+        "x": 4,
+        "y": 0
+      },
+      "kills": 4
+    }
+  ],
+  "errors": [],
+  "firstLevel": {
+    "turn": 11,
+    "wave": 2,
+    "kills": 4,
+    "gold": 4
+  },
+  "result": "PASS",
+  "finishedAt": "2026-10-13T03:04:27.230Z"
+}
