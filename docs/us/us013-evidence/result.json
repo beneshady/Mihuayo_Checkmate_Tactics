@@ -1,0 +1,235 @@
+{
+  "scope": "正常首关仅实际点选，无战局/金币/SP注入；商店边界使用另外的独立context专项注入",
+  "normal": {
+    "steps": [
+      {
+        "turn": 1,
+        "actor": "starting-pawn",
+        "type": "attack",
+        "to": {
+          "x": 1,
+          "y": 4
+        },
+        "kills": 1,
+        "hp": 3
+      },
+      {
+        "turn": 1,
+        "actor": "starting-spearman",
+        "type": "directional",
+        "to": {
+          "x": 7,
+          "y": 4
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 4,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 3,
+          "y": 0
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 5,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 3,
+          "y": 1
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 6,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 4,
+          "y": 1
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 7,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 3,
+          "y": 0
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 7,
+        "actor": "starting-spearman",
+        "type": "move",
+        "to": {
+          "x": 7,
+          "y": 4
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 8,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 3,
+          "y": 1
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 8,
+        "actor": "rook",
+        "type": "rook-move",
+        "to": {
+          "x": 0,
+          "y": 1
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 8,
+        "actor": "starting-spearman",
+        "type": "move",
+        "to": {
+          "x": 7,
+          "y": 5
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 9,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 3,
+          "y": 2
+        },
+        "kills": 2,
+        "hp": 3
+      },
+      {
+        "turn": 9,
+        "actor": "rook",
+        "type": "attack",
+        "to": {
+          "x": 4,
+          "y": 1
+        },
+        "kills": 3,
+        "hp": 3
+      },
+      {
+        "turn": 9,
+        "actor": "starting-spearman",
+        "type": "directional",
+        "to": {
+          "x": 8,
+          "y": 5
+        },
+        "kills": 4,
+        "hp": 3
+      },
+      {
+        "turn": 10,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 4,
+          "y": 2
+        },
+        "kills": 4,
+        "hp": 3
+      },
+      {
+        "turn": 11,
+        "actor": "king",
+        "type": "move",
+        "to": {
+          "x": 5,
+          "y": 2
+        },
+        "kills": 4,
+        "hp": 3
+      },
+      {
+        "turn": 11,
+        "actor": "rook",
+        "type": "rook-move",
+        "to": {
+          "x": 4,
+          "y": 0
+        },
+        "kills": 4,
+        "hp": 3
+      }
+    ],
+    "initial": {
+      "gold": 0,
+      "party": [
+        "rook",
+        "starting-pawn",
+        "starting-archer",
+        "starting-spearman"
+      ]
+    },
+    "result": {
+      "phase": "intermission",
+      "turn": 11,
+      "wave": 2,
+      "gold": 4,
+      "kills": 4,
+      "seen5": true,
+      "seen6": true
+    },
+    "purchase": {
+      "status": "本次实得不足8，不购买；未增发奖励或调难度",
+      "gold": 4
+    },
+    "level2": {
+      "gold": 4,
+      "cannon": null
+    },
+    "retry": "真实第二关失败后快照恢复"
+  },
+  "isolated": [
+    {
+      "gold": 7,
+      "status": "PASS",
+      "scope": "隔离商店资源边界，不代表正常收入"
+    },
+    {
+      "gold": 8,
+      "status": "PASS",
+      "scope": "隔离商店资源边界，不代表正常收入"
+    },
+    {
+      "gold": 16,
+      "status": "PASS",
+      "scope": "隔离商店资源边界，不代表正常收入"
+    }
+  ],
+  "errors": [],
+  "result": "PASS",
+  "finishedAt": "2026-10-11T14:25:32.057Z",
+  "versions": {
+    "web/index.html": "0f3076ca609665980917f232796640e546190dd9f8620a513e9d3661a0feeeb7",
+    "web/js/app.js": "c9b5e19037da4e1b1f55649e42508882d9cf07591a0a7fe7fdc250c872ec3fa0",
+    "web/js/rules.js": "06c5ec57f0cd094433ae4e7f266acf8eac2f01c98081a127de29b5d7c100cd16"
+  }
+}

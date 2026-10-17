@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-11T22:26:55.413518+08:00",
+  "branch": "codex/web-gameplay-validation",
+  "head": "efdad8467441e3b7ffa5e4178f39ccb46276ac29",
+  "workingTree": "未提交改动，未推送部署",
+  "versions": {
+    "web/index.html": "0f3076ca609665980917f232796640e546190dd9f8620a513e9d3661a0feeeb7",
+    "web/js/rules.js": "06c5ec57f0cd094433ae4e7f266acf8eac2f01c98081a127de29b5d7c100cd16",
+    "web/js/app.js": "c9b5e19037da4e1b1f55649e42508882d9cf07591a0a7fe7fdc250c872ec3fa0",
+    "tests/cannon-purchase.test.cjs": "67ddfe1825d832fb1190fa3f4963f2a66fb3289d088dc05532df8ca4e1995ca6",
+    "tests/cannon-purchase-browser.cjs": "ef026e5a3c03ff5762800f0600c14a7509c45f381c399e3bb71fd478656758ff",
+    "tests/rules.test.cjs": "d3931a438818de50061e4172e7a3ba2d2648460455f15b039eb57b854b67406b",
+    "tests/legacy-rules.test.cjs": "a9519f7b156ea880972dc3891f8844aecdac8f04a15295886921d23adc162e54",
+    "tests/replay.test.cjs": "c15ca25bb96837ffbed6442d86c99680b4688e1e7359ae93c0b2e6b2ba6f0324",
+    "tests/ui-headless.test.cjs": "8f9143c3950cd696b9b61fe2eb48a747789f642369f86c8fd810495af5a1eb4b",
+    "tests/v1-flow-browser.cjs": "b1908eb15cd815cb7980ef8139b140286ce77a2360820e331dd8cd0f73b16460"
+  },
+  "checks": {
+    "focusedRules": 4,
+    "filteredAffectedRules": 6,
+    "browser": "PASS",
+    "syntax": "PASS",
+    "diff": "PASS"
+  },
+  "limitation": "本次正常首关实得4币，没有完成正常收入买8币炮；购炮/继承/重试为专项证据，不代表平衡验证"
+}
