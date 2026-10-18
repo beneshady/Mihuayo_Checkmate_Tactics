@@ -14,8 +14,8 @@
   --left-rail: 280px;
   --right-rail: 264px;
 }
-html, body { min-width: 320px; font-size: 14px; }
-body { background: radial-gradient(ellipse at 50% 10%, #243142 0, var(--bg) 65%); }
+#game-viewport { min-width: 320px; font-size: 14px; }
+#game-viewport { background: radial-gradient(ellipse at 50% 10%, #243142 0, var(--bg) 65%); }
 button, summary, [role="button"] { -webkit-tap-highlight-color: transparent; }
 button {
   min-height: 44px;
@@ -119,8 +119,8 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
 .order { width: 19px; height: 19px; background: #49395e; color: #e2c4ff; border: 1px solid #6f568f; margin-right: 5px; font-size: 11px; }
 .friendly-fire { background: #442a33; color: #ffb4b4; border-left: 3px solid #ff9898; padding: 8px; margin: 8px 0; line-height: 1.6; }
 .hit { margin: 6px 0; }
-#hover-intent { left: calc(50% + (var(--left-rail) - var(--right-rail)) / 2); bottom: 122px; max-width: min(520px, calc(100vw - 590px)); border-color: #8c70af; background: #1e2435f5; padding: 12px; line-height: 1.7; box-shadow: 0 12px 30px #0006; }
-#banner { top: 90px; left: 50%; max-width: 90vw; padding: 10px 18px; background: #304338; border: 1px solid #789884; color: #ecf7ef; font-size: 12px; box-shadow: 0 8px 25px #0005; pointer-events: none; }
+#hover-intent { left: calc(50% + (var(--left-rail) - var(--right-rail)) / 2); bottom: 122px; max-width: min(520px, calc(100cqw - 590px)); border-color: #8c70af; background: #1e2435f5; padding: 12px; line-height: 1.7; box-shadow: 0 12px 30px #0006; }
+#banner { top: 90px; left: 50%; max-width: 90cqw; padding: 10px 18px; background: #304338; border: 1px solid #789884; color: #ecf7ef; font-size: 12px; box-shadow: 0 8px 25px #0005; pointer-events: none; }
 
 /* 行动栏：攻击与回合提交明确区分。 */
 #action-bar { position: absolute; z-index: 5; left: 12px; right: 12px; bottom: 12px; min-height: 66px; display: flex; align-items: center; gap: 20px; border-radius: 12px; padding: 10px 18px; }
@@ -135,7 +135,7 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
 
 /* 弹窗：卡片可换行，不压缩成长、整备和增益内容。 */
 .overlay { position: fixed; padding: 20px; background: #080f1cdd; backdrop-filter: blur(7px); }
-.dialog { width: min(720px, 100%); max-height: calc(100dvh - 40px); padding: 30px; border-radius: 16px; background: #1b2636; border: 1px solid #806a49; box-shadow: 0 24px 80px #0008; }
+.dialog { width: min(720px, 100%); max-height: calc(100cqh - 40px); padding: 30px; border-radius: 16px; background: #1b2636; border: 1px solid #806a49; box-shadow: 0 24px 80px #0008; }
 .dialog > .eyebrow { margin-bottom: 12px; }
 .dialog h2 { font-size: 28px; color: #f3d299; letter-spacing: .06em; margin-bottom: 14px; }
 .dialog > p { color: #c5cfdb; font-size: 13px; line-height: 1.8; }
@@ -153,8 +153,8 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
 #deploy-roster button.active { color: #ffe3ab; }
 
 /* 1920×1080 基准：随可用宽度增加面板和文字，棋盘仍由剩余空间决定。 */
-@media (min-width: 1440px) {
-  :root { --left-rail: clamp(300px, 17vw, 360px); --right-rail: clamp(280px, 16vw, 340px); }
+@container game (min-width: 1440px) {
+  #game-viewport { --left-rail: clamp(300px, 17cqw, 360px); --right-rail: clamp(280px, 16cqw, 340px); }
   #panel, #threat-panel, #selected-card, #preview-box { font-size: 14px; }
   .panel-section { padding: 16px; }
   h3, .skill { font-size: 14px; }
@@ -169,8 +169,8 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
   #board-guide, #board-legend { font-size: 13px; }
   #actions button { font-size: 14px; }
 }
-@media (max-width: 1100px) and (min-width: 901px) {
-  :root { --left-rail: 242px; --right-rail: 224px; }
+@container game (max-width: 1100px) and (min-width: 901px) {
+  #game-viewport { --left-rail: 242px; --right-rail: 224px; }
   #topbar { gap: 12px; padding: 10px 14px; }
   .brand { flex-basis: 160px; gap: 8px; }
   .brand h1 { font-size: 20px; }
@@ -180,16 +180,16 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
   .unit { grid-template-columns: 26px minmax(0, 1fr); }
   .unit .ap { grid-column: 2; text-align: left; }
   .panel-section { padding-left: 12px; padding-right: 12px; }
-  #hover-intent { max-width: calc(100vw - 510px); }
+  #hover-intent { max-width: calc(100cqw - 510px); }
   .action-help .eyebrow { font-size: 9px; }
   .action-help > span:last-child { font-size: 10px; }
   #actions { gap: 6px; }
   #actions button { min-width: 64px; padding: 10px; }
 }
-@media (max-width: 900px) {
-  html, body { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
-  html { scroll-padding-bottom: calc(124px + env(safe-area-inset-bottom)); }
-  body { padding-bottom: calc(124px + env(safe-area-inset-bottom)); }
+@container game (max-width: 900px) {
+  #game-viewport { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+  #game-viewport { scroll-padding-bottom: calc(124px + env(safe-area-inset-bottom)); }
+  #game-viewport { padding-bottom: calc(124px + env(safe-area-inset-bottom)); }
   #topbar { position: relative; top: auto; left: auto; right: auto; margin: 10px; width: auto; max-width: none; display: block; padding: 14px; font-size: 13px; }
   .brand { margin-bottom: 15px; }
   .brand h1 { font-size: 24px; }
@@ -201,7 +201,7 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
   .commander-metric { grid-column: span 2; padding-left: 12px; }
   .commander-metric b { font-size: 11px; }
   #fixture-badge { top: 18px; right: 14px; bottom: auto; max-width: 50%; }
-  #scene { position: relative; top: auto; bottom: auto; left: auto; right: auto; width: 100%; height: clamp(290px, 90vw, 500px); }
+  #scene { position: relative; top: auto; bottom: auto; left: auto; right: auto; width: 100%; height: clamp(290px, 90cqw, 500px); }
   #board-guide, #board-legend { position: static; margin: 8px 12px 12px; font-size: 10px; gap: 12px; }
   #board-guide { flex-wrap: wrap; }
   #panel, #threat-panel { position: relative; top: auto; bottom: auto; left: auto; right: auto; margin: 12px; width: auto; height: auto; max-height: none; display: block; overflow: visible; padding: 0; border-radius: 12px; }
@@ -229,13 +229,13 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
   #actions #btn-undo { grid-column: 3 / 5; grid-row: 2; }
   #actions #btn-pause { min-width: 0; grid-column: 5 / 7; grid-row: 2; }
   #hover-intent { position: fixed; left: 12px; right: 12px; transform: none; bottom: 124px; max-width: none; font-size: 11px; }
-  #banner { position: fixed; top: 12px; max-width: calc(100vw - 24px); width: max-content; white-space: normal; z-index: 25; }
+  #banner { position: fixed; top: 12px; max-width: calc(100cqw - 24px); width: max-content; white-space: normal; z-index: 25; }
   .overlay { padding: 12px; }
-  .dialog { padding: 22px 16px; max-height: calc(100dvh - 24px); }
+  .dialog { padding: 22px 16px; max-height: calc(100cqh - 24px); }
   .dialog h2 { font-size: 25px; }
   .good { padding: 15px 10px; }
 }
-@media (max-width: 480px) {
+@container game (max-width: 480px) {
   #ally-list { grid-template-columns: 1fr; }
   .unit { grid-template-columns: 30px minmax(0, 1fr) 72px; }
   .unit .ap { grid-column: auto; text-align: right; }
@@ -253,7 +253,7 @@ summary { min-height: 44px; cursor: pointer; font-weight: 600; line-height: 1.6;
 }
 
 /* 回合结束前提醒；浮层不占布局空间，不拦截棋盘操作。 */
-#end-turn-hint { position:fixed;z-index:15;width:220px;max-width:calc(100vw - 16px);padding:14px;border-radius:6px;border-color:var(--gold);pointer-events:none;font-size:13px; }
+#end-turn-hint { position:fixed;z-index:15;width:220px;max-width:calc(100cqw - 16px);padding:14px;border-radius:6px;border-color:var(--gold);pointer-events:none;font-size:13px; }
 #end-turn-hint[hidden] { display:none; }
 #end-turn-hint b { color:var(--gold); }
 #end-turn-hint ul { padding:0;margin:10px 0;list-style:none; }

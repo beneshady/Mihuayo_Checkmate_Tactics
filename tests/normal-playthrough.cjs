@@ -3,7 +3,7 @@ const R=require('../web/js/rules.js');
 function score(s){const k=R.king(s,'player');if(!k||s.result==='dead')return -100000;return (s.result==='victory'?10000:0)+k.hp*100+s.kills*25+s.units.filter(u=>u.side==='player'&&u.kind!=='king').reduce((v,u)=>v+u.hp*3+4,0);}
 function generate(buff='move',initialState){
  let s=initialState?R.copy(initialState):R.newGame();const steps=[];
- function add(step,next){steps.push({...step,expected:{phase:next.phase,wave:next.wave,turn:next.turn,gold:next.gold,kills:next.kills,units:next.units.map(u=>[u.id,u.x,u.y,u.hp,u.sp])}});s=next;}
+ function add(step,next){steps.push({...step,expected:{phase:next.phase,wave:next.wave,turn:next.turn,gold:next.gold,teamSp:next.teamSp,kills:next.kills,units:next.units.map(u=>[u.id,u.x,u.y,u.hp,u.kills])}});s=next;}
  add({type:'deploy',actor:'rook',to:{x:0,y:1}},R.deploy(s,'rook',{x:0,y:1}));
  add({type:'deploy',actor:'rook',to:{x:0,y:0}},R.deploy(s,'rook',{x:0,y:0}));
  add({type:'confirmDeployment'},R.confirmDeployment(s));

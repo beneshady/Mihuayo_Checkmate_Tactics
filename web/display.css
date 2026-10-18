@@ -1,0 +1,13 @@
+/* 尺寸复用 preview 的 448×924 基准；窄屏采用真实可用视口。 */
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+#display-stage{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:center;overflow:clip;background:radial-gradient(ellipse at 50% 20%,#223044,#0c121c 75%)}
+#display-frame{position:relative;overflow:clip}
+#game-shell{position:absolute;left:0;top:0;transform-origin:top left;container-type:size;container-name:game;flex:none}
+#game-viewport{position:relative;width:100%;height:100%;overflow:clip;transform:translateZ(0);background:var(--bg)}
+#campaign .display-options{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+#campaign .display-options button{flex:1;min-height:44px}
+#campaign .display-options [aria-pressed=true]{border-color:var(--gold);color:var(--gold);background:#514631}
+#display-current{font-size:12px;color:var(--muted);text-align:center;margin:0}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+#campaign #flow-new-confirm{padding:12px;overflow:auto;align-items:safe center}
+#campaign #flow-new-confirm>div{max-height:100%;overflow:auto}

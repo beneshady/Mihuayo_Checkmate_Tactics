@@ -18,6 +18,6 @@ $('flow-enter').onclick=()=>enter(selected);
 window.M0Campaign=internal?null:{menu,requestNew,toMap:()=>{selected=completed+1;returnView='map';show('map');},update:s=>{if(journey&&s.phase==='intermission')completed=Math.max(completed,s.level);},enter,info:()=>({journey,completed,selected,view})};
 const scripts=['vendor/three.min.js','js/rules.js','js/maps.js','js/app.js','js/ui.js'];
 let startupError=null;const failed=e=>{startupError=e.error||Error(e.message);};window.addEventListener('error',failed);
-try{for(const src of scripts){$('flow-load-status').textContent='正在准备棋盘与旅程…';await new Promise((ok,no)=>{const el=document.createElement('script');el.src=src+'?v=v1-flow-20261006';el.onload=ok;el.onerror=()=>no(Error('资源加载失败：'+src));document.body.append(el);});if(startupError)throw startupError;}if(!window.__M0_CAMPAIGN__)throw Error('战斗入口未准备好');window.removeEventListener('error',failed);show(internal?'battle':'menu');}
+try{for(const src of scripts){$('flow-load-status').textContent='正在准备棋盘与旅程…';await new Promise((ok,no)=>{const el=document.createElement('script');el.src=src+'?v=us018-20261018';el.onload=ok;el.onerror=()=>no(Error('资源加载失败：'+src));document.body.append(el);});if(startupError)throw startupError;}if(!window.__M0_CAMPAIGN__)throw Error('战斗入口未准备好');window.removeEventListener('error',failed);show(internal?'battle':'menu');}
 catch(e){window.removeEventListener('error',failed);show('loading');$('flow-load-status').textContent='准备失败：'+e.message;$('flow-reload').hidden=false;$('flow-reload').onclick=()=>location.reload();}
 })();

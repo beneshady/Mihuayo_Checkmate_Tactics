@@ -23,14 +23,14 @@
   }
   function closeMobileSheet() { restoreView(); sheet.classList.remove('show'); }
   function showMobileSheet(key) {
-    if (window.innerWidth > 900) return;
+    if (!window.M0Display.isMobile()) return;
     restoreView();
     activeView = key;
     byId('mobile-sheet-content').replaceChildren(viewNodes[key]);
     byId('mobile-sheet-title').textContent = viewNames[key];
     if (key === 'skills') {
-      const points = byId('mobile-selected').textContent.match(/SP \d+/);
-      if (points) byId('mobile-sheet-title').textContent += ` · ${points[0]}`;
+      const points = byId('team-sp').textContent.match(/\d+/);
+      if (points) byId('mobile-sheet-title').textContent += ` · 公共 SP ${points[0]}`;
     }
     sheet.querySelectorAll('[data-ui-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.uiView === key)));
     sheet.classList.add('show');
@@ -39,19 +39,20 @@
   document.querySelectorAll('[data-ui-view]').forEach(button => button.addEventListener('click', () => showMobileSheet(button.dataset.uiView)));
   byId('btn-mobile-info-close').addEventListener('click', closeMobileSheet);
   sheet.addEventListener('click', event => { if (event.target === sheet) closeMobileSheet(); });
-  window.matchMedia('(max-width: 900px)').addEventListener('change', event => { if (!event.matches) closeMobileSheet(); });
+  window.addEventListener('resize', () => { if (!window.M0Display.isMobile()) closeMobileSheet(); });
 
   const endButton = byId('btn-end'), endHint = byId('end-turn-hint');
   function hideEndHint() { endHint.hidden = true; }
   function showEndHint() {
     if (endButton.disabled || document.querySelector('.overlay.show')) return;
     endHint.hidden = false;
-    const button = endButton.getBoundingClientRect();
-    const box = endHint.getBoundingClientRect();
-    const left = window.innerWidth > 900 ? button.right + 12 : button.right - box.width;
-    endHint.style.left = `${Math.max(8, Math.min(left, window.innerWidth - box.width - 8))}px`;
-    const top = window.innerWidth > 900 ? button.top : button.top - box.height - 10;
-    endHint.style.top = `${Math.max(8, Math.min(top, window.innerHeight - box.height - 8))}px`;
+    const rect = endButton.getBoundingClientRect(),size=window.M0Display.size();
+    const start=window.M0Display.local({x:rect.left,y:rect.top}),finish=window.M0Display.local({x:rect.right,y:rect.bottom});
+    const button={top:start.y,right:finish.x},box={width:endHint.offsetWidth,height:endHint.offsetHeight};
+    const left = !window.M0Display.isMobile() ? button.right + 12 : button.right - box.width;
+    endHint.style.left = `${Math.max(8, Math.min(left, size.width - box.width - 8))}px`;
+    const top = !window.M0Display.isMobile() ? button.top : button.top - box.height - 10;
+    endHint.style.top = `${Math.max(8, Math.min(top, size.height - box.height - 8))}px`;
   }
   endButton.addEventListener('mouseenter', showEndHint);
   endButton.addEventListener('mouseleave', hideEndHint);
@@ -108,15 +109,15 @@
       });
     }
     const selected = byId('ally-list').querySelector('.selected');
-    byId('action-hint').textContent = window.innerWidth > 900 ? '悬停预览 · 点击攻击' : !byId('btn-execute').disabled
+    byId('action-hint').textContent = !window.M0Display.isMobile() ? '悬停预览 · 点击攻击' : !byId('btn-execute').disabled
       ? '核对右侧伤害与风险，再执行攻击'
       : selected
         ? '点击合法空格直接移动；攻击需预览确认'
         : '选择我方棋子，规划本次行动';
     refreshMobilePreview();
     if (activeView === 'skills') {
-      const points = byId('mobile-selected').textContent.match(/SP \d+/);
-      byId('mobile-sheet-title').textContent = viewNames.skills + (points ? ` · ${points[0]}` : '');
+      const points = byId('team-sp').textContent.match(/\d+/);
+      byId('mobile-sheet-title').textContent = viewNames.skills + (points ? ` · 公共 SP ${points[0]}` : '');
     }
   }
 
@@ -158,8 +159,8 @@
   // 单位列表由 app.js 重建；事件代理保留其既有点选处理。
   byId('ally-list').addEventListener('click', event => {
     if (event.target.closest('[data-unit]')) {
-      if (window.innerWidth > 900 && event.detail > 0) byId('panel').scrollTop = 0;
-      else if (window.innerWidth <= 900) closeMobileSheet();
+      if (!window.M0Display.isMobile() && event.detail > 0) byId('panel').scrollTop = 0;
+      else if (window.M0Display.isMobile()) closeMobileSheet();
     }
   });
   byId('ally-list').addEventListener('keydown', event => {
@@ -207,7 +208,7 @@
   const previewObserver = new MutationObserver(() => {
     // 方向预览即使没有合法命中，也应显示盲区/不可提交的原因。
     if (byId('btn-execute').disabled && !byId('preview-box').querySelector('b')) return;
-    if (window.innerWidth > 900) byId('threat-panel').scrollTop = 0;
+    if (!window.M0Display.isMobile()) byId('threat-panel').scrollTop = 0;
   });
   previewObserver.observe(byId('preview-box'), { childList: true });
   const overlayObserver = new MutationObserver(refreshOverlays);
