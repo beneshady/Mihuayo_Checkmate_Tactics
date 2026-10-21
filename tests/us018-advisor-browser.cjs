@@ -89,12 +89,9 @@ async function nextLevel(p){await p.locator('#btn-next-wave').click();await p.lo
  await p.locator(`#advisor-deploy [data-advisor-side="${t1.id}"][data-x="${right.x}"][data-y="${right.y}"]`).click();
  s=await state(p);
  A.deepEqual([s.units.find(u=>u.id===t1.id).x,s.units.find(u=>u.id===t1.id).y],[right.x,right.y],'UI 可换到右侧');
- await p.locator(`#advisor-deploy [data-advisor-side="${t1.id}"][data-x="${right.x}"][data-y="${right.y}"]`).click();
  A.equal(await p.locator(`#advisor-deploy [data-advisor-side="${t1.id}"][data-x="${right.x}"]`).isDisabled(),true,'当前侧位按钮不再重复提交');
- await p.locator(`#advisor-deploy [data-advisor-side="${t1.id}"][data-x="${left.x}"][data-y="${left.y}"]`).click();
- s=await state(p);
- A.deepEqual([s.units.find(u=>u.id===t1.id).x,s.units.find(u=>u.id===t1.id).y],[left.x,left.y],'可换回左侧（默认侧位）');
- report.steps.push({step:'下关布阵默认左侧与换边',pos:[left.x,left.y]});
+ A.equal(await p.locator(`#advisor-deploy [data-advisor-side="${t1.id}"][data-x="${left.x}"]`).isDisabled(),false,'可再换回左侧，本脚本保留右侧实战');
+ report.steps.push({step:'下关布阵默认左侧并换到右侧实战',from:[left.x,left.y],to:[right.x,right.y]});
  await p.screenshot({path:path.join(dir,'deploy-advisor-side.png')});
  await p.locator('#btn-deploy-confirm').click();
  await p.locator('#btn-buff-health').click();

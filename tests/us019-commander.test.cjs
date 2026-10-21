@@ -82,7 +82,7 @@ test('K07 主帅仍受攻击伤害，死亡仍判负（不因纯辅助免疫）'
 test('K02 主帅保持团队 buff 选择与对象排除，出宫不关闭 buff',()=>{
  let s=R.newGame();
  s=R.chooseCommanderBuff(s,'move');
- A.equal(s.commanderBuff,'move');
+ A.equal(s.buffs.move,true,'US-020：疾行走旅程增益字段，仍跨关保留');
  A.equal(G(s,'king').commanderMove,0,'主帅本人不吃移动 buff');
  A.equal(G(s,'rook').commanderMove,1,'队友吃到移动 buff');
  withKingAt(s,2,1);

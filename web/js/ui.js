@@ -130,8 +130,10 @@
     if (sheet.classList.contains('show') && overlays.some(overlay => overlay !== sheet && overlay.classList.contains('show'))) closeMobileSheet();
     const next = overlays.filter(overlay => overlay.classList.contains('show')).at(-1) || null;
     const labels = {
-      'ov-commander': '选择主帅增益',
-      'ov-shop': '整备与救援',
+      
+      
+      'ov-rescue': '救援机会',
+      'ov-tutorial': '教学提示',
       'ov-deploy': '布置队伍',
       'ov-pause': '已暂停',
       'ov-confirm': '确认结束回合',

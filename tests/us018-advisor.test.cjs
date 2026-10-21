@@ -54,7 +54,7 @@ test('S02 下一关固定侧位：第一座默认左侧、可选右侧、两座�
   A.notStrictEqual(placed,one,'队友可占住另一侧位作为冲突场景');
   A.strictEqual(R.deploy(placed,t1.id,RIGHT),placed,'侧位被队友占据时拒绝交换，不覆盖');
   // 8 人上满仍可有两座仕，且编队不被挤到后备
-  let full=R.newGame();full.phase='intermission';full.gold=60;
+  let full=R.newGame();full.phase='intermission';full.gold=60;full.population=8;/* US-020：人口上限 8，本条沿用“8 人上满”语义 */
   for(let i=0;i<10;i++)full=R.buy(full,'pawn');
   A.equal(full.activeIds.filter(id=>full.party.find(u=>u.id===id).kind!=='advisor').length,8);
   full=R.buy(R.buy(full,'advisor'),'advisor');
@@ -345,7 +345,7 @@ test('S13 死亡留残骸占格、可推、入水销毁、不可治疗/复活；
   A.deepEqual([body.x,body.y],[3,1],'残骸占据原格');
   A.ok(R.occupied(dead,{x:3,y:1}),'残骸占格阻挡');
   // 不可治疗/复活
-  const rescuePhase=Object.assign(R.copy(dead),{phase:'rescue',commanderBuff:'rescue',rescueUsed:false});
+  const rescuePhase=Object.assign(R.copy(dead),{phase:'rescue',buffs:{health:false,move:false,rescue:true},rescueUsed:false});
   A.strictEqual(R.rescue(rescuePhase,'a1'),rescuePhase,'仕不能被救援复活');
   // 残骸仍可作炮架
   const rack=st();rack.corpses=[{id:'corpse-a1',x:3,y:1,unit:p('a1','advisor',3,1)}];
@@ -400,7 +400,7 @@ test('S14 预览纯净且与实际流水线一致：仕先敌后、无状态/随
 
 test('R1 救援死锁：只剩主帅与仕残骸时不进入救援、直接第二波；救援名单只含合法对象，UI 死亡名单排除仕/装置',()=>{
   // 仅仕残骸：无合法救援对象，必须直接走既有第二波流程，不能卡在 rescue
-  let s=st();s.turn=5;s.commanderBuff='rescue';s.rescueUsed=false;
+  let s=st();s.turn=5;s.buffs={health:false,move:false,rescue:true};s.rescueUsed=false;
   s.corpses=[{id:'corpse-a1',x:3,y:1,unit:p('a1','advisor',3,1)}];
   const n=R.endTurn(s).state;
   A.equal(n.turn,6);
@@ -408,7 +408,7 @@ test('R1 救援死锁：只剩主帅与仕残骸时不进入救援、直接第�
   A.equal(n.wave,2,'直接进入第二波');
   A.ok(n.pendingSpawns.some(w=>w.status==='spawned'),'第二波正常出场');
   // 有普通队友残骸：仍进入救援；仕不能作为救援对象，普通队友可以
-  let t=st();t.turn=5;t.commanderBuff='rescue';t.rescueUsed=false;
+  let t=st();t.turn=5;t.buffs={health:false,move:false,rescue:true};t.rescueUsed=false;
   t.corpses=[{id:'corpse-a1',x:3,y:1,unit:p('a1','advisor',3,1)},{id:'corpse-p1',x:2,y:2,unit:p('p1','pawn',2,2)}];
   const r=R.endTurn(t).state;
   A.equal(r.phase,'rescue','有合法对象时进入救援');
@@ -421,7 +421,7 @@ test('R1 救援死锁：只剩主帅与仕残骸时不进入救援、直接第�
   A.equal(R.commanderTarget(Object.assign(p('y','rook',3,1),{device:true})),false,'装置不是救援对象');
   A.equal(R.commanderTarget(p('z','rook',3,1)),true);
   const src=fs.readFileSync(path.join(__dirname,'../web/js/app.js'),'utf8');
-  A.match(src,/\.map\(c=>c\.unit\)\.filter\(R\.commanderTarget\)/,'UI 死亡名单排除仕/装置');
+  A.match(src,/R\.rescueTargets\(state\)/,'US-020：UI 救援名单复用规则层 rescueTargets，自动排除仕/装置与满血单位');
 });
 
 test('R2 初始化侧位冲突：保留队友原位置、仕进待布置、腾格后可放置、未清空不可确认、不新增后备',()=>{

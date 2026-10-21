@@ -1,0 +1,76 @@
+/* US-020 主营地、选关预览与教学关样式；复用活动页既有按钮与卡片，不新建视觉框架。 */
+#campaign .camp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:10px}
+#campaign .panel-card{background:var(--panel);border:1px solid #3a4a5a;border-radius:10px;padding:14px;min-width:0}
+#campaign .panel-card h2{font-size:22px;margin:0 0 10px;color:var(--gold)}
+#campaign .panel-card h2 small{font-size:12px;color:var(--muted);font-family:'Microsoft YaHei',sans-serif}
+#campaign .panel-card p{margin:4px 0}
+#campaign .camp-key{display:inline-block;min-width:5.5em;color:var(--muted)}
+#campaign .camp-value{font-size:20px;color:var(--gold)}
+#campaign .camp-banner{margin:0 0 10px;padding:10px 12px;border-left:4px solid var(--gold);background:#2a2418;border-radius:6px}
+#campaign .camp-unit{display:block;width:100%;text-align:left;margin:5px 0;padding:8px 12px;min-height:40px;font-size:14px}
+#campaign .camp-unit.active{border-color:var(--gold);background:#2f3a2a}
+#campaign .camp-unit.fixed{opacity:.85;cursor:default}
+#campaign .goods{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}
+#campaign .good{border:1px solid #3a4a5a;border-radius:8px;padding:10px;background:#1b2530}
+#campaign .good b{color:var(--gold)}
+#campaign .good p{font-size:12px;color:var(--muted);margin:2px 0 8px}
+#campaign .good button{width:100%;min-height:38px;font-size:13px;padding:6px 8px}
+#campaign .good small{display:block;margin-top:6px;font-size:11px;color:#e0a0a0}
+#campaign .growth-row{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #3a4a5a}
+#campaign .growth-row:last-child{border-bottom:0}
+#campaign .growth-row p{font-size:12px;color:var(--muted);margin:2px 0 0}
+#campaign .growth-row button{min-height:38px;white-space:nowrap;font-size:13px}
+#campaign .skill-unit{border-top:1px dashed #3a4a5a;padding-top:8px;margin-top:8px}
+#campaign .skill-unit:first-child{border-top:0;margin-top:0;padding-top:0}
+#campaign .skill-unit>p{margin:0 0 6px;font-size:13px}
+#campaign .camp-skills .skill{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;margin:4px 0;min-height:36px;font-size:13px;padding:6px 10px}
+#campaign .camp-skills .skill small{display:block;color:var(--muted);font-size:11px}
+#campaign .ok{color:#8fd694}
+#campaign .warn{color:#f0a3a3}
+#campaign .tutorial-layout{display:grid;grid-template-columns:minmax(280px,620px);justify-content:center;gap:14px}
+#campaign .tutorial-checklist{list-style:none;margin:10px 0;padding:0;display:grid;gap:6px}
+#campaign .tutorial-checklist li{display:flex;gap:10px;align-items:baseline;font-size:14px}
+#campaign .tutorial-checklist li span{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#33424f;color:var(--gold);font-size:12px}
+#campaign .camp-dialog{position:fixed;inset:0;z-index:120;background:#090e17dd;display:grid;place-items:center;padding:16px}
+#campaign .camp-dialog[hidden]{display:none!important}
+#campaign .camp-dialog>div{max-width:min(560px,92cqw);max-height:88cqh;overflow:auto;padding:22px;background:var(--panel);border:1px solid var(--gold);border-radius:12px}
+#campaign .camp-dialog h2{margin:0 0 10px;color:var(--gold);font-size:24px}
+#campaign .camp-dialog p,#campaign .camp-guide-list{font-size:14px;line-height:1.7}
+#campaign .camp-guide-list{padding-left:18px;margin:0 0 12px}
+#campaign .camp-guide-list b{color:var(--gold)}
+#campaign .camp-dialog .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+#level-preview{margin-top:12px;border-top:1px solid #3a4a5a;padding-top:10px}
+#level-preview .preview-title{margin:0 0 6px;font-size:13px;color:var(--gold)}
+#level-preview-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;width:100%;max-width:290px;aspect-ratio:1;background:#2c3a48;border:1px solid #4a5b6b;border-radius:4px;padding:2px}
+#level-preview-grid .pv-cell{display:grid;place-items:center;font-size:11px;line-height:1;color:#f2f6ff;border-radius:2px}
+#level-preview-grid .terrain-land{background:#6d5b3c}
+#level-preview-grid .terrain-water{background:#2b5f8a}
+#level-preview-grid .terrain-bridge{background:#a97f42}
+#level-preview-grid .terrain-mountain{background:#5a5a54}
+#level-preview-grid .terrain-cracked{background:#7a7364}
+#level-preview-grid .terrain-forest{background:#33582f}
+#level-preview-grid .pv-cell b{font-weight:700}
+#level-preview .preview-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--muted);margin:6px 0}
+#level-preview .preview-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+#level-preview .preview-legend .terrain-land{background:#6d5b3c}
+#level-preview .preview-legend .terrain-water{background:#2b5f8a}
+#level-preview .preview-legend .terrain-bridge{background:#a97f42}
+#level-preview .preview-legend .terrain-mountain{background:#5a5a54}
+#level-preview .preview-legend .terrain-forest{background:#33582f}
+#level-preview .preview-enemies{font-size:12px;color:var(--text)}
+#level-preview .hint{font-size:11px;color:var(--muted)}
+#tutorial-hint{position:absolute;z-index:9;left:50%;bottom:96px;transform:translateX(-50%);width:min(460px,92%);padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+#tutorial-hint[hidden]{display:none}
+#tutorial-hint h2{font-size:17px;margin:2px 0 6px;color:var(--gold)}
+#tutorial-hint .eyebrow{color:var(--muted);font-size:11px;letter-spacing:.08em}
+#tutorial-hint .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+@container game(max-width:900px){
+ #campaign .camp-grid{grid-template-columns:1fr}
+ #campaign .panel-card{padding:10px}
+ #campaign .panel-card h2{font-size:18px}
+ #campaign .camp-unit,#campaign .growth-row button,#campaign .good button{font-size:12px;min-height:34px;padding:5px 8px}
+ #campaign .camp-dialog>div{padding:16px}
+ #level-preview-grid{max-width:100%}
+ #tutorial-hint{left:6px;right:6px;bottom:120px;transform:none;width:auto;padding:8px 10px;font-size:11px;max-height:40cqh;overflow:auto}
+ #tutorial-hint h2{font-size:14px}
+}
