@@ -1,0 +1,57 @@
+{
+  "view": "camp",
+  "tutorialReward": 1,
+  "gold": 9,
+  "population": 4,
+  "teamSp": 0,
+  "buffs": {
+    "health": true,
+    "move": false,
+    "rescue": false
+  },
+  "activeIds": [
+    "rook",
+    "starting-pawn",
+    "starting-pawn-2",
+    "starting-horse"
+  ],
+  "party": [
+    {
+      "id": "rook",
+      "kind": "rook",
+      "hp": 3,
+      "maxHp": 3,
+      "commanderHealth": 1,
+      "level": 1,
+      "kills": 0
+    },
+    {
+      "id": "starting-pawn",
+      "kind": "pawn",
+      "hp": 2,
+      "maxHp": 2,
+      "commanderHealth": 1,
+      "level": 1,
+      "kills": 0
+    },
+    {
+      "id": "starting-pawn-2",
+      "kind": "pawn",
+      "hp": 2,
+      "maxHp": 2,
+      "commanderHealth": 1,
+      "level": 1,
+      "kills": 0
+    },
+    {
+      "id": "starting-horse",
+      "kind": "horse",
+      "hp": 2,
+      "maxHp": 2,
+      "commanderHealth": 1,
+      "level": 1,
+      "kills": 0
+    }
+  ],
+  "rosterText": "上阵 · 车 · rook · Lv.1 · 击杀 0 上阵 · 兵 · starting-pawn · Lv.1 · 击杀 0 上阵 · 兵 · starting-pawn-2 · Lv.1 · 击杀 0 上阵 · 马 · starting-horse · Lv.1 · 击杀 0"
+}

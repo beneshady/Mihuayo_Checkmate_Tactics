@@ -1,0 +1,31 @@
+{
+  "pendingReload": {
+    "phase": "rescue",
+    "wave": 1,
+    "used": false
+  },
+  "skip": {
+    "before": false,
+    "after": true,
+    "reload": {
+      "phase": "player",
+      "wave": 2,
+      "used": true
+    }
+  },
+  "retry": {
+    "phase": "deploy",
+    "wave": 1,
+    "used": false,
+    "retrigger": "rescue"
+  },
+  "use": {
+    "target": "rook",
+    "wave": 2,
+    "used": true,
+    "reload": {
+      "wave": 2,
+      "used": true
+    }
+  }
+}

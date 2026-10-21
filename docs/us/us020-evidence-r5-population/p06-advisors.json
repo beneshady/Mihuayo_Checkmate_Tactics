@@ -1,0 +1,11 @@
+{
+  "summary": "猫粮10公共 SP0（全队共用，与猫粮分开）队友总数：4（其中后备 0）· 持有普通队友数量不限部署人口：4／4（上阵普通队友／部署上限，后备不占部署人口）主帅：1 · 自动上场（不计入队友总数与部署人口）仕：2/2 座 · 固定上阵、无后备（不计入队友总数与部署人口）旅程进度已通关 0/3 · 下一个挑战：第 1 关旅程增益坚守 ✓ 疾行 × 救援 ×教学结果未处理",
+  "rosterText": "上阵 · 车 · rook · Lv.1 · 击杀 0 上阵 · 兵 · starting-pawn · Lv.1 · 击杀 0 上阵 · 兵 · starting-pawn-2 · Lv.1 · 击杀 0 上阵 · 马 · starting-horse · Lv.1 · 击杀 0 固定上阵 · 仕 · recruit-advisor-0 · 间隔 3 回合 固定上阵 · 仕 · recruit-advisor-1 · 间隔 3 回合",
+  "advisorRecruitDisabled": true,
+  "deployText": "部署人口：4／4（上阵普通队友／部署上限，至少 1 名；主帅 1 与仕 2 座单独计数，不计入部署人口）",
+  "onBoard": {
+    "ordinary": 4,
+    "advisors": 2,
+    "king": 1
+  }
+}

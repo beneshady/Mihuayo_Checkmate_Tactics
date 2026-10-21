@@ -1,0 +1,79 @@
+{
+  "before": {
+    "teamSp": 4,
+    "party": [
+      "rook",
+      "starting-pawn",
+      "starting-pawn-2",
+      "starting-horse"
+    ]
+  },
+  "afterArcher": {
+    "teamSp": 2,
+    "party": [
+      {
+        "id": "rook",
+        "kind": "rook",
+        "attack": 1,
+        "hp": 3,
+        "maxHp": 3
+      },
+      {
+        "id": "starting-pawn",
+        "kind": "archer",
+        "attack": 2,
+        "hp": 2,
+        "maxHp": 2
+      },
+      {
+        "id": "starting-pawn-2",
+        "kind": "pawn",
+        "attack": 1,
+        "hp": 2,
+        "maxHp": 2
+      },
+      {
+        "id": "starting-horse",
+        "kind": "horse",
+        "attack": 1,
+        "hp": 2,
+        "maxHp": 2
+      }
+    ]
+  },
+  "afterSpear": {
+    "teamSp": 0,
+    "party": [
+      {
+        "id": "rook",
+        "kind": "rook",
+        "attack": 1,
+        "hp": 3,
+        "maxHp": 3
+      },
+      {
+        "id": "starting-pawn",
+        "kind": "archer",
+        "attack": 2,
+        "hp": 2,
+        "maxHp": 2
+      },
+      {
+        "id": "starting-pawn-2",
+        "kind": "spearman",
+        "attack": 1,
+        "hp": 3,
+        "maxHp": 3
+      },
+      {
+        "id": "starting-horse",
+        "kind": "horse",
+        "attack": 1,
+        "hp": 2,
+        "maxHp": 2
+      }
+    ]
+  },
+  "skillText": "车 · 上阵 · Lv.1 · rook 强健 当前/最大 HP +1 1 公共 SP 转冲锋车 解锁冲锋，不能转回 2 公共 SP 转牵引车 解锁牵引，不能转回 2 公共 SP 弓 · 上阵 · Lv.1 · starting-pawn 强健 当前/最大 HP +1 1 公共 SP 连动 下回合 AP 上限 +1 2 公共 SP 前向 Lv.2/8 攻击 2→2～3 格（相邻1格盲区） 1 公共 SP 右向 Lv.2/8 攻击 2→2～3 格（相邻1格盲区） 1 公共 SP 后向 Lv.2/8 攻击 2→2～3 格（相邻1格盲区） 1 公共 SP 左向 Lv.2/8 攻击 2→2～3 格（相邻1格盲区） 1 公共 SP 枪兵 · 上阵 · Lv.1 · starting-pawn-2 强健 当前/最大 HP +1 1 公共 SP 连动 下回合 AP 上限 +1 2 公共 SP 前向 Lv.2/8 攻击 1→1～2 格 1 公共 SP 右向 Lv.2/8 攻击 1→1～2 格 1 公共 SP 后向 Lv.2/8 攻击 1→1～2 格 1 公共 SP 左向 Lv.2/8 攻击 1→1～2 格 1 公共 SP 马 · 上阵 · Lv.1 · starting-horse 强健 当前/最大 HP +1 1 公共 SP",
+  "rosterText": "上阵 · 车 · rook · Lv.1 · 击杀 0 上阵 · 弓 · starting-pawn · Lv.1 · 击杀 0 上阵 · 枪 · starting-pawn-2 · Lv.1 · 击杀 0 上阵 · 马 · starting-horse · Lv.1 · 击杀 0"
+}

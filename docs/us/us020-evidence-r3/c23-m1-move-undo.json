@@ -1,0 +1,37 @@
+{
+  "savePoint": {
+    "reason": "确认布阵",
+    "revision": 0,
+    "rook": {
+      "x": 0,
+      "y": 0
+    },
+    "phase": "player"
+  },
+  "move": {
+    "rook": {
+      "x": 1,
+      "y": 0
+    },
+    "savedRawUnchanged": true
+  },
+  "undo": {
+    "rook": {
+      "x": 0,
+      "y": 0
+    },
+    "history": 0,
+    "savedRawUnchanged": true
+  },
+  "reload": {
+    "view": "battle",
+    "phase": "player",
+    "revision": 0,
+    "rook": {
+      "x": 0,
+      "y": 0
+    },
+    "campVisible": false,
+    "mapVisible": false
+  }
+}

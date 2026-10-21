@@ -1,0 +1,418 @@
+{
+  "scope": "US-018 A18-02/03/04/06/07 浏览器专项；夹具注入状态/RNG/SP 均标注专项，不冒充 A18-01 正常流程",
+  "viewports": {
+    "desktop": "1280x900",
+    "mobileLandscape": "844x390"
+  },
+  "cases": [
+    {
+      "id": "A18-02",
+      "type": "专项",
+      "title": "S01/S02 两座上限、第三座拒绝、8 人名额、侧位交换、初始化冲突/待布置/手动腾格、开战后不可移动",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "不足金币：按钮禁用且点击不扣款",
+          "gold": 4,
+          "advisors": 0
+        },
+        {
+          "text": "两座上限与第三座拒绝",
+          "gold": 2,
+          "advisors": 2
+        },
+        {
+          "text": "8 名队友 + 两座仕：仕不占 8 人额、固定上阵",
+          "activeIds": 10,
+          "bench": 0
+        },
+        {
+          "text": "两座左右侧位可交换",
+          "leftTower": "recruit-advisor-0",
+          "rightTower": "recruit-advisor-1"
+        },
+        {
+          "text": "844x390 手机横版侧位按钮可读",
+          "buttons": 4,
+          "viewport": "844x390"
+        },
+        {
+          "text": "待布置冲突提示与确认拦截",
+          "pending": [
+            "recruit-advisor-0"
+          ]
+        },
+        {
+          "text": "开战后仕不可移动；buff 排除帅与仕",
+          "advisorMaxHp": 2,
+          "kingMaxHp": 3,
+          "rookMaxHp": 3
+        }
+      ],
+      "evidence": [
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-shop-insufficient.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-shop-two-third-disabled.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-shop-eight-roster.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-deploy-two-desktop.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-deploy-swapped.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-deploy-two-844x390.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-conflict-pending.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-conflict-cleared.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-02-battle-advisor-immovable.png"
+      ]
+    },
+    {
+      "id": "A18-03",
+      "type": "专项",
+      "title": "S03-S06/S10 八邻格、单目标、三级排序、无目标就绪、冷却显示、冷却中升级",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "八邻格/第二格/距帅/低HP/行列排序",
+          "enemyIds": 8,
+          "target": "fix-e3"
+        },
+        {
+          "text": "选中仕：射程/冷却/锁定与目标线",
+          "card": "仕 @ (3,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却就绪：结束回合后射程内有敌人即自动开火 本回合锁定：敌军兵 (3,2) 射程内 8 个敌人，按距帅最近 → 低 HP → 行列顺序只选 1 个 不能移动或被推动、不能治疗或复活、不吃主帅增益 · 不占 8 人名"
+        },
+        {
+          "text": "实际移动帅后目标重排",
+          "before": "fix-e4",
+          "after": "fix-e3"
+        },
+        {
+          "text": "无目标保持就绪，结束回合不进冷却",
+          "lastFireTurn": null
+        },
+        {
+          "text": "冷却标签 2 回合",
+          "card": "仕 @ (3,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却中：还需 2 回合，本回合结束不会开火 本回合锁定：敌军兵 (5,2) 每座每次只选 1 个敌人 不能移动或被推动、不能治疗或复活"
+        },
+        {
+          "text": "冷却途中升级 3→2，立即满足间隔但不即时开火",
+          "interval": 2,
+          "teamSp": 0,
+          "targetHp": 1
+        }
+      ],
+      "evidence": [
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-03-range-eight.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-03-king-moved-target.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-03-no-target-ready.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-03-cooldown-2.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-03-upgrade-fired.png"
+      ]
+    },
+    {
+      "id": "A18-04",
+      "type": "专项",
+      "title": "S07-S09/S14 两座同局面集火、树林 0/1/2 次独立命中、奖励去重、预览纯净、独立升档与满级/不足",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "两座同局面锁定同一片树林目标",
+          "targets": [
+            "fix-foe",
+            "fix-foe"
+          ],
+          "marks": 2
+        },
+        {
+          "text": "树林独立 0/1/2 次命中与奖励去重",
+          "runs": [
+            {
+              "name": "零次命中",
+              "seed": 8,
+              "toast": "仕阶段：2 座被树林闪避",
+              "foeHp": 1,
+              "sp": 9,
+              "kills": 0
+            },
+            {
+              "name": "一次命中",
+              "seed": 1,
+              "toast": "仕阶段：1 座命中、1 座被树林闪避",
+              "foeHp": 0,
+              "sp": 10,
+              "kills": 1
+            },
+            {
+              "name": "两次命中",
+              "seed": 166,
+              "toast": "仕阶段：2 座命中",
+              "foeHp": 0,
+              "sp": 10,
+              "kills": 1
+            }
+          ]
+        },
+        {
+          "text": "分别升级、只升级所选仕、满级与重复提交",
+          "left": 1,
+          "right": 3,
+          "teamSp": 1
+        },
+        {
+          "text": "余额不足不扣款",
+          "teamSp": 2
+        }
+      ],
+      "evidence": [
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-04-two-towers-forest.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-04-forest-two-towers.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-04-upgrade-maxed.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-04-upgrade-insufficient.png"
+      ]
+    },
+    {
+      "id": "A18-06",
+      "type": "专项",
+      "title": "R1 救援：仅仕残骸直接第二波不卡死；有普通队友残骸只列合法对象",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "仅仕残骸：不卡救援，直接第二波",
+          "turn": 6,
+          "wave": 2,
+          "phase": "player",
+          "spawned": 6
+        },
+        {
+          "text": "有普通队友时救援名单只含合法对象",
+          "options": "兵：复活 1 HP"
+        },
+        {
+          "text": "完成合法救援后进入第二波，仕不复活",
+          "phase": "player",
+          "wave": 2,
+          "revivedHp": 1
+        }
+      ],
+      "evidence": [
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-06-advisor-only-wave2.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-06-rescue-list.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-06-after-rescue.png"
+      ]
+    },
+    {
+      "id": "A18-07",
+      "type": "专项（双端UI）",
+      "title": "S14 网页与手机横版：侧位按钮、选中卡、目标线、冷却、成长、移动帅后目标更新",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "网页横版：选中卡/目标线/开火标签",
+          "target": "fix-e2",
+          "card": "仕 @ (3,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却就绪：结束回合后射程内有敌人即自动开火 本回合锁定：敌军兵 (5,2) 射程内 2 个敌人，按距帅最近 → 低 HP → 行列顺序"
+        },
+        {
+          "text": "网页横版：移动帅后目标更新",
+          "king": [
+            3,
+            0
+          ],
+          "target": "fix-e1"
+        },
+        {
+          "text": "844x390 手机横版：选中卡/冷却/成长可读",
+          "card": "仕 (4,2) · HP 2/2 · 攻 1 八邻格 · 间隔 3 回合 · 冷却 2 回合 · 目标 兵 (3,2) · 固定装置不可移动",
+          "viewport": "844x390"
+        },
+        {
+          "text": "侧位按钮双端证据见 A18-02（1280x900 与 844x390 截图）"
+        }
+      ],
+      "evidence": [
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-07-desktop-before-move.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-07-desktop-after-move.png",
+        "docs/us/us018-evidence/round-20261019-dsh/browser-special/a18-07-mobile-landscape-cooldown.png"
+      ]
+    }
+  ],
+  "errors": [],
+  "steps": [
+    {
+      "case": "A18-02",
+      "text": "不足金币：按钮禁用且点击不扣款",
+      "gold": 4,
+      "advisors": 0
+    },
+    {
+      "case": "A18-02",
+      "text": "两座上限与第三座拒绝",
+      "gold": 2,
+      "advisors": 2
+    },
+    {
+      "case": "A18-02",
+      "text": "8 名队友 + 两座仕：仕不占 8 人额、固定上阵",
+      "activeIds": 10,
+      "bench": 0
+    },
+    {
+      "case": "A18-02",
+      "text": "两座左右侧位可交换",
+      "leftTower": "recruit-advisor-0",
+      "rightTower": "recruit-advisor-1"
+    },
+    {
+      "case": "A18-02",
+      "text": "844x390 手机横版侧位按钮可读",
+      "buttons": 4,
+      "viewport": "844x390"
+    },
+    {
+      "case": "A18-02",
+      "text": "待布置冲突提示与确认拦截",
+      "pending": [
+        "recruit-advisor-0"
+      ]
+    },
+    {
+      "case": "A18-02",
+      "text": "开战后仕不可移动；buff 排除帅与仕",
+      "advisorMaxHp": 2,
+      "kingMaxHp": 3,
+      "rookMaxHp": 3
+    },
+    {
+      "case": "A18-03",
+      "text": "八邻格/第二格/距帅/低HP/行列排序",
+      "enemyIds": 8,
+      "target": "fix-e3"
+    },
+    {
+      "case": "A18-03",
+      "text": "选中仕：射程/冷却/锁定与目标线",
+      "card": "仕 @ (3,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却就绪：结束回合后射程内有敌人即自动开火 本回合锁定：敌军兵 (3,2) 射程内 8 个敌人，按距帅最近 → 低 HP → 行列顺序只选 1 个 不能移动或被推动、不能治疗或复活、不吃主帅增益 · 不占 8 人名"
+    },
+    {
+      "case": "A18-03",
+      "text": "实际移动帅后目标重排",
+      "before": "fix-e4",
+      "after": "fix-e3"
+    },
+    {
+      "case": "A18-03",
+      "text": "无目标保持就绪，结束回合不进冷却",
+      "lastFireTurn": null
+    },
+    {
+      "case": "A18-03",
+      "text": "冷却标签 2 回合",
+      "card": "仕 @ (3,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却中：还需 2 回合，本回合结束不会开火 本回合锁定：敌军兵 (5,2) 每座每次只选 1 个敌人 不能移动或被推动、不能治疗或复活"
+    },
+    {
+      "case": "A18-03",
+      "text": "冷却途中升级 3→2，立即满足间隔但不即时开火",
+      "interval": 2,
+      "teamSp": 0,
+      "targetHp": 1
+    },
+    {
+      "case": "A18-04",
+      "text": "两座同局面锁定同一片树林目标",
+      "targets": [
+        "fix-foe",
+        "fix-foe"
+      ],
+      "marks": 2
+    },
+    {
+      "case": "A18-04",
+      "text": "树林独立 0/1/2 次命中与奖励去重",
+      "runs": [
+        {
+          "name": "零次命中",
+          "seed": 8,
+          "toast": "仕阶段：2 座被树林闪避",
+          "foeHp": 1,
+          "sp": 9,
+          "kills": 0
+        },
+        {
+          "name": "一次命中",
+          "seed": 1,
+          "toast": "仕阶段：1 座命中、1 座被树林闪避",
+          "foeHp": 0,
+          "sp": 10,
+          "kills": 1
+        },
+        {
+          "name": "两次命中",
+          "seed": 166,
+          "toast": "仕阶段：2 座命中",
+          "foeHp": 0,
+          "sp": 10,
+          "kills": 1
+        }
+      ]
+    },
+    {
+      "case": "A18-04",
+      "text": "分别升级、只升级所选仕、满级与重复提交",
+      "left": 1,
+      "right": 3,
+      "teamSp": 1
+    },
+    {
+      "case": "A18-04",
+      "text": "余额不足不扣款",
+      "teamSp": 2
+    },
+    {
+      "case": "A18-06",
+      "text": "仅仕残骸：不卡救援，直接第二波",
+      "turn": 6,
+      "wave": 2,
+      "phase": "player",
+      "spawned": 6
+    },
+    {
+      "case": "A18-06",
+      "text": "有普通队友时救援名单只含合法对象",
+      "options": "兵：复活 1 HP"
+    },
+    {
+      "case": "A18-06",
+      "text": "完成合法救援后进入第二波，仕不复活",
+      "phase": "player",
+      "wave": 2,
+      "revivedHp": 1
+    },
+    {
+      "case": "A18-07",
+      "text": "网页横版：选中卡/目标线/开火标签",
+      "target": "fix-e2",
+      "card": "仕 @ (3,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却就绪：结束回合后射程内有敌人即自动开火 本回合锁定：敌军兵 (5,2) 射程内 2 个敌人，按距帅最近 → 低 HP → 行列顺序"
+    },
+    {
+      "case": "A18-07",
+      "text": "网页横版：移动帅后目标更新",
+      "king": [
+        3,
+        0
+      ],
+      "target": "fix-e1"
+    },
+    {
+      "case": "A18-07",
+      "text": "844x390 手机横版：选中卡/冷却/成长可读",
+      "card": "仕 (4,2) · HP 2/2 · 攻 1 八邻格 · 间隔 3 回合 · 冷却 2 回合 · 目标 兵 (3,2) · 固定装置不可移动",
+      "viewport": "844x390"
+    },
+    {
+      "case": "A18-07",
+      "text": "侧位按钮双端证据见 A18-02（1280x900 与 844x390 截图）"
+    }
+  ],
+  "finishedAt": "2026-10-18T18:31:47.066Z",
+  "head": null,
+  "files": {
+    "web/index.html": "5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602",
+    "web/js/app.js": "1ed21a249dbc37b407724f1c9a0a7dbeee8389da3d588974f09ae85f237cde14",
+    "web/js/rules.js": "ca2136687ece0afcd44ca3d32fa16d68fc4c109624776e303e94949b8096990a"
+  },
+  "result": "PASS"
+}

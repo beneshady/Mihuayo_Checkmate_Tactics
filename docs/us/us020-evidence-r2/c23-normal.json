@@ -1,0 +1,21 @@
+{
+  "entry": {
+    "sp": 4,
+    "gold": 2,
+    "rookMaxHp": 4
+  },
+  "afterBattle": {
+    "sp": 2,
+    "gold": 2
+  },
+  "dead": {
+    "result": "dead",
+    "phase": "result"
+  },
+  "retry": {
+    "phase": "deploy",
+    "sp": 4,
+    "gold": 2,
+    "rookMaxHp": 4
+  }
+}

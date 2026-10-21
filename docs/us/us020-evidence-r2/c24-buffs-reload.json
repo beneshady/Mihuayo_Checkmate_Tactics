@@ -1,0 +1,14 @@
+{
+  "move": {
+    "before": 12,
+    "after": 7,
+    "reload": 7,
+    "unlocked": true
+  },
+  "rescue": {
+    "before": 7,
+    "after": 2,
+    "reload": 2,
+    "unlocked": true
+  }
+}

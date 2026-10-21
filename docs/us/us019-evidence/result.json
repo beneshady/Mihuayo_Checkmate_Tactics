@@ -1,0 +1,49 @@
+{
+  "scope": "正常入口仅实际点选：新建旅程→布阵确认→选择 buff→主帅走位与选中检查；未注入战局/资源",
+  "steps": [
+    {
+      "step": "新旅程+选择坚守 buff",
+      "phase": "player",
+      "buff": "health",
+      "king": [
+        4,
+        0
+      ]
+    },
+    {
+      "step": "选中主帅",
+      "card": "帅 @ (4,0) 棋子等级 Lv.1 · 击杀 0 · HP 3/3 · 纯辅助（无攻击） AP 1/1 九宫内：横竖一步 + 中心↔四角米字斜走 · 横竖一步可出入九宫 不能攻击或吃子、不能主动进入水格、不能购买个人升级",
+      "skillButtons": 0
+    },
+    {
+      "step": "选中基础车",
+      "skillButtons": 3
+    },
+    {
+      "step": "主帅点击敌兵",
+      "revision": 0,
+      "ap": 1
+    },
+    {
+      "step": "主帅走位出宫",
+      "to": [
+        2,
+        0
+      ],
+      "inPalace": false,
+      "card": "帅 @ (2,0) 棋子等级 Lv.1 · 击杀 0 · HP 3/3 · 纯辅助（无攻击） AP 0/1 九宫外：仅上下左右一步 · 横竖一步可出入九宫 不能攻击或吃子、不能主动进入水格、不能购买个人升级"
+    },
+    {
+      "step": "宫外斜向点击",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "result": "PASS",
+  "finishedAt": "2026-10-17T16:30:47.122Z",
+  "versions": {
+    "web/index.html": "4975f872053f672bcbdb2c230317ca167dd511acd5fc23261711bf9d95778e96",
+    "web/js/app.js": "382f0d7255609c4d8cf3579906563f70beb271642d26d695097f739d3bd129ef",
+    "web/js/rules.js": "1a6e7f3a852b1a1687d853e13327849f1251e7f2771d60b08a63734e09ac2ace"
+  }
+}

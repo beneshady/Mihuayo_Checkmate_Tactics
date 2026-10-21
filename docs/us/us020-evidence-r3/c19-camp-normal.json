@@ -1,0 +1,13 @@
+{
+  "spBefore": 6,
+  "spAfterBench": 5,
+  "spAfterActive": 4,
+  "bench": {
+    "id": "recruit-pawn-0",
+    "maxHp": 3
+  },
+  "active": {
+    "id": "rook",
+    "fortify": 1
+  }
+}

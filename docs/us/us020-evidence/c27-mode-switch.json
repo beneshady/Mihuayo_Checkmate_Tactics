@@ -1,0 +1,26 @@
+{
+  "scope": "C27 显示模式切换（网页版/手机版）",
+  "checks": [
+    {
+      "mode": "desktop",
+      "layout": "desktop",
+      "menu": true
+    },
+    {
+      "mode": "mobile",
+      "layout": "mobile",
+      "menu": true
+    }
+  ],
+  "pageErrors": [],
+  "result": "PASS",
+  "campVisible": true,
+  "campVisibleMobile": true,
+  "previewVisible": true,
+  "previewCells": 81,
+  "mobileMap": "mobile",
+  "deployOk": true,
+  "endOk": true,
+  "desktopBattle": true,
+  "finishedAt": "2026-10-20T15:46:39.638Z"
+}

@@ -1,0 +1,111 @@
+{
+  "round": "2026-10-18 DSH 验收（A18/A19）",
+  "scope": "浏览器可用性有限排查；结论仅影响本机当前受限令牌环境，不代表项目缺陷",
+  "conclusion": "浏览器二进制、Playwright 与 localhost 服务均存在，但当前 DSH 命令沙箱使用 Windows 受限令牌，Chromium 无法创建其子进程 IPC 通道（Mojo 命名管道安全描述符被拒），渲染器/会话不可用；无法执行任何真实浏览器验收。Node 规则层与静态检查不受影响。",
+  "env": {
+    "node": "v24.15.0",
+    "playwright": "1.62.1（~/.cache/codex-runtimes/.../node_modules/playwright）",
+    "playwrightChromium": "chromium_headless_shell-1234 / chrome-headless-shell 151.0.7922.34",
+    "systemChrome": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe 155.0.8059.80",
+    "systemEdge": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe 155.0.4283.62（未单独深测，同一 Chromium IPC 机制）",
+    "existingServer": "http://127.0.0.1:8785 由用户既有 python http.server 提供，/js/rules.js 的 sha256 与工作区一致（ca213668…990a）",
+    "workspaceBranch": "codex/web-gameplay-validation",
+    "workspaceHead": "8d2a9d273084794a3d36808fcf411d1c0ab5a57f"
+  },
+  "attempts": [
+    {
+      "id": "P1",
+      "action": "Playwright chromium.launch({headless:true}) 启动自带 Chromium",
+      "result": "失败",
+      "error": "browserType.launch: spawn EPERM（Playwright 以 stdio pipe + --remote-debugging-pipe 启动子进程）",
+      "command": "node tmp/dsh-browser-probe.cjs"
+    },
+    {
+      "id": "P2",
+      "action": "手工以 stdio:ignore 启动 chrome-headless-shell --headless --no-sandbox --remote-debugging-port=9333，再用原始 CDP 连接",
+      "result": "浏览器进程存活且 Browser 级 CDP 可用，但页面会话不可用",
+      "detail": "GET /json/version 正常；Target.createTarget 返回 targetId；Target.attachToTarget 返回 sessionId；随后 Page.enable / Runtime.evaluate 在 4–6 秒内超时；日志出现 FATAL mojo platform_channel.cc:108 Check failed: . : 拒绝访问 (0x5)，表明渲染器/子进程 Mojo 通道创建被拒。",
+      "command": "node tmp/dsh-cdp-session.cjs / tmp/dsh-cdp-session2.cjs 9335"
+    },
+    {
+      "id": "P3",
+      "action": "Playwright connectOverCDP(http://127.0.0.1:9333) 连接上述浏览器",
+      "result": "失败",
+      "detail": "WebSocket 连接建立；Browser.getVersion、Target.setAutoAttach、Browser.setDownloadBehavior 有响应；session 级命令无响应，30 秒超时（renderer 不可用）。",
+      "command": "node tmp/dsh-browser-connect.cjs"
+    },
+    {
+      "id": "P4",
+      "action": "chrome-headless-shell --dump-dom 单次渲染",
+      "result": "失败",
+      "detail": "FATAL mojo platform_channel.cc:108 Check failed: . : 拒绝访问 (0x5)，退出码 -2147483645；网络缓存目录 ACL 访问告警同时出现。",
+      "command": "chrome-headless-shell --headless --no-sandbox --user-data-dir=tmp/shell-dumpdom --dump-dom http://127.0.0.1:8791/index.html"
+    },
+    {
+      "id": "P5",
+      "action": "系统 Chrome 155 --headless=new --remote-debugging-port",
+      "result": "失败",
+      "detail": "crashpad client 报 OpenProcess: 拒绝访问 (0x5) 后 self-terminating；单进程模式仍出现 Mojo FATAL。",
+      "command": "node tmp/dsh-chrome-system.cjs / tmp/dsh-chrome-combos.cjs / tmp/dsh-chrome-combos2.cjs"
+    },
+    {
+      "id": "P6",
+      "action": "组合开关排除子进程：--single-process --no-zygote --in-process-gpu --disable-gpu --disable-breakpad --disable-crash-reporter --no-crashpad --enable-features=NetworkServiceInProcess --disable-features=NetworkService,AudioServiceOutOfProcess,VizDisplayCompositor",
+      "result": "失败",
+      "detail": "仍出现同一 Mojo FATAL；单进程/禁用网络与音频服务未能消除 Chromium 子进程 IPC 需求。"
+    },
+    {
+      "id": "P7",
+      "action": "对照：在受限令牌内用 .NET NamedPipeServerStream 创建普通命名管道",
+      "result": "成功",
+      "detail": "普通命名管道可创建，说明并非全面禁止命名管道；失败点在于 Chromium 为子进程创建的管道的安全描述符/受限令牌访问检查。"
+    },
+    {
+      "id": "P8",
+      "action": "检查是否存在既有可复用浏览器自动化服务",
+      "result": "未发现",
+      "detail": "netstat 列出的 127.0.0.1 监听端口无 Chrome DevTools/CDP 自动化端点；系统中 Chrome 进程（用户 10-17 启动）无调试端口，未操作；WSL 未安装（无 Distro）；未发现 puppeteer/浏览器插件。"
+    },
+    {
+      "id": "P9",
+      "action": "申请一次 danger-full-access 沙箱升级以验证浏览器能力",
+      "result": "失败（无审批通道）",
+      "detail": "工具返回：sandbox escalation to \"danger-full-access\" requires approval, but no approval channel is available。未再重复申请；未修改任何系统/浏览器安全配置。"
+    }
+  ],
+  "notDone": [
+    "未安装任何依赖或浏览器",
+    "未修改系统安全策略、浏览器安全开关或 DSH 沙箱配置",
+    "未停止任何既有进程/服务；仅清理本会话自己启动的探针浏览器进程",
+    "未操作用户浏览器页面、用户旧局或 Codex 现存验收页",
+    "未无限重试：在确认受限令牌与 Chromium IPC 限制后停止环境排查"
+  ],
+  "unverified": [
+    "A18-01 正常入口浏览器链路（菜单→战斗→商店→布阵→自动开火→真实 SP 升级）",
+    "A18-02 浏览器专项（冲突提示、手动腾格确认、第三座禁用视觉）",
+    "A18-03 浏览器专项（目标线、待敌/冷却显示）",
+    "A18-04 浏览器专项（树林概率提示、集火、满级界面）",
+    "A18-06 两个救援专项页面",
+    "A18-07 1280 横版与 390/手机横版信息与操作",
+    "A19-01 正常入口浏览器步骤与 AP/SP 前后记录",
+    "A19-02 正常走位与专项遍历的浏览器证据",
+    "A19-03 强制推出宫/强制入水的浏览器专项",
+    "A19-04 跨关/重试/双显示模式浏览器证据",
+    "A19-05 共享 SP 浏览器证据（并入 A18-01 未执行）"
+  ],
+  "nodeUnaffected": {
+    "us018-advisor": "16 pass / 0 fail",
+    "us019-commander": "12 pass / 0 fail",
+    "shared-sp": "11 pass / 0 fail",
+    "legacy-rules": "26 pass / 0 fail",
+    "rules": "9 pass / 0 fail",
+    "cannon-purchase": "4 pass / 0 fail",
+    "static-check": "OK（DOM ids 55 / rules APIs 36）"
+  },
+  "evidence": [
+    "browser-probe/*.log（上述探针的原始 stderr）",
+    "node/*.log（本轮实际 Node 回归输出）",
+    "static-ui-inspection.log（UI 字符串静态定位，仅静态检查）",
+    "rules-normal-flow-sim.json（规则层正常流程模拟，仅补充，不是浏览器证据）"
+  ]
+}

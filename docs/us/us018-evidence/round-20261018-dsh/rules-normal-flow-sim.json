@@ -1,0 +1,157 @@
+{
+  "stage": [
+    {
+      "level": 1,
+      "phase": "intermission",
+      "gold": 3,
+      "teamSp": 3,
+      "kills": 3,
+      "result": "victory",
+      "advisors": 0
+    },
+    {
+      "event": "next-level",
+      "level": 2,
+      "phase": "deploy",
+      "pending": [],
+      "towers": []
+    },
+    {
+      "level": 2,
+      "phase": "intermission",
+      "gold": 6,
+      "teamSp": 6,
+      "kills": 3,
+      "result": "victory",
+      "advisors": 0
+    },
+    {
+      "event": "buy-advisor",
+      "goldBefore": 6,
+      "goldAfter": 1,
+      "partyAdvisors": 1,
+      "activeAdvisors": 1
+    },
+    {
+      "event": "next-level",
+      "level": 3,
+      "phase": "deploy",
+      "pending": [],
+      "towers": [
+        [
+          3,
+          1
+        ]
+      ]
+    },
+    {
+      "event": "advisor-swap-right",
+      "ok": true,
+      "at": [
+        5,
+        1
+      ]
+    },
+    {
+      "event": "tower-board",
+      "pos": [
+        5,
+        1
+      ],
+      "hp": 2,
+      "interval": 3,
+      "teamSp": 6
+    },
+    {
+      "event": "tower-fired",
+      "lastFireTurn": 3,
+      "phase": "player",
+      "teamSp": 6,
+      "turn": 4
+    },
+    {
+      "event": "upgrade-advisor",
+      "before": {
+        "teamSp": 6,
+        "interval": 3,
+        "hp": 1,
+        "maxHp": 2
+      },
+      "after": {
+        "teamSp": 3,
+        "interval": 2,
+        "hp": 1,
+        "maxHp": 2
+      },
+      "accepted": true
+    },
+    {
+      "level": 3,
+      "phase": "intermission",
+      "gold": 3,
+      "teamSp": 5,
+      "kills": 2,
+      "result": "victory",
+      "advisors": 1
+    }
+  ],
+  "log": [
+    {
+      "event": "level-played",
+      "from": {
+        "level": 1,
+        "turn": 1,
+        "gold": 0,
+        "teamSp": 0,
+        "kills": 0
+      },
+      "to": {
+        "level": 1,
+        "turn": 11,
+        "gold": 3,
+        "teamSp": 3,
+        "kills": 3,
+        "phase": "intermission",
+        "result": "victory"
+      }
+    },
+    {
+      "event": "level-played",
+      "from": {
+        "level": 2,
+        "turn": 1,
+        "gold": 3,
+        "teamSp": 3,
+        "kills": 0
+      },
+      "to": {
+        "level": 2,
+        "turn": 11,
+        "gold": 6,
+        "teamSp": 6,
+        "kills": 3,
+        "phase": "intermission",
+        "result": "victory"
+      }
+    },
+    {
+      "event": "level-played",
+      "from": {
+        "level": 3,
+        "turn": 4,
+        "gold": 1,
+        "teamSp": 3,
+        "kills": 0
+      },
+      "to": {
+        "level": 3,
+        "turn": 11,
+        "gold": 3,
+        "teamSp": 5,
+        "kills": 2,
+        "phase": "intermission",
+        "result": "victory"
+      }
+    }
+  ]
+}

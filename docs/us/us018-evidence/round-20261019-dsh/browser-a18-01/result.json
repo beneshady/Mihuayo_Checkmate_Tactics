@@ -1,0 +1,78 @@
+{
+  "scope": "正常入口实际点选：正常关卡自然赚金币与公共 SP→商店买一座仕→下关布阵侧位→结束回合自动开火→实际公共 SP 升级；未注入资源",
+  "premise": "自然收益跨关累计；买一座即可，两座上限/交换为专项",
+  "steps": [
+    {
+      "step": "首关正常打完两波",
+      "level": 1,
+      "phase": "intermission",
+      "gold": 3,
+      "teamSp": 3,
+      "kills": 3
+    },
+    {
+      "step": "第 2 关正常打完",
+      "level": 2,
+      "phase": "intermission",
+      "gold": 6,
+      "teamSp": 6,
+      "kills": 3
+    },
+    {
+      "step": "商店按自然金币买一座仕",
+      "goldBefore": 6,
+      "goldAfter": 1,
+      "teamSp": 6
+    },
+    {
+      "step": "下关布阵默认左侧并换到右侧实战",
+      "from": [
+        3,
+        1
+      ],
+      "to": [
+        5,
+        1
+      ]
+    },
+    {
+      "step": "选中仕与技能入口",
+      "card": "仕 @ (5,1) · 固定防御装置 HP 2/2 · 攻击 1 · 射程八邻格 · 攻击间隔 3 回合 冷却就绪：结束回合后射程内有敌人即自动开火 射程内无敌人：保持就绪，不消耗攻击机会 每座每次只选 1 个敌人 不能移动或被推动、不能治疗或复活、不吃主帅增益 · 不占 8 人名额",
+      "skillButtons": 1,
+      "marks": [
+        "intent-overview",
+        "intent-overview",
+        "intent-overview",
+        "intent-overview",
+        "selected"
+      ]
+    },
+    {
+      "step": "实战自动开火",
+      "firedTurn": 3,
+      "hp": [
+        2
+      ]
+    },
+    {
+      "step": "实际公共 SP 升级仕间隔",
+      "from": 6,
+      "to": 3,
+      "interval": 2,
+      "maxHp": 2,
+      "hpBefore": 1
+    },
+    {
+      "step": "390 窄屏仕信息与升级入口",
+      "card": "仕 (6,2) · HP 1/2 · 攻 1 八邻格 · 间隔 2 回合 · 冷却 1 回合 · 目标 车 (7,2) · 固定装置不可移动"
+    }
+  ],
+  "errors": [],
+  "result": "PASS",
+  "finishedAt": "2026-10-18T18:17:52.746Z",
+  "versions": {
+    "web/index.html": "5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602",
+    "web/js/app.js": "1ed21a249dbc37b407724f1c9a0a7dbeee8389da3d588974f09ae85f237cde14",
+    "web/js/rules.js": "ca2136687ece0afcd44ca3d32fa16d68fc4c109624776e303e94949b8096990a"
+  }
+}

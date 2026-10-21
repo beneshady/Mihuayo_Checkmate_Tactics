@@ -1,0 +1,72 @@
+{
+  "round": "2026-10-19 DSH 浏览器补验（US-019）",
+  "contract": "docs/us/US-019-commander-support-movement.md §13（A19-01…A19-05）",
+  "workspace": "D:\\Projects\\mihuayou\\gamehack2026",
+  "branch": "codex/web-gameplay-validation",
+  "head": "184a46a2b0e11ac6990ea5ef13725ee2efd4292f",
+  "browser": {
+    "engine": "Playwright 1.62.1 / Chromium headless shell",
+    "server": "http://127.0.0.1:8792 (python -m http.server, web/)",
+    "permission": "process-level danger-full-access via outer approval; no global config/security changes; no --no-sandbox",
+    "pageErrors": []
+  },
+  "items": [
+    {
+      "id": "A19-01",
+      "type": "正常流程（无注入）",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-a19/result.json",
+      "summary": "疾行buff：帅3HP/commanderMove0，车maxHp2/move1；帅纯辅助无攻击/吃子/升级；点敌兵revision0/AP1/SP0；队友6升级项含强健（SP0禁用）。"
+    },
+    {
+      "id": "A19-02",
+      "type": "正常流程（实际走位）",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-a19/result.json",
+      "summary": "宫内非法斜走拒绝不耗AP；中心(4,1)→角(3,2)合法；斜出宫拒绝、横竖出宫(3,3)；斜回宫拒绝、横竖回宫(3,2)；角→中心(4,1)合法AP0；第6回合第二波buff保留。"
+    },
+    {
+      "id": "A19-03",
+      "type": "专项（状态夹具）",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-special/result.json",
+      "summary": "现有敌车冲击接口(仅夹具rookPush)推出宫：HP3→2、宫外直向；强制入水立即result=dead且turn仍1；主动入水拒绝AP不变；桥格通行HP3。"
+    },
+    {
+      "id": "A19-04",
+      "type": "正常流程+专项",
+      "status": "pass",
+      "viewport": ["1280x900", "844x390"],
+      "evidence": "browser-a19/result.json",
+      "summary": "正常操作第6回合阵亡→重试回布阵(帅4,0/buff null/attack0)；关间专项进入第2关选疾行：坚守不叠加、move生效；1280/844x390双显示与菜单切换战局不变。"
+    },
+    {
+      "id": "A19-05",
+      "type": "专项+定向回归",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-a19/result.json + node/*.log",
+      "summary": "注入1SP队友强健SP1→0/maxHp2→3；帅5SP仍无升级项且不扣；us019 12、shared-sp 11、legacy 26、us018 16全绿，K09/敌士隔离/静态检查通过。"
+    }
+  ],
+  "node": {
+    "tests/us019-commander.test.cjs": "tests 12 / pass 12 / fail 0",
+    "tests/shared-sp.test.cjs": "tests 11 / pass 11 / fail 0",
+    "tests/legacy-rules.test.cjs": "tests 26 / pass 26 / fail 0",
+    "tests/us018-advisor.test.cjs": "tests 16 / pass 16 / fail 0",
+    "tests/rules.test.cjs": "tests 9 / pass 9 / fail 0",
+    "tests/cannon-purchase.test.cjs": "tests 4 / pass 4 / fail 0",
+    "tests/static-check.cjs": "static check: OK"
+  },
+  "unverified": [
+    "强制位移浏览器仅覆盖现有敌车冲击出宫/入水；友军牵引/贴身强拉/阻挡/三体碰撞仅规则回归",
+    "A19-04下一关换buff的关间状态为专项夹具；正常失败/重试与双显示为真实操作",
+    "强度平衡未验证",
+    "US014完整直视未实现",
+    "shared-sp-browser.cjs/terrain/v23-contract/ui-static等未运行"
+  ],
+  "uncommitted": true
+}

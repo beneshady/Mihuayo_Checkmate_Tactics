@@ -1,0 +1,16 @@
+{
+  "scope": "正常入口实际点选：首关两波自然赚金币与公共 SP→商店买仕→下关布阵侧位→结束回合自动开火→实际公共 SP 升级；未注入资源",
+  "steps": [],
+  "errors": [],
+  "result": "FAIL",
+  "failure": {
+    "message": "首关自然金币足够买仕（实际 3）",
+    "stack": "AssertionError [ERR_ASSERTION]: 首关自然金币足够买仕（实际 3）\n    at D:\\Projects\\mihuayou\\gamehack2026\\tests\\us018-advisor-browser.cjs:39:4"
+  },
+  "finishedAt": "2026-10-18T03:07:18.331Z",
+  "versions": {
+    "web/index.html": "5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602",
+    "web/js/app.js": "ae098d6355ea84bb6c4202d65fa067d42e8ee18862e0d8ef0bb113a703c7bd96",
+    "web/js/rules.js": "78a7c4b1b3cc399013155135290ad37b7a56695883cf04bc670613567ec1a739"
+  }
+}

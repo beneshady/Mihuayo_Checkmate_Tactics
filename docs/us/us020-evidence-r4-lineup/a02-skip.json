@@ -1,0 +1,42 @@
+{
+  "view": "camp",
+  "skipEnabled": true,
+  "gold": 8,
+  "population": 4,
+  "teamSp": 0,
+  "buffs": {
+    "health": true,
+    "move": false,
+    "rescue": false
+  },
+  "party": [
+    {
+      "id": "rook",
+      "kind": "rook",
+      "hp": 3,
+      "maxHp": 3,
+      "commanderHealth": 1
+    },
+    {
+      "id": "starting-pawn",
+      "kind": "pawn",
+      "hp": 2,
+      "maxHp": 2,
+      "commanderHealth": 1
+    },
+    {
+      "id": "starting-pawn-2",
+      "kind": "pawn",
+      "hp": 2,
+      "maxHp": 2,
+      "commanderHealth": 1
+    },
+    {
+      "id": "starting-horse",
+      "kind": "horse",
+      "hp": 2,
+      "maxHp": 2,
+      "commanderHealth": 1
+    }
+  ]
+}

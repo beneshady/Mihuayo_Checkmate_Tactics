@@ -1,0 +1,12 @@
+{
+  "before": {
+    "view": "battle",
+    "phase": "intermission",
+    "result": "victory"
+  },
+  "afterReload": {
+    "view": "battle",
+    "phase": "intermission",
+    "result": "victory"
+  }
+}

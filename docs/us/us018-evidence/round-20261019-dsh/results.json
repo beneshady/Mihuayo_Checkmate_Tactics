@@ -1,0 +1,88 @@
+{
+  "round": "2026-10-19 DSH 浏览器补验（US-018）",
+  "contract": "docs/us/US-018-advisor-defense-tower.md §16（A18-01…A18-07）",
+  "workspace": "D:\\Projects\\mihuayou\\gamehack2026",
+  "branch": "codex/web-gameplay-validation",
+  "head": "184a46a2b0e11ac6990ea5ef13725ee2efd4292f",
+  "browser": {
+    "engine": "Playwright 1.62.1 / Chromium headless shell",
+    "server": "http://127.0.0.1:8792 (python -m http.server, web/)",
+    "permission": "process-level danger-full-access via outer approval; no global config/security changes; no --no-sandbox",
+    "pageErrors": []
+  },
+  "items": [
+    {
+      "id": "A18-01",
+      "type": "正常流程（无注入）",
+      "status": "pass",
+      "viewport": ["1280x900", "390x844"],
+      "evidence": "browser-a18-01/result.json",
+      "summary": "第1关自然金币3/SP3，第2关累计6/6；买一座仕6→1；第3关默认左(3,1)换右(5,1)；第3回合自然开火；真实SP6→3升3→2，HP仍2；390窄屏可读；无注入。"
+    },
+    {
+      "id": "A18-02",
+      "type": "专项（状态夹具）",
+      "status": "pass",
+      "viewport": ["1280x900", "844x390"],
+      "evidence": "browser-special/result.json",
+      "summary": "金币不足禁用不扣款；两座上限/第三座拒绝不扣；8队友+2仕 activeIds=10/bench=0；侧位交换；844x390侧位按钮；待布置冲突/拦截/手动腾格/确认；buff排除帅与仕；开战后不可移动。"
+    },
+    {
+      "id": "A18-03",
+      "type": "专项（状态夹具）",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-special/result.json",
+      "summary": "八邻格8目标、第二格排除；行序/低HP排序；实际移动帅后目标 fix-e4→fix-e3；无目标 lastFireTurn 仍 null；冷却2标签；冷却中升级3→2不即时开火、回合末开火。"
+    },
+    {
+      "id": "A18-04",
+      "type": "专项（状态+确定性RNG）",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-special/result.json",
+      "summary": "两座同目标/树林非必杀；种子8/1/166对应0/1/2次命中，SP 9/10/10、击杀0/1/1、两座都冷却；左3→2→1右保持3；满级/重复/不足不扣。"
+    },
+    {
+      "id": "A18-05",
+      "type": "专项（规则/快照）",
+      "status": "pass",
+      "viewport": ["N/A"],
+      "evidence": "node/us018-advisor.test.log",
+      "summary": "16项全绿：活仕受伤/不可位移、碰撞、残骸占格/炮架/推动/入水、治疗复活禁止、第二波冷却、新关恢复、失败快照。"
+    },
+    {
+      "id": "A18-06",
+      "type": "专项（状态夹具）",
+      "status": "pass",
+      "viewport": ["1280x900"],
+      "evidence": "browser-special/result.json",
+      "summary": "仅仕残骸第6回合直接第二波(phase=player/wave=2/6增援/无救援弹窗)；有兵残骸只列“兵：复活1HP”；救援后仕不复活。"
+    },
+    {
+      "id": "A18-07",
+      "type": "专项（双端UI）",
+      "status": "pass",
+      "viewport": ["1280x900", "844x390"],
+      "evidence": "browser-special/result.json",
+      "summary": "网页/手机横版选中卡、目标线、冷却、成长可读；移动帅后目标 fix-e2→fix-e1；侧位按钮证据见A18-02；无pageerror。"
+    }
+  ],
+  "node": {
+    "tests/us018-advisor.test.cjs": "tests 16 / pass 16 / fail 0",
+    "tests/us019-commander.test.cjs": "tests 12 / pass 12 / fail 0",
+    "tests/shared-sp.test.cjs": "tests 11 / pass 11 / fail 0",
+    "tests/legacy-rules.test.cjs": "tests 26 / pass 26 / fail 0",
+    "tests/rules.test.cjs": "tests 9 / pass 9 / fail 0",
+    "tests/cannon-purchase.test.cjs": "tests 4 / pass 4 / fail 0",
+    "tests/static-check.cjs": "static check: OK"
+  },
+  "unverified": [
+    "5金币/3+5SP强度平衡未试玩结论",
+    "A18-04树林0/1/2命中为确定性RNG专项夹具，不是自然随机采样",
+    "US014完整直视未实现；残骸直视遮挡记为依赖",
+    "terrain/v23-contract/ui-static等历史基线红项未运行未扩修",
+    "ui-headless/v1-flow/shared-sp/us019-king/display-*等脚本未运行"
+  ],
+  "uncommitted": true
+}

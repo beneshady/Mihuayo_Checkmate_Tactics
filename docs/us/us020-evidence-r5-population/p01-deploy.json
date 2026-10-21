@@ -1,0 +1,19 @@
+{
+  "deployPopulation": "部署人口：4／4（上阵普通队友／部署上限，至少 1 名；主帅 1 与仕 0 座单独计数，不计入部署人口）",
+  "ordinaryOnBoard": 4,
+  "deployIds": [
+    "king",
+    "rook",
+    "starting-pawn",
+    "starting-pawn-2",
+    "recruit-pawn-0"
+  ],
+  "deployRosterIds": [
+    "rook",
+    "starting-pawn",
+    "starting-pawn-2",
+    "recruit-pawn-0"
+  ],
+  "phase": "player",
+  "banner": ""
+}

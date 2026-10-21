@@ -1,0 +1,266 @@
+{
+  "scope": "US-020 主营地/旅程成长/关节预览：正常入口 + 专项 + 规则",
+  "results": [
+    {
+      "id": "C01",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "首次跳过禁用且提示「首次游玩必须完成教学，完成前不能跳过进入主营地。」；7 步教学目标实际完成后先入主营地（view=camp），未直接进入正式战斗。",
+      "evidence": "c01-tutorial-entry.png,c01-tutorial-steps.png,c01-tutorial-done.png"
+    },
+    {
+      "id": "C03-完成路径",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "教学实得猫粮 G=1；入营后猫粮 9=G+8（8 为首次入营奖励），坚守自动生效、队伍满血、人口 4、公共 SP 0。",
+      "evidence": "c01-tutorial-done.png"
+    },
+    {
+      "id": "C07-满级",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 20：连续四次扩编得到人口 5/6/7/8 与余额 15/10/5/0，满级后按钮禁用，无赠送人口。",
+      "evidence": "c07-population.png"
+    },
+    {
+      "id": "C07-余额边界",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 4 扩编禁用；余额 5 恰好成功并把余额扣到 0。",
+      "evidence": ""
+    },
+    {
+      "id": "C09",
+      "type": "正常浏览器+专项",
+      "result": "通过",
+      "detail": "招募价目与实施前商店一致（兵3/车5/马5/炮8/仕5）；正常点击招募兵扣 3 猫粮并进入队伍；无出售/遣散入口；顶部与提示统一显示猫粮。",
+      "evidence": "c09-recruit.png"
+    },
+    {
+      "id": "C26",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "首次入营自动显示指引（扩编/招募/SP/增益顺序与费用），可跳过不强制消费；收起后「帮助」可重看且不扣资源（余额 6 不变）。",
+      "evidence": "c26-guide.png"
+    },
+    {
+      "id": "C11",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 10：疾行 10→5、救援 5→0；救援在移动未解锁时禁用并提示「先解锁移动增益」；解锁后三增益同时生效且不可重购。",
+      "evidence": "c11-buffs.png"
+    },
+    {
+      "id": "C12",
+      "type": "专项",
+      "result": "通过",
+      "detail": "入关后普通队友继承 +1 HP 与 +1 移动（车 4→5 格、弓攻距不变）；主帅不继承；刷新后加成仍只一次。 训练营名单：上阵 · 车 · rook · Lv.1 · 击杀 0 上阵 · 兵 · starting-pawn · Lv.1 · …",
+      "evidence": "c11-buffs.png"
+    },
+    {
+      "id": "C13",
+      "type": "专项",
+      "result": "通过",
+      "detail": "同一扩编按钮连续触发两次只扣一次（人口 4→5、余额 20→15）；随后合法扩编与招募仍可连续执行（人口 6、余额 7）。",
+      "evidence": ""
+    },
+    {
+      "id": "C10",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 2：炮按钮禁用且只显示价格、不出现差额；疾行因未获坚守禁用；强行触发点击不扣款。",
+      "evidence": "c10-disabled.png"
+    },
+    {
+      "id": "C02-失败重试",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：教学主帅阵亡后显示失败提示且仍停留在教学（view=battle，未入营），重试回到第 1 步。",
+      "evidence": "c02-tutorial-fail.png"
+    },
+    {
+      "id": "C02-老玩家跳过",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：曾完成教学的玩家新旅程可跳过（二次确认，取消不改变状态），入营猫粮 8（无教学收益），view=camp。",
+      "evidence": "c02-skip.png"
+    },
+    {
+      "id": "C03-跳过路径",
+      "type": "专项",
+      "result": "通过",
+      "detail": "跳过路径：猫粮 8（无教学收益）、人口 4、SP 0、车兵弓枪无炮仕、坚守自动生效且满血。与完成路径的差别仅教学猫粮 G=1。",
+      "evidence": "c02-skip.png"
+    },
+    {
+      "id": "C04",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "刷新后猫粮 6 不回退不重发（首次奖励标志保持）；开始新旅程后只重发一次 8 猫粮，教学完成资格与指引已看标志保留，指引不再自动弹出。",
+      "evidence": ""
+    },
+    {
+      "id": "C25",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "新旅程后进度/资源/人口重置（completed 0、猫粮 8、人口 4、SP 0），首次营地 8 猫粮与坚守恢复，教学跳过资格与指引标志保留。",
+      "evidence": ""
+    },
+    {
+      "id": "C05",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "入关前可在地图↔主营地往返且猫粮/增益不退（余额 8）；确认进入关卡后只有布阵界面，暂停菜单仅可继续或重新开始，无法回到主营地购物。",
+      "evidence": "c05-deploy.png"
+    },
+    {
+      "id": "C08",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项人口 5：连续招募不受阻断（后备不限），上阵普通队友始终 ≤5；仕固定上阵不占人口（场上额外 1 座）；换下 1 人后场上 4 名普通队友仍可确认布阵。0 名与超人口的拒绝由规则用例覆盖。",
+      "evidence": "c08-roster.png"
+    },
+    {
+      "id": "C14",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项已解锁救援：第 5→6 回合进入救援，仅列合法目标；救援 rook 回复到 3/3（含坚守上限），随后进入第二波且本关不再触发。",
+      "evidence": "c14-rescue.png"
+    },
+    {
+      "id": "C16",
+      "type": "专项",
+      "result": "通过",
+      "detail": "救援名单只含受伤存活普通队友与仍在场的普通队友尸体；主帅、仕/仕残骸、满血单位与已销毁尸体不在名单。规则用例另有 0 目标自动进入第二波的断言。",
+      "evidence": "c14-rescue.png"
+    },
+    {
+      "id": "C15",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：阵亡普通队友在尸体位置以 1 HP 复活并移除尸体，未出现叠子；已销毁尸体不在救援名单。",
+      "evidence": "c15-revive.png"
+    },
+    {
+      "id": "C17",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：救援跳过后继续第二波且本关不再触发；机会不累计到下一关；刷新回到主营地不重发救援。跨关重新拥有一次由规则用例与正常通关链路共同覆盖。",
+      "evidence": ""
+    },
+    {
+      "id": "C06",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "正常通关三关：第1关 wave2/turn11/猫粮12；第2关 wave2/turn11/猫粮15；第3关 wave2/turn11/猫粮18；非最终关结算后进入主营地并满血恢复，最终关直接显示通关结算。",
+      "evidence": "c06-camp-after-level1.png,c06-camp-after-level2.png,c06-final.png"
+    },
+    {
+      "id": "C18",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "非最终关胜利后入营即恢复满血（含阵亡队友与仕），身份与成长保留；不重复发奖或加成（由 C06 链路与规则用例 C18 共同断言）。",
+      "evidence": "c06-camp-after-level1.png"
+    },
+    {
+      "id": "C19",
+      "type": "专项（营地UI）",
+      "result": "通过",
+      "detail": "营地技能列表覆盖上场与后备队友；点击升级共用公共 SP 池（6→5）；后备成长随入关保留（规则用例 C19/C12 覆盖）。",
+      "evidence": "c19-skills.png"
+    },
+    {
+      "id": "C20",
+      "type": "专项（营地UI）",
+      "result": "通过",
+      "detail": "主帅无任何个人升级按钮；仕只有攻击间隔 3/5 SP 且无治疗/强健（规则用例 C20 断言）。",
+      "evidence": "c19-skills.png"
+    },
+    {
+      "id": "C21",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "三关全部可预览（各 81 格地形与第一波敌方站位：第一波敌方 8 枚：兵（2,6）、兵（5,6）、兵（8,6）、车（9,8）、炮（…）；已通关第 1 关与未解锁第 3 关不可进入，只有当前下一关可进入；仅查看预览无资源/快照/战局副作用。",
+      "evidence": "c21-map-preview.png"
+    },
+    {
+      "id": "C22",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项绑定编辑器图到第 2 关（0,1 树林、8,1 山、敌兵移 (1,3)）：地图预览的地形与第一波站位与实际入关完全一致；预览不含第二波位置，第二波仍按战斗内预告显示。",
+      "evidence": "c22-preview-bound.png"
+    },
+    {
+      "id": "C23",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "确认进入关卡即记录快照（SP 4）；布阵期花 2 SP 转职；真实失败后重试回到布阵，SP 与猫粮恢复入关值、转职回滚，且不能返回主营地。",
+      "evidence": "c23-failure.png"
+    },
+    {
+      "id": "C24",
+      "type": "专项",
+      "result": "通过",
+      "detail": "营地操作后立即写入单个存档键（人口 5）并在刷新后保持；把 setItem 替换为抛错后再次扩编，界面回退且余额/人口不变，存储内容未改写——不虚报成功也不复制收益。",
+      "evidence": ""
+    },
+    {
+      "id": "C27",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "1280×720 与 844×390 两种上下文下主营地、关卡预览、布阵与战斗操作均可见可点；显示模式切换（网页版/手机版按钮）前后旅程状态一致，见 tests/us020-mode-switch.cjs 的 c27-mode-switch.json；无新增页面错误。",
+      "evidence": "c27-1280x720.png,c27-844x390.png,c27-mode-switch.json"
+    },
+    {
+      "id": "C28",
+      "type": "规则+静态检查",
+      "result": "通过",
+      "detail": "代码与文档一致性：不再存在三选一/关间商店 DOM、无固定 8 人编队文案；人口、旅程增益、救援与存档均为新实现。最终哈希见 us020-result.json。",
+      "evidence": "us020-result.json"
+    }
+  ],
+  "pageErrors": [],
+  "shots": [
+    "c01-tutorial-entry.png",
+    "c01-tutorial-steps.png",
+    "c01-tutorial-done.png",
+    "c26-guide.png",
+    "c03-camp-completed.png",
+    "c07-population.png",
+    "c09-recruit.png",
+    "c11-buffs.png",
+    "c10-disabled.png",
+    "c02-tutorial-fail.png",
+    "c02-skip.png",
+    "c05-deploy.png",
+    "c08-roster.png",
+    "c14-rescue.png",
+    "c15-revive.png",
+    "c01-tutorial-entry.png",
+    "c01-tutorial-steps.png",
+    "c01-tutorial-done.png",
+    "c26-guide.png",
+    "c06-camp-after-level1.png",
+    "c06-camp-after-level2.png",
+    "c06-final.png",
+    "c19-skills.png",
+    "c21-map-preview.png",
+    "c22-preview-bound.png",
+    "c23-failure.png",
+    "c27-1280x720.png",
+    "c27-844x390.png"
+  ],
+  "hashes": {
+    "web/index.html": "4b1cd61ab3a7c5fa382664e044ad96d0edac80a3ff3a2d7f19421ceb5ddb8896",
+    "web/js/rules.js": "230b17befef2249fcfb3e566b004a02a71c63eb1aad05025d2a8d20e1196ddf1",
+    "web/js/app.js": "58a6df7b18384ba2edf9e183ec140f7a3fbd27bd18367134ce2e43d63e0be4e5",
+    "web/js/campaign.js": "83f59855366b4e5ad292cc0467294b0bf52c4f8c27310f8070324e8c83959603",
+    "web/js/journey.js": "cdb57d8bca024763f2f21d21f24f4e842d993fee91798f377ef394f064b59649",
+    "web/js/tutorial.js": "d396f135aaa3d3a798a14bfb57cd3888d74de688f378da49d71ac4fe95fb6828",
+    "web/js/ui.js": "a7b33468f5c747e32a1df10bad2d682cb34e4a8f8716ecc988922da5be19fa15",
+    "web/js/maps.js": "878d29b09826a7e661c7d643ae784c916b920e9d6dc1c1e830d13195e69cd4bf",
+    "web/camp.css": "fc7a0234e59850032619e4ee23412eb94e2999d6c87f6c34f3127eae4c643f1a",
+    "web/campaign.css": "936d4c24a440cacc7865f87c46c0fed776d902957db023ab612d06a045259429"
+  },
+  "finishedAt": "2026-10-20T16:01:21.870Z"
+}

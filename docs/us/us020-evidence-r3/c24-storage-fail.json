@@ -1,0 +1,12 @@
+{
+  "before": {
+    "population": 5,
+    "gold": 15
+  },
+  "after": {
+    "population": 5,
+    "gold": 15
+  },
+  "storedPopulation": 5,
+  "passed": true
+}

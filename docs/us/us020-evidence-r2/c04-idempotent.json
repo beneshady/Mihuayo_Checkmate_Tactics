@@ -1,0 +1,14 @@
+{
+  "afterReload": {
+    "gold": 6,
+    "firstEntryRewarded": true
+  },
+  "newJourney": {
+    "gold": 8,
+    "completed": 0,
+    "population": 4,
+    "teamSp": 0,
+    "tutorial": "skipped"
+  },
+  "guideSeen": true
+}

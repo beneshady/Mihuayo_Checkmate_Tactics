@@ -1,0 +1,16 @@
+{
+  "party": [
+    "rook",
+    "starting-pawn",
+    "starting-archer",
+    "starting-spearman"
+  ],
+  "savedParty": [
+    "rook",
+    "starting-pawn",
+    "starting-archer",
+    "starting-spearman"
+  ],
+  "completed": 1,
+  "gold": 12
+}

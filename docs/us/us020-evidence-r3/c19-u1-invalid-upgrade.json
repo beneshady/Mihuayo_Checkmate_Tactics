@@ -1,0 +1,20 @@
+{
+  "before": {
+    "sp": 0,
+    "revision": 0,
+    "rawUnchanged": true
+  },
+  "openClose": "no-save",
+  "invalidUpgrade": {
+    "unit": "king",
+    "skill": "fortify",
+    "sp": 0,
+    "revision": 0,
+    "rawUnchanged": true
+  },
+  "reload": {
+    "sp": 0,
+    "revision": 0,
+    "reason": "确认布阵"
+  }
+}

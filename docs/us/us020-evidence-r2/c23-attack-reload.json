@@ -1,0 +1,19 @@
+{
+  "before": {
+    "revision": 0
+  },
+  "afterAttack": {
+    "revision": 1,
+    "kills": 1,
+    "targetGone": true
+  },
+  "stored": {
+    "revision": 1,
+    "killLedger": true
+  },
+  "reload": {
+    "view": "battle",
+    "revision": 1,
+    "killLedger": true
+  }
+}

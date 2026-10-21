@@ -1,0 +1,48 @@
+{
+  "level": 1,
+  "phase": "deploy",
+  "population": 4,
+  "units": [
+    {
+      "id": "king",
+      "kind": "king",
+      "x": 4,
+      "y": 0,
+      "hp": 3,
+      "maxHp": 3
+    },
+    {
+      "id": "rook",
+      "kind": "rook",
+      "x": 0,
+      "y": 0,
+      "hp": 3,
+      "maxHp": 3
+    },
+    {
+      "id": "starting-pawn",
+      "kind": "pawn",
+      "x": 1,
+      "y": 3,
+      "hp": 2,
+      "maxHp": 2
+    },
+    {
+      "id": "starting-pawn-2",
+      "kind": "pawn",
+      "x": 4,
+      "y": 3,
+      "hp": 2,
+      "maxHp": 2
+    },
+    {
+      "id": "starting-horse",
+      "kind": "horse",
+      "x": 7,
+      "y": 3,
+      "hp": 2,
+      "maxHp": 2
+    }
+  ],
+  "confirmedPhase": "player"
+}

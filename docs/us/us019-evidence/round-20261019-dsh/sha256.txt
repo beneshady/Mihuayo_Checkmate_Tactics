@@ -1,0 +1,43 @@
+# round: 2026-10-19 DSH browser acceptance
+# branch: codex/web-gameplay-validation
+# HEAD: 184a46a2b0e11ac6990ea5ef13725ee2efd4292f
+# uncommitted: yes (no commit/push/deploy)
+76bfe03af6c8c6f4e3ebee38bbdb4abfef45a6a9d7415d5edc280c632c550255  docs/us/US-019-commander-support-movement.md
+3f3c8bb84f99cef8caf16aa02409c506a4f610156839533fe6f7fb9ebe72a725  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-01-king-selected.png
+a57c4e9d6b371d3ade0ceeb8e2d5ece6dba153c9a7804f17b73fa393d91a5b67  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-back-center.png
+8466b420077e956dba06e0036a5ce3423a080f6eb99db3ab2af41e96c780c6bb  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-outside-palace.png
+00c4dcfda0c41f184a499acac6035f83b5e84270c55e511799e9ca815770587a  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-palace-center.png
+967b36f3d39d0a27b4df1b343f24f9b56a9f6ce1c0e427a6a05e7b36e56435fc  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-turn6-buff.png
+ece21a6cd0956a1708a50145c268d8f02faa9a893ecbff005c1aa8bb1c494e7e  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-defeat.png
+befa5633cf1b6ca7205a0c82670599f18d3226592103e2ae62c293de2396e36d  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-desktop-after-switch.png
+364b33e31ee75c19804db89032143d78ac39032aba97f4217821deb06bf15224  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-level2-desktop.png
+3a9c67a43b2c1ecbc4192c0a59db1ec55e135fb537be40b96b673c6e4a7ef9ef  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-mobile-landscape.png
+7be9f33e3b62499c90f764bce76b734804516646003ac80625c67ecea739c980  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-retry-deploy.png
+87ede5696ea49d55ec1771a3c5992b4b2654721decc55546fc7ec65b3a0ac80a  docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-05-ally-spend.png
+64871daf74d14405f72db5e4135b1f15ad6311fa92e82ec73d0c943fd2243be0  docs/us/us019-evidence/round-20261019-dsh/browser-a19/result.json
+dbba19464efa53c880bdf850cf45179a4daeb8e5326c1dbc2f20a8ff2c96ff38  docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-active-water-rejected.png
+c9d5cbfdc8ee4fb2ecba5ba9957df12ae12a9074b305b649d7dbd1631a9d4639  docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-bridge.png
+add2176eb9acbd87d9b83a563b70eaf5646ed1d5b073a3a8ad639d7073431f01  docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-forced-out-walk.png
+2db3668a8c4dc678f113b35867d5d3733a33604a859cdc6fe8d185c9e475afe6  docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-forced-out.png
+ddeff801e1f8110cb430a93810aa167543077e21246ab9559a9dff7db205bfb0  docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-forced-water.png
+71003c24ad98f38354d1e4389279a48372339fbea798c32f117126ce18b21a28  docs/us/us019-evidence/round-20261019-dsh/browser-special/result.json
+f569fb395480137ef75399a60d7408bd0508d83a299a96f4f21da1a242efcdaa  docs/us/us019-evidence/round-20261019-dsh/node/cannon-purchase.test.log
+249a41c933f6e18ca19bd63a87c259fbe713e0caedcd285588535d0c2f7bc62f  docs/us/us019-evidence/round-20261019-dsh/node/legacy-rules.test.log
+241b3993bf9ff454ddb475d09725b8d99ab2c82d013755346099549ddbd3e096  docs/us/us019-evidence/round-20261019-dsh/node/rules.test.log
+c31f2e6481c8caaf762171f5785c1dcaa8daffdab233c54ee4cc5dd5d2b2b7eb  docs/us/us019-evidence/round-20261019-dsh/node/shared-sp.test.log
+2dc263965052c699db5d8954a53acdd6c7ac30a0984891c685ae4db30d596802  docs/us/us019-evidence/round-20261019-dsh/node/static-check.log
+75229b01315b5f9b89f38db6959a8f5a5897c3bd4e1ac9f2dbf8a86cb4e0dafa  docs/us/us019-evidence/round-20261019-dsh/node/us018-advisor.test.log
+40909111ca631fc6f84e2d21be40cb76eb15cfeca7359bcc1caa614abb901f1b  docs/us/us019-evidence/round-20261019-dsh/node/us019-commander.test.log
+28bfd3f5e89b03e52926875fdf8626836095504d8144d69605c28da822080a48  docs/us/us019-evidence/round-20261019-dsh/results.json
+334db66bbfad9b3c2b74d2c38e7ddf99f4ced0404e1fb6a78e10fc3dcc90a066  tests/cannon-purchase.test.cjs
+055300901a872a19938e565bfc346a2b98e0e01333f19e5cc49ebacd1829f283  tests/legacy-rules.test.cjs
+d3931a438818de50061e4172e7a3ba2d2648460455f15b039eb57b854b67406b  tests/rules.test.cjs
+74dcc689ef94327717e8877f147b4d9d692ac5ce7e5e73680fec2fa39db2bffd  tests/shared-sp.test.cjs
+e2c5b1ead4844798d4dc5cf2a681532434539cfb3734ed9d0ce776f587c6eb3b  tests/static-check.cjs
+c3806c7bf18a0a9b29fab79f0dfedefe090792050eb3eb3bcba8ec68103195b6  tests/us018-advisor.test.cjs
+3ff44ee162c59d368eca2f0082a2f25b1a8a15f7f2f0f69d86efdffb6b4a0010  tests/us019-acceptance-browser.cjs
+8c0ce05694880722ef0a9d894f52a1321ae12f2c3809ce81c1096e0ae712c2cb  tests/us019-commander.test.cjs
+444e114604086f92e0c76fe246ebafc9fa7e973aee92d0205e7c8f1a278c00b5  tests/us019-special-browser.cjs
+5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602  web/index.html
+1ed21a249dbc37b407724f1c9a0a7dbeee8389da3d588974f09ae85f237cde14  web/js/app.js
+ca2136687ece0afcd44ca3d32fa16d68fc4c109624776e303e94949b8096990a  web/js/rules.js

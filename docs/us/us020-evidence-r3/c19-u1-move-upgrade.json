@@ -1,0 +1,26 @@
+{
+  "context": "C23-M2 同一正常入口，真实击杀自然 SP",
+  "spBefore": 1,
+  "spAfter": 0,
+  "move": {
+    "king": {
+      "x": 3,
+      "y": 0
+    }
+  },
+  "saved": {
+    "reason": "升级",
+    "kingX": 3,
+    "fortify": 1,
+    "sp": 0
+  },
+  "reload": {
+    "sp": 0,
+    "kingX": 3,
+    "fortify": 1
+  },
+  "undoAfterUpgrade": {
+    "disabled": true,
+    "history": 0
+  }
+}

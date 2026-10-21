@@ -1,0 +1,12 @@
+{
+  "source": "正常浏览器：教学→第1关胜利→主营地",
+  "goldBefore": 12,
+  "goldAfterMove": 7,
+  "goldAfterRescue": 2,
+  "buffs": {
+    "health": true,
+    "move": true,
+    "rescue": true
+  },
+  "rookMove": 1
+}

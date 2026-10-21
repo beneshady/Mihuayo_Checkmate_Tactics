@@ -1,0 +1,50 @@
+{
+  "party": [
+    {
+      "id": "rook",
+      "kind": "rook",
+      "hp": 3,
+      "maxHp": 3,
+      "level": 1,
+      "towerInterval": null
+    },
+    {
+      "id": "starting-pawn",
+      "kind": "pawn",
+      "hp": 2,
+      "maxHp": 2,
+      "level": 1,
+      "towerInterval": null
+    },
+    {
+      "id": "starting-archer",
+      "kind": "archer",
+      "hp": 2,
+      "maxHp": 2,
+      "level": 1,
+      "towerInterval": null
+    },
+    {
+      "id": "starting-spearman",
+      "kind": "spearman",
+      "hp": 3,
+      "maxHp": 3,
+      "level": 3,
+      "towerInterval": null
+    },
+    {
+      "id": "adv-c18",
+      "kind": "advisor",
+      "hp": 2,
+      "maxHp": 2,
+      "level": 1,
+      "towerInterval": 2
+    }
+  ],
+  "gold": 12,
+  "buffs": {
+    "health": true,
+    "move": false,
+    "rescue": false
+  }
+}

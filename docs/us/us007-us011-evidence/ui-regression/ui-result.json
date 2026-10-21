@@ -3,14 +3,14 @@
   "failed": 0,
   "browserErrors": [],
   "versions": {
-    "web/index.html": "b31c79273697fd121a9e9e2b2f5f6e1897ba5d45f9bead20ea7eb8d4ce42d9c3",
-    "web/js/rules.js": "00ff3df25b81b3f83ceacf8c43d62439cfda6a3ef55e223d5648d07921a138fd",
-    "web/js/app.js": "78b053a16cc54ff80a8dad26896fdc2be916072cb3bee2282d6363e313a745b0",
-    "web/js/ui.js": "adbfed2a194832594fedd6536215ca7dcdecfb8555833da038a9bfb2c80d9ac7",
-    "web/ui.css": "c952f38439f18b42af02ebe855c228013b042809e3d1d65ebb0d28f392d6bc7d",
-    "web/desktop.css": "dee16e6832704f6c9f5c0d5aabc7526324ce270c42ed5b9822190523e8ac2630",
-    "web/mobile.css": "b15c49148c02669238fa6aeb4b9443548ac07b8bfdd7a6a66c2dbed44953e0fc"
+    "web/index.html": "8a87862f09e576d3920c131e519a00373cc86816bb177bd4adda70a4082a1555",
+    "web/js/rules.js": "09428a0917c2f9908ebd168f29c7a77cb54325ff219e7e1e31ed7e72df2aa864",
+    "web/js/app.js": "c7342cd3b1b73c858b743aaf34c7a06b520d62e89d2f0d67b7c32e6c6bfd97f9",
+    "web/js/ui.js": "a7b33468f5c747e32a1df10bad2d682cb34e4a8f8716ecc988922da5be19fa15",
+    "web/ui.css": "716729508e3eb46f0a90e8b42a4d8874a23f6cb70b283bb97c6864cae4cd9bd8",
+    "web/desktop.css": "8986eadfc1dea0eafe47c628c59df8e33daf18f0429c39ca90502adac42be38b",
+    "web/mobile.css": "50562405350bfb494dcf81eebcba01f9f5cab3bed8d126ddc05c69805b9f8f55"
   },
-  "finishedAt": "2026-10-06T15:10:57.351Z",
-  "scope": "2 historical-map isolated UI chains + current normal mobile undo; other isolated UI probes; new normal terrain/editor flow in terrain-editor-browser.cjs"
+  "finishedAt": "2026-10-21T07:36:50.633Z",
+  "scope": "2 historical-map isolated chains (two waves + real kills only) + battle UI probes + US020 rescue list; camp purchase/roster/cross-level/retry now covered by us020-acceptance-browser.cjs normal entry"
 }

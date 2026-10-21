@@ -1,0 +1,29 @@
+{
+  "fixture": "预置 pull 车与 (3,1) 敌兵，仅验证攻击分类持久化",
+  "before": {
+    "revision": 0
+  },
+  "after": {
+    "revision": 1,
+    "target": {
+      "x": 1,
+      "y": 0
+    },
+    "rook": {
+      "x": 0,
+      "y": 0
+    },
+    "reason": "攻击结算"
+  },
+  "reload": {
+    "revision": 1,
+    "target": {
+      "x": 1,
+      "y": 0
+    },
+    "rook": {
+      "x": 0,
+      "y": 0
+    }
+  }
+}

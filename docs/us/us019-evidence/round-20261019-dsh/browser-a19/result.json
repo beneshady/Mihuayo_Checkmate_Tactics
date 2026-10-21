@@ -1,0 +1,324 @@
+{
+  "scope": "US-019 A19-01/02/04/05 浏览器验收；正常入口走位与专项夹具分开标注",
+  "viewports": {
+    "desktop": "1280x900",
+    "mobileLandscape": "844x390"
+  },
+  "cases": [
+    {
+      "id": "A19-01",
+      "type": "正常流程",
+      "title": "K01-K03/K08 正常入口：帅无攻击/吃子/升级，非法点击不耗 AP/SP，buff 生效且排除帅，队友仍有升级入口",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "新旅程选“疾行”buff：帅 3HP、队友移动 +1、帅无升级入口",
+          "kingHp": 3,
+          "rookHp": 2,
+          "rookMove": 1
+        },
+        {
+          "text": "帅点击敌兵：无攻击/吃子、AP 与 SP 不变",
+          "revision": 0,
+          "ap": 1,
+          "sp": 0
+        },
+        {
+          "text": "队友仍有强健等升级项（SP 0 时禁用）",
+          "skillButtons": 6
+        }
+      ],
+      "evidence": [
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-01-king-selected.png"
+      ]
+    },
+    {
+      "id": "A19-02",
+      "type": "正常流程+专项",
+      "title": "K04/K05 正常走位：宫内米字斜走、横竖出宫/回宫、斜向跨宫禁止、宫外直向、高亮提示一致",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "T1 非法斜走不耗 AP；横竖到中心",
+          "pos": [
+            4,
+            1
+          ]
+        },
+        {
+          "text": "T2 中心(4,1)→角(3,2) 米字斜走合法",
+          "pos": [
+            3,
+            2
+          ]
+        },
+        {
+          "text": "T3 斜向出宫被拒；横竖一步出宫并显示宫外提示",
+          "pos": [
+            3,
+            3
+          ],
+          "card": "帅 @ (3,3) 棋子等级 Lv.1 · 击杀 0 · HP 3/3 · 纯辅助（无攻击） AP 0/1 九宫外：仅上下左右一步 · 横竖一步可出入九宫 不能攻击或吃子、不能主动进入水格、不能购买个人升级"
+        },
+        {
+          "text": "T4 宫外斜走被拒；横竖一步回宫",
+          "pos": [
+            3,
+            2
+          ]
+        },
+        {
+          "text": "T5 回宫后角(3,2)→中心(4,1)斜走合法且仅一次行动",
+          "pos": [
+            4,
+            1
+          ],
+          "ap": 0
+        },
+        {
+          "text": "T6 跨波 buff 保留（供 A19-04）",
+          "turn": 6,
+          "wave": 2,
+          "buff": "move"
+        }
+      ],
+      "evidence": [
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-palace-center.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-outside-palace.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-back-center.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-02-turn6-buff.png"
+      ]
+    },
+    {
+      "id": "A19-04",
+      "type": "正常流程+专项",
+      "title": "K02/K08/K11 失败重试恢复；下一关换 buff 不叠加；网页/手机横版切换与帅无攻击/升级回归",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "T4 前压尝试（正常占格可能阻挡）",
+          "king": [
+            4,
+            2
+          ],
+          "ap": 1,
+          "turn": 4
+        },
+        {
+          "text": "T5 桥面前压尝试",
+          "king": [
+            4,
+            2
+          ],
+          "turn": 5,
+          "hp": 2
+        },
+        {
+          "text": "正常操作下主帅阵亡进入失败结算（未注入血量/资源）",
+          "turn": 6,
+          "wave": 2,
+          "hp": 0
+        },
+        {
+          "text": "重试恢复本关入口快照、清除本关 buff、帅仍无攻击",
+          "phase": "deploy",
+          "king": [
+            4,
+            0
+          ],
+          "buff": null
+        },
+        {
+          "text": "下一关换 buff：坚守不叠加、疾行生效；帅攻击/升级仍禁用（关间状态为专项夹具）",
+          "level": 2,
+          "buff": "move",
+          "rookHp": 2
+        },
+        {
+          "text": "844x390 手机横版：帅纯辅助可读",
+          "card": "帅 (5,1) · Lv.1 · 纯辅助 九宫内：横竖一步 / 中心↔四角斜走 · 不能攻击或升级",
+          "viewport": "844x390"
+        },
+        {
+          "text": "显示模式菜单切换手机/网页，战局不变",
+          "stateRevision": 0
+        }
+      ],
+      "evidence": [
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-defeat.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-retry-deploy.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-level2-desktop.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-mobile-landscape.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-04-desktop-after-switch.png"
+      ]
+    },
+    {
+      "id": "A19-05",
+      "type": "专项",
+      "title": "K09/共享 SP：队友可用公共 SP 升级，帅即使有 SP 也不能消费；敌将/敌士规则由定向回归覆盖",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "专项注入 1 SP：队友可消费并强健（夹具，不是正常收益）",
+          "spBefore": 1,
+          "spAfter": 0,
+          "maxHpBefore": 2,
+          "maxHpAfter": 3
+        },
+        {
+          "text": "帅即使有公共 SP 也无升级入口、不扣 SP",
+          "teamSp": 5
+        }
+      ],
+      "evidence": [
+        "docs/us/us019-evidence/round-20261019-dsh/browser-a19/a19-05-ally-spend.png"
+      ]
+    }
+  ],
+  "errors": [],
+  "steps": [
+    {
+      "case": "A19-01",
+      "text": "新旅程选“疾行”buff：帅 3HP、队友移动 +1、帅无升级入口",
+      "kingHp": 3,
+      "rookHp": 2,
+      "rookMove": 1
+    },
+    {
+      "case": "A19-01",
+      "text": "帅点击敌兵：无攻击/吃子、AP 与 SP 不变",
+      "revision": 0,
+      "ap": 1,
+      "sp": 0
+    },
+    {
+      "case": "A19-01",
+      "text": "队友仍有强健等升级项（SP 0 时禁用）",
+      "skillButtons": 6
+    },
+    {
+      "case": "A19-02",
+      "text": "T1 非法斜走不耗 AP；横竖到中心",
+      "pos": [
+        4,
+        1
+      ]
+    },
+    {
+      "case": "A19-02",
+      "text": "T2 中心(4,1)→角(3,2) 米字斜走合法",
+      "pos": [
+        3,
+        2
+      ]
+    },
+    {
+      "case": "A19-02",
+      "text": "T3 斜向出宫被拒；横竖一步出宫并显示宫外提示",
+      "pos": [
+        3,
+        3
+      ],
+      "card": "帅 @ (3,3) 棋子等级 Lv.1 · 击杀 0 · HP 3/3 · 纯辅助（无攻击） AP 0/1 九宫外：仅上下左右一步 · 横竖一步可出入九宫 不能攻击或吃子、不能主动进入水格、不能购买个人升级"
+    },
+    {
+      "case": "A19-02",
+      "text": "T4 宫外斜走被拒；横竖一步回宫",
+      "pos": [
+        3,
+        2
+      ]
+    },
+    {
+      "case": "A19-02",
+      "text": "T5 回宫后角(3,2)→中心(4,1)斜走合法且仅一次行动",
+      "pos": [
+        4,
+        1
+      ],
+      "ap": 0
+    },
+    {
+      "case": "A19-02",
+      "text": "T6 跨波 buff 保留（供 A19-04）",
+      "turn": 6,
+      "wave": 2,
+      "buff": "move"
+    },
+    {
+      "case": "A19-04",
+      "text": "T4 前压尝试（正常占格可能阻挡）",
+      "king": [
+        4,
+        2
+      ],
+      "ap": 1,
+      "turn": 4
+    },
+    {
+      "case": "A19-04",
+      "text": "T5 桥面前压尝试",
+      "king": [
+        4,
+        2
+      ],
+      "turn": 5,
+      "hp": 2
+    },
+    {
+      "case": "A19-04",
+      "text": "正常操作下主帅阵亡进入失败结算（未注入血量/资源）",
+      "turn": 6,
+      "wave": 2,
+      "hp": 0
+    },
+    {
+      "case": "A19-04",
+      "text": "重试恢复本关入口快照、清除本关 buff、帅仍无攻击",
+      "phase": "deploy",
+      "king": [
+        4,
+        0
+      ],
+      "buff": null
+    },
+    {
+      "case": "A19-04",
+      "text": "下一关换 buff：坚守不叠加、疾行生效；帅攻击/升级仍禁用（关间状态为专项夹具）",
+      "level": 2,
+      "buff": "move",
+      "rookHp": 2
+    },
+    {
+      "case": "A19-04",
+      "text": "844x390 手机横版：帅纯辅助可读",
+      "card": "帅 (5,1) · Lv.1 · 纯辅助 九宫内：横竖一步 / 中心↔四角斜走 · 不能攻击或升级",
+      "viewport": "844x390"
+    },
+    {
+      "case": "A19-04",
+      "text": "显示模式菜单切换手机/网页，战局不变",
+      "stateRevision": 0
+    },
+    {
+      "case": "A19-05",
+      "text": "专项注入 1 SP：队友可消费并强健（夹具，不是正常收益）",
+      "spBefore": 1,
+      "spAfter": 0,
+      "maxHpBefore": 2,
+      "maxHpAfter": 3
+    },
+    {
+      "case": "A19-05",
+      "text": "帅即使有公共 SP 也无升级入口、不扣 SP",
+      "teamSp": 5
+    }
+  ],
+  "finishedAt": "2026-10-18T18:33:56.263Z",
+  "files": {
+    "web/index.html": "5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602",
+    "web/js/app.js": "1ed21a249dbc37b407724f1c9a0a7dbeee8389da3d588974f09ae85f237cde14",
+    "web/js/rules.js": "ca2136687ece0afcd44ca3d32fa16d68fc4c109624776e303e94949b8096990a"
+  },
+  "result": "PASS"
+}

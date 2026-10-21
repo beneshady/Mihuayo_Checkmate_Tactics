@@ -1,0 +1,55 @@
+{
+  "scope": "US-020 初始阵容调整 A01～A03 浏览器补验（不重跑 C01～C28 全套）",
+  "branch": "codex/web-gameplay-validation",
+  "head": "e9b2120f1877bdf4e05fb891fca5703ca4979793",
+  "base": "http://127.0.0.1:8777",
+  "viewport": "1280x720",
+  "results": [
+    {
+      "id": "A01",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "独立上下文实际完成 7 步教学→主营地：名单车 rook / 兵 starting-pawn / 兵 starting-pawn-2 / 马 starting-horse，无弓枪炮仕，人口 4、ID 互异，猫粮 9（教学 1+首营 8），SP 0，坚守后满血（车 3/3、兵 2/2、兵 2/2、马 2/2）；第一关布阵 5 枚我方站位合法无重叠并经确认进入我方行动。",
+      "evidence": "a01-camp-roster.png,a01-deploy.png,a01-camp.json,a01-deploy.json"
+    },
+    {
+      "id": "A02",
+      "type": "专项（预置曾完成教学）",
+      "result": "通过",
+      "detail": "曾完成教学的独立上下文：跳过按钮可用，跳过直接入营，名单与 A01 一致（车/兵/兵/马）、猫粮 8（无教学收益）、SP 0、人口 4、坚守后满血；随后开新旅程仍可跳过，队伍回到同一基础阵容且猫粮重置为 8、进度 0。",
+      "evidence": "a02-skip-camp.png,a02-new-journey.png,a02-skip.json,a02-new-journey.json"
+    },
+    {
+      "id": "A02-旧局边界",
+      "type": "专项（规则/存档边界）",
+      "result": "通过",
+      "detail": "预置含旧自带弓/枪的旅程存档载入后，营地队伍仍为车/兵/弓/枪，未被迁移或替换成新基础阵容；读取到的存档 party 仍保持旧 ID 与旧资源（不改写旧局、不迁移）。",
+      "evidence": "a02-legacy-save.json"
+    },
+    {
+      "id": "A03",
+      "type": "专项（预置 SP 4）",
+      "result": "通过",
+      "detail": "专项注入公共 SP 4：营地先后为 starting-pawn 转弓兵（SP 4→2，攻击 2，HP 2/2）、starting-pawn-2 转枪兵（SP 2→0，HP 3/3），两兵职业各自独立；已转职兵不再出现转职按钮。初始移除自带弓/枪不影响转职获取，费用 2 SP 沿用。",
+      "evidence": "a03-promote.png,a03-promote.json"
+    }
+  ],
+  "shots": [
+    "a01-camp-roster.png",
+    "a01-deploy.png",
+    "a02-skip-camp.png",
+    "a02-new-journey.png",
+    "a03-promote.png"
+  ],
+  "pageErrors": [],
+  "hashes": {
+    "web/index.html": "8a87862f09e576d3920c131e519a00373cc86816bb177bd4adda70a4082a1555",
+    "web/js/rules.js": "09428a0917c2f9908ebd168f29c7a77cb54325ff219e7e1e31ed7e72df2aa864",
+    "web/js/app.js": "c7342cd3b1b73c858b743aaf34c7a06b520d62e89d2f0d67b7c32e6c6bfd97f9",
+    "web/js/campaign.js": "8fce32ce09c2348974f582b732d4b828addaf6386bb1e44f448541aa5b7fcfa4",
+    "web/js/journey.js": "3f5fa260fef670f0a64e00d665bff7b62323acc4f5f4e2338eba69f3aa9925b4",
+    "tests/us020-camp.test.cjs": "5d354e6e9aaa91e0917f3935ed13e914a41697221ecbe3f38bfb89175e956d1b",
+    "tests/us020-lineup-browser.cjs": "8d5dc1c03cd0af37b111daf0fcc36d9012ed2642202ae3485aa2293c2ecb9461"
+  },
+  "finishedAt": "2026-10-21T07:38:33.663Z"
+}

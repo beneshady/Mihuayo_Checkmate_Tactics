@@ -1,0 +1,95 @@
+{
+  "round": "2026-10-18 DSH 自验收（浏览器阻塞轮）",
+  "contract": "docs/us/US-018-advisor-defense-tower.md §16（A18-01…A18-07）",
+  "branch": "codex/web-gameplay-validation",
+  "head": "8d2a9d273084794a3d36808fcf411d1c0ab5a57f",
+  "workspaceState": "未提交、未切分支、未推送、未部署；保留全部既有未提交改动",
+  "environment": "Windows 受限令牌命令沙箱；Playwright 1.62.1 与 Chromium/Chrome 存在但无法建立子进程 IPC（详见 browser-blocker.json）",
+  "evidenceRoot": "docs/us/us018-evidence/round-20261018-dsh",
+  "items": [
+    {
+      "id": "A18-01",
+      "type": "正常流程",
+      "status": "未验（浏览器阻塞）",
+      "precondition": "独立页面正常新旅程；不注入资源/存档",
+      "steps": "设计步骤：菜单→新旅程→进入→布阵确认→选 buff→正常打完两波→商店用自然金币买一座仕→下一关布阵（默认左/换右）→结束回合触发自动开火→用实际公共 SP 升 3→2。",
+      "actual": "浏览器无法启动渲染器，未执行任何页面步骤。补充规则层模拟（非浏览器、未注入资源）：第 1 关 3 杀/金币 3/公共 SP 3；第 2 关再 3 杀累计金币 6/SP 6；购买一座仕后金币 1；第 3 关默认左侧 (3,1)，可换右侧 (5,1) 并换回；结束回合后第 3 回合末自然开火（lastFireTurn=3）；公共 SP 6→3、间隔 3→2，血量上限仍 2。",
+      "evidence": [
+        "rules-normal-flow-sim.json",
+        "browser-blocker.json",
+        "browser-probe/",
+        "（修正后未执行的脚本）tests/us018-advisor-browser.cjs"
+      ],
+      "notes": "按用户指示修正旧 S15 前提：自然金币买一座即可，真实 SP 升级；未注入金币/SP，未改价格奖励。浏览器证据仍缺失，不能宣称 A18-01 通过。"
+    },
+    {
+      "id": "A18-02",
+      "type": "专项",
+      "status": "规则专项通过；浏览器专项未验",
+      "steps": "规则定向：足够/不足金币、两座上限、第三座拒绝且不扣钱、8 名队友名额、左右侧位交换、初始化侧位冲突（保留队友位置、仕待布置、腾格后布置）、开战后不可移动。",
+      "actual": "us018-advisor.test 16 项全绿（含 S01/S02/R2）。浏览器冲突提示、手动腾格确认截图未取得。",
+      "evidence": ["node/us018-advisor.test.log", "browser-blocker.json"],
+      "notes": "合同要求的“实际浏览器专项截图”缺失，ID 不标记为完整通过。"
+    },
+    {
+      "id": "A18-03",
+      "type": "专项",
+      "status": "规则专项通过；浏览器未验",
+      "steps": "规则定向：八邻格含斜向、第二格不可、单目标、伤害 1/2HP；距帅→HP→行列排序；无目标就绪；3 档 1/4/7、2 档 1/3/5、1 档每回合；冷却途中升级保留等待。",
+      "actual": "us018-advisor.test S03–S06、S10 全绿（16 项的一部分）。目标线/待敌/冷却显示截图未取得。",
+      "evidence": ["node/us018-advisor.test.log", "static-ui-inspection.log", "browser-blocker.json"],
+      "notes": "静态字符串仅证明代码存在，不替代浏览器显示证据。"
+    },
+    {
+      "id": "A18-04",
+      "type": "专项",
+      "status": "规则专项通过；浏览器未验",
+      "steps": "规则定向：两座同一局面锁定、1HP 溢出不转火且奖励一次、树林 0/1/2 次独立命中、预览纯净、3/5 SP 分别升级、余额不足/满级/重复提交不扣款、禁强健。",
+      "actual": "us018-advisor.test S07–S09、S14 全绿。集火概率提示与满级界面截图未取得。",
+      "evidence": ["node/us018-advisor.test.log", "browser-blocker.json"],
+      "notes": "浏览器专项截图缺失。"
+    },
+    {
+      "id": "A18-05",
+      "type": "专项",
+      "status": "通过（定向规则与快照字段）",
+      "steps": "规则定向：活仕不可位移但受伤、被推撞双方各 1 且不传递、死亡留残骸占格/可当炮架/可推动/入水销毁、关内不能治疗复活、第二波不重置冷却、新关满血就绪保留档位、毁骸仍恢复、失败按入关快照。",
+      "actual": "us018-advisor.test S11–S13 全绿；合同对 A18-05 的证据要求为定向规则断言与快照字段对照，未强制正常流程制造边界。",
+      "evidence": ["node/us018-advisor.test.log"],
+      "notes": "US014 完整直视不在本次必需验收；残骸遮挡直视仍为待接入依赖。"
+    },
+    {
+      "id": "A18-06",
+      "type": "专项",
+      "status": "规则回归通过；浏览器专项未验",
+      "steps": "规则：仅仕残骸时第 6 回合直接进入第二波不卡死；有普通队友残骸时只显示/接受合法对象；commanderTarget 排除仕/装置；UI 静态确认死亡名单用同一判定。设计浏览器步骤：实际结束回合进入第 6 回合观察救援列表。",
+      "actual": "us018-advisor.test R1 全绿。两个专项页面步骤、截图与状态记录未取得。",
+      "evidence": ["node/us018-advisor.test.log", "browser-blocker.json"],
+      "notes": "浏览器专项缺失。"
+    },
+    {
+      "id": "A18-07",
+      "type": "专项（UI/双端）",
+      "status": "未验（浏览器阻塞）",
+      "steps": "设计步骤：已买仕的正常/专项局在网页横版与手机横版各检查侧位按钮、选中卡、目标线、冷却、成长；移动帅后观察目标更新；记录实际视口与显示模式。",
+      "actual": "浏览器未执行。仅静态定位 app.js 中仕卡、侧位面板、技能项、棋盘标签等字符串（static-ui-inspection.log），不构成浏览器证据。",
+      "evidence": ["static-ui-inspection.log", "browser-blocker.json"],
+      "notes": "合同明确不能仅以 390 竖屏替代横版检查；本轮无任何视口截图。"
+    }
+  ],
+  "commands": [
+    {"command": "node tests/us018-advisor.test.cjs", "result": "PASS 16 / FAIL 0"},
+    {"command": "node tests/us019-commander.test.cjs", "result": "PASS 12 / FAIL 0"},
+    {"command": "node tests/shared-sp.test.cjs", "result": "PASS 11 / FAIL 0"},
+    {"command": "node tests/legacy-rules.test.cjs", "result": "PASS 26 / FAIL 0"},
+    {"command": "node tests/rules.test.cjs", "result": "PASS 9 / FAIL 0"},
+    {"command": "node tests/cannon-purchase.test.cjs", "result": "PASS 4 / FAIL 0"},
+    {"command": "node tests/static-check.cjs", "result": "PASS（DOM ids 55 / rules APIs 36 / static check: OK）"},
+    {"command": "node --check tests/us018-advisor-browser.cjs", "result": "PASS"},
+    {"command": "node tmp/us018-normal-flow-sim.cjs", "result": "规则层补充模拟完成；不是浏览器证据"}
+  ],
+  "notRun": [
+    "任何浏览器脚本（us018-advisor-browser / shared-sp-browser / us019-king-browser / v1-flow-browser / ui-headless / display-* / terrain-editor-browser）",
+    "terrain.test / v23-contract.test / ui-static.test（与本需求无关的既有基线红项，未扩修）"
+  ]
+}

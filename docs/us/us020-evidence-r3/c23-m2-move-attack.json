@@ -1,0 +1,50 @@
+{
+  "savePoint": {
+    "revision": 0,
+    "reason": "确认布阵"
+  },
+  "moveBeforeAttack": {
+    "rook": {
+      "x": 1,
+      "y": 0
+    },
+    "savedRawUnchanged": true
+  },
+  "attack": {
+    "revision": 2,
+    "kill": "w1-0",
+    "savedReason": "攻击结算",
+    "savedRook": {
+      "x": 1,
+      "y": 0
+    }
+  },
+  "afterReload": {
+    "revision": 2,
+    "kill": true,
+    "rook": {
+      "x": 1,
+      "y": 0
+    },
+    "undoDisabled": true
+  },
+  "secondMove": {
+    "king": {
+      "x": 3,
+      "y": 0
+    },
+    "savedRawUnchanged": true
+  },
+  "afterSecondReload": {
+    "revision": 2,
+    "king": {
+      "x": 4,
+      "y": 0
+    },
+    "rook": {
+      "x": 1,
+      "y": 0
+    },
+    "campVisible": false
+  }
+}

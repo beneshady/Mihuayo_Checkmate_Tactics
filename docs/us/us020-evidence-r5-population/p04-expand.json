@@ -1,0 +1,19 @@
+{
+  "gold": 0,
+  "population": 6,
+  "party": [
+    "rook",
+    "starting-pawn",
+    "starting-pawn-2",
+    "starting-horse"
+  ],
+  "activeIds": [
+    "rook",
+    "starting-pawn",
+    "starting-pawn-2",
+    "starting-horse"
+  ],
+  "bench": [],
+  "summary": "猫粮0 公共 SP0（全队共用，与猫粮分开） 队友总数：4（其中后备 0）· 持有普通队友数量不限 部署人口：4／6（上阵普通队友／部署上限，后备不占部署人口） 主帅：1 · 自动上场（不计入队友总数与部署人口） 仕：0/2 座 · 固定上阵、无后备（不计入队友总数与部署人口） 旅程进度已通关 0/3 · 下一个挑战：第 1 关 旅程增益坚守 ✓ 疾行 × 救援 × 教学结果未处理",
+  "expandText": "部署上限 +1 · 5猫粮"
+}

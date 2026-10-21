@@ -1,62 +1,11 @@
 {
-  "normal": [
-    {
-      "viewport": {
-        "width": 1280,
-        "height": 900
-      },
-      "killActor": "starting-pawn",
-      "recipient": "rook",
-      "recipientKills": 0,
-      "earned": 1,
-      "spent": 1,
-      "after": 0,
-      "upgrade": "fortify",
-      "upgradeUndoBoundary": "PASS",
-      "modeSwitch": "PASS"
-    },
-    {
-      "scope": "实际首关两波→商店→下关→真实失败重试",
-      "kills": 4,
-      "earned": 4,
-      "spent": 2,
-      "pool": 2,
-      "gold": 4
-    },
-    {
-      "scope": "同页新旅程确认重置公共池与升级",
-      "teamSp": 0
-    },
-    {
-      "viewport": {
-        "width": 390,
-        "height": 844
-      },
-      "killActor": "starting-pawn",
-      "recipient": "rook",
-      "recipientKills": 0,
-      "earned": 1,
-      "spent": 1,
-      "after": 0,
-      "upgrade": "fortify",
-      "upgradeUndoBoundary": "PASS",
-      "modeSwitch": "PASS"
-    },
-    {
-      "scope": "file://独立加载/公共SP显示冒烟",
-      "url": "file:///D:/Projects/mihuayou/gamehack2026/web/index.html",
-      "teamSp": 0
-    }
-  ],
-  "isolated": [
-    {
-      "scope": "debug旧状态真实入口专项，非正常资源流程",
-      "authoritative": "units rook2 overrides party99",
-      "teamSp": 2,
-      "repeat": "unchanged"
-    }
-  ],
+  "normal": [],
+  "isolated": [],
   "errors": [],
-  "result": "PASS",
-  "finishedAt": "2026-10-15T15:03:44.983Z"
+  "result": "FAIL",
+  "failure": {
+    "message": "browserType.launch: spawn EPERM\nCall log:\n\u001b[2m  - <launching> C:\\Users\\HW\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1234\\chrome-headless-shell-win64\\chrome-headless-shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\HW\\AppData\\Local\\Temp\\dsh-4GHBNM\\playwright_chromiumdev_profile-gF3riU --remote-debugging-pipe --no-startup-window\u001b[22m\n",
+    "stack": "browserType.launch: spawn EPERM\nCall log:\n\u001b[2m  - <launching> C:\\Users\\HW\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1234\\chrome-headless-shell-win64\\chrome-headless-shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\\Users\\HW\\AppData\\Local\\Temp\\dsh-4GHBNM\\playwright_chromiumdev_profile-gF3riU --remote-debugging-pipe --no-startup-window\u001b[22m\n\n    at D:\\Projects\\mihuayou\\gamehack2026\\tests\\shared-sp-browser.cjs:19:38\n    at Object.<anonymous> (D:\\Projects\\mihuayou\\gamehack2026\\tests\\shared-sp-browser.cjs:22:884)"
+  },
+  "finishedAt": "2026-10-18T02:47:47.238Z"
 }

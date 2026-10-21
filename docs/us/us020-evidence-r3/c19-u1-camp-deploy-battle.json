@@ -1,0 +1,31 @@
+{
+  "camp": {
+    "spBefore": 6,
+    "afterBench": 5,
+    "afterActive": 4,
+    "benchReload": 5,
+    "activeReload": 4
+  },
+  "deploy": {
+    "sp": 3,
+    "reason": "升级",
+    "reload": {
+      "phase": "deploy",
+      "sp": 3,
+      "fortify": 2
+    }
+  },
+  "battle": {
+    "sp": 2,
+    "reason": "升级",
+    "reload": {
+      "sp": 2,
+      "fortify": 3
+    },
+    "undoAfterUpgrade": {
+      "disabled": true,
+      "history": 0
+    }
+  },
+  "entrySnapshotUnchanged": true
+}

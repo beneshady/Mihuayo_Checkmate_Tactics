@@ -1,0 +1,17 @@
+{
+  "phase": "deploy",
+  "population": 6,
+  "activeIds": [
+    "rook",
+    "starting-pawn",
+    "starting-pawn-2",
+    "recruit-pawn-0",
+    "recruit-pawn-1",
+    "recruit-pawn-2"
+  ],
+  "bench": [
+    "starting-horse",
+    "recruit-pawn-3"
+  ],
+  "deployText": "部署人口：6／6（上阵普通队友／部署上限，至少 1 名；主帅 1 与仕 0 座单独计数，不计入部署人口）"
+}

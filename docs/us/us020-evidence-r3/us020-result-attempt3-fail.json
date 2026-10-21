@@ -1,0 +1,244 @@
+{
+  "scope": "US-020 主营地/旅程成长/关节预览：正常入口 + 专项 + 规则",
+  "results": [
+    {
+      "id": "C01",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "首次跳过禁用且提示「首次游玩必须完成教学，完成前不能跳过进入主营地。」；7 步教学目标实际完成后先入主营地（view=camp），未直接进入正式战斗。",
+      "evidence": "c01-tutorial-entry.png,c01-tutorial-steps.png,c01-tutorial-done.png"
+    },
+    {
+      "id": "C03-完成路径",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "教学实得猫粮 G=1；入营后猫粮 9=G+8（8 为首次入营奖励），坚守自动生效、队伍满血、人口 4、公共 SP 0。",
+      "evidence": "c01-tutorial-done.png"
+    },
+    {
+      "id": "C07-满级",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 20：连续四次扩编得到人口 5/6/7/8 与余额 15/10/5/0，满级后按钮禁用，无赠送人口。",
+      "evidence": "c07-population.png"
+    },
+    {
+      "id": "C07-余额边界",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 4 扩编禁用；余额 5 恰好成功并把余额扣到 0。",
+      "evidence": "c07-balance.png"
+    },
+    {
+      "id": "C09",
+      "type": "正常浏览器+专项",
+      "result": "通过",
+      "detail": "招募价目与实施前商店一致（兵3/车5/马5/炮8/仕5）；正常点击招募兵扣 3 猫粮并进入队伍；无出售/遣散入口；顶部与提示统一显示猫粮。",
+      "evidence": "c09-recruit.png"
+    },
+    {
+      "id": "C26",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "首次入营自动显示指引（扩编/招募/SP/增益顺序与费用），跳过可关闭且玩家级标志置 true；「帮助」可重看且不扣资源（余额 6 不变）。",
+      "evidence": "c26-guide.png,c26-guide-skip.png"
+    },
+    {
+      "id": "C11",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 10：疾行 10→5、救援 5→0；救援在移动未解锁时禁用并提示「先解锁移动增益」；解锁后三增益同时生效且不可重购。",
+      "evidence": "c11-buffs.png"
+    },
+    {
+      "id": "C12",
+      "type": "专项",
+      "result": "通过",
+      "detail": "入关后普通队友继承 +1 HP 与 +1 移动（车 4→5 格、弓攻距不变）；主帅不继承；刷新后仍在本关布阵且加成只一次。 训练营名单：上阵 · 车 · rook · Lv.1 · 击杀 0 上阵 · 兵 · starting-pawn · Lv.1 · …",
+      "evidence": "c11-buffs.png,c12-buff-reload-battle.png"
+    },
+    {
+      "id": "C13",
+      "type": "专项",
+      "result": "通过",
+      "detail": "同一扩编按钮连续触发两次只扣一次（人口 4→5、余额 20→15）；随后合法扩编与招募仍可连续执行（人口 6、余额 7）。",
+      "evidence": "c13-repeat-purchase.png"
+    },
+    {
+      "id": "C10",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项余额 2：炮按钮禁用且只显示价格、不出现差额；疾行因未获坚守禁用；强行触发点击不扣款。",
+      "evidence": "c10-disabled.png"
+    },
+    {
+      "id": "C02-失败重试",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：教学主帅阵亡后显示失败提示且仍停留在教学（view=battle，未入营），重试回到第 1 步。",
+      "evidence": "c02-tutorial-fail.png"
+    },
+    {
+      "id": "C02-老玩家跳过",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：曾完成教学的玩家新旅程可跳过（二次确认，取消不改变状态），入营猫粮 8（无教学收益），view=camp。",
+      "evidence": "c02-skip.png"
+    },
+    {
+      "id": "C03-跳过路径",
+      "type": "专项",
+      "result": "通过",
+      "detail": "跳过路径：猫粮 8（无教学收益）、人口 4、SP 0、车兵弓枪无炮仕、坚守自动生效且满血。与完成路径的差别仅教学猫粮 G=1。",
+      "evidence": "c02-skip.png"
+    },
+    {
+      "id": "C04",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "刷新后猫粮 6 不回退不重发（首次奖励标志保持）；开始新旅程后只重发一次 8 猫粮，教学完成资格与指引已看标志保留，指引不再自动弹出。",
+      "evidence": "c04-camp-reload.png,c04-idempotent.json"
+    },
+    {
+      "id": "C25",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "新旅程后进度/资源/人口重置（completed 0、猫粮 8、人口 4、SP 0），首次营地 8 猫粮与坚守恢复，教学跳过资格与指引标志保留。",
+      "evidence": "c25-new-journey.png,c04-idempotent.json"
+    },
+    {
+      "id": "C05",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "入关前可在地图↔主营地往返且猫粮/增益不退（余额 8）；确认进入关卡后只有布阵界面；布阵中刷新/继续仍恢复本关布阵，快照不变，菜单不能回营或重选关。",
+      "evidence": "c05-deploy.png"
+    },
+    {
+      "id": "C08",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项人口 5：连续招募不受阻断（后备不限），上阵普通队友始终 ≤5；仕固定上阵不占人口（场上额外 1 座）；换下 1 人后场上 4 名普通队友仍可确认布阵。0 名与超人口的拒绝由规则用例覆盖。",
+      "evidence": "c08-roster.png"
+    },
+    {
+      "id": "C14",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项已解锁救援：第 5→6 回合进入救援，仅列合法目标；救援 rook 回复到 3/3（含坚守上限），随后进入第二波且本关不再触发。",
+      "evidence": "c14-rescue.png"
+    },
+    {
+      "id": "C16",
+      "type": "专项",
+      "result": "通过",
+      "detail": "救援名单 rook,starting-archer,starting-pawn,starting-spearman 与规则合法目标 rook,starting-pawn,starting-archer,starting-spearman 完全一致；主帅、仕/仕残骸、满血单位与已销毁尸体不在名单。规则用例另有 0 目标自动进入第二波的断言。",
+      "evidence": "c14-rescue.png"
+    },
+    {
+      "id": "C15",
+      "type": "专项",
+      "result": "通过",
+      "detail": "专项：阵亡普通队友在尸体位置以 1 HP 复活并移除尸体，未出现叠子；已销毁尸体不在救援名单。",
+      "evidence": "c15-revive.png"
+    },
+    {
+      "id": "C17-待选择刷新",
+      "type": "专项",
+      "result": "通过",
+      "detail": "救援待选择时刷新：恢复 view=battle/phase=rescue，rescueUsed 仍为 false，救援弹层与合法名单恢复，不能回营。",
+      "evidence": "c17-rescue-before-skip.png,c17-rescue-pending-reload.png"
+    },
+    {
+      "id": "C17-跳过刷新",
+      "type": "专项",
+      "result": "通过",
+      "detail": "救援跳过：wave=2，rescueUsed=false→true；刷新后 view=battle、wave=2、rescueUsed=true，救援弹层不重发，不能回营/重选关。",
+      "evidence": "c17-rescue-before-skip.png,c17-rescue-skip-reload.png,c17-rescue-log.json"
+    },
+    {
+      "id": "C17-失败重试",
+      "type": "专项",
+      "result": "通过",
+      "detail": "重试恢复入关快照：布阵、wave=1、rescueUsed=false；重新推进到第 6 回合再次出现救援，跳过后本关只消耗一次。",
+      "evidence": "c17-rescue-retry.png,c17-rescue-log.json"
+    },
+    {
+      "id": "C17-使用刷新",
+      "type": "专项",
+      "result": "通过",
+      "detail": "救援使用 rook：回满 HP、wave=2、rescueUsed=true；刷新后 view=battle 且仍为 true/wave2，弹层不重发。",
+      "evidence": "c17-rescue-use-reload.png,c17-rescue-log.json"
+    },
+    {
+      "id": "C21",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "正常通关第 1 关后查看三关：各 81 格地形与第一波站位；已通关第 1 关和未解锁第 3 关不可进入，只有当前第 2 关可进入；只查看预览不产生资源/快照/战局。",
+      "evidence": "c21-map-normal.png"
+    },
+    {
+      "id": "C06",
+      "type": "正常浏览器",
+      "result": "通过",
+      "detail": "正常通关三关：第1关 wave2/turn11/猫粮12；第2关 wave2/turn11/猫粮15；第3关 wave2/turn11/猫粮18；非最终关结算后进入主营地并满血恢复，最终关直接显示通关结算且刷新后仍停留在终局。",
+      "evidence": "c06-camp-after-level1.png,c06-camp-after-level2.png,c06-final.png,c06-final-reload.png,c06-final-resume.json"
+    }
+  ],
+  "pageErrors": [],
+  "shots": [
+    "c01-tutorial-entry.png",
+    "c01-tutorial-steps.png",
+    "c01-tutorial-done.png",
+    "c26-guide.png",
+    "c03-camp-completed.png",
+    "c07-population.png",
+    "c07-balance.png",
+    "c09-recruit.png",
+    "c26-guide-skip.png",
+    "c11-buffs.png",
+    "c12-buff-reload-battle.png",
+    "c13-repeat-purchase.png",
+    "c10-disabled.png",
+    "c02-tutorial-fail.png",
+    "c02-skip.png",
+    "c04-camp-reload.png",
+    "c25-new-journey.png",
+    "c05-deploy.png",
+    "c08-roster.png",
+    "c14-rescue.png",
+    "c15-revive.png",
+    "c17-rescue-before-skip.png",
+    "c17-rescue-pending-reload.png",
+    "c17-rescue-skip-reload.png",
+    "c17-rescue-retry.png",
+    "c17-rescue-use-reload.png",
+    "c01-tutorial-entry.png",
+    "c01-tutorial-steps.png",
+    "c01-tutorial-done.png",
+    "c26-guide.png",
+    "c06-camp-after-level1.png",
+    "c21-map-normal.png",
+    "c06-camp-after-level2.png",
+    "c06-final.png",
+    "c06-final-reload.png"
+  ],
+  "hashes": {
+    "web/index.html": "8a87862f09e576d3920c131e519a00373cc86816bb177bd4adda70a4082a1555",
+    "web/js/rules.js": "230b17befef2249fcfb3e566b004a02a71c63eb1aad05025d2a8d20e1196ddf1",
+    "web/js/app.js": "c7342cd3b1b73c858b743aaf34c7a06b520d62e89d2f0d67b7c32e6c6bfd97f9",
+    "web/js/campaign.js": "8fce32ce09c2348974f582b732d4b828addaf6386bb1e44f448541aa5b7fcfa4",
+    "web/js/journey.js": "3f5fa260fef670f0a64e00d665bff7b62323acc4f5f4e2338eba69f3aa9925b4",
+    "web/js/tutorial.js": "d396f135aaa3d3a798a14bfb57cd3888d74de688f378da49d71ac4fe95fb6828",
+    "web/js/ui.js": "a7b33468f5c747e32a1df10bad2d682cb34e4a8f8716ecc988922da5be19fa15",
+    "web/js/maps.js": "878d29b09826a7e661c7d643ae784c916b920e9d6dc1c1e830d13195e69cd4bf",
+    "web/camp.css": "fc7a0234e59850032619e4ee23412eb94e2999d6c87f6c34f3127eae4c643f1a",
+    "web/campaign.css": "936d4c24a440cacc7865f87c46c0fed776d902957db023ab612d06a045259429",
+    "tests/us020-camp.test.cjs": "e6de5df82b20129c54386b130220fcc95f3bb4cae35d2ca488eb5c33f20f7bd4",
+    "tests/us020-acceptance-browser.cjs": "082fbdb76816280d02792704fa100147837dd30609437d4affd4e7ec2b2bd314"
+  },
+  "failure": {
+    "message": "page.waitForFunction: Timeout 30000ms exceeded.",
+    "stack": "page.waitForFunction: Timeout 30000ms exceeded.\n    at openMenu (D:\\Projects\\mihuayou\\gamehack2026\\tests\\us020-acceptance-browser.cjs:33:134)\n    at async D:\\Projects\\mihuayou\\gamehack2026\\tests\\us020-acceptance-browser.cjs:598:12"
+  },
+  "finishedAt": "2026-10-21T06:08:59.483Z"
+}

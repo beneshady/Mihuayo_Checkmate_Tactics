@@ -1,0 +1,30 @@
+{
+  "before": {
+    "revision": 0
+  },
+  "move": {
+    "rook": {
+      "x": 1,
+      "y": 0
+    },
+    "savedRawUnchanged": true
+  },
+  "afterEndTurn": {
+    "reason": "回合推进",
+    "turn": 2,
+    "revision": 2,
+    "rook": {
+      "x": 1,
+      "y": 0
+    }
+  },
+  "reload": {
+    "turn": 2,
+    "revision": 2,
+    "rook": {
+      "x": 1,
+      "y": 0
+    },
+    "unitsEqual": true
+  }
+}

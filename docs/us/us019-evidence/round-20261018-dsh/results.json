@@ -1,0 +1,67 @@
+{
+  "round": "2026-10-18 DSH 自验收（浏览器阻塞轮）",
+  "contract": "docs/us/US-019-commander-support-movement.md §13（A19-01…A19-05）",
+  "branch": "codex/web-gameplay-validation",
+  "head": "8d2a9d273084794a3d36808fcf411d1c0ab5a57f",
+  "workspaceState": "未提交、未切分支、未推送、未部署；保留全部既有未提交改动",
+  "environment": "Windows 受限令牌命令沙箱；Playwright 1.62.1 与 Chromium/Chrome 存在但无法建立子进程 IPC（详见 browser-blocker.json）",
+  "evidenceRoot": "docs/us/us019-evidence/round-20261018-dsh",
+  "items": [
+    {
+      "id": "A19-01",
+      "type": "正常流程",
+      "status": "规则+静态通过；浏览器正常步骤未验",
+      "steps": "设计浏览器步骤：菜单→选关→布阵→选 buff→选帅→尝试点敌人→查看成长→切队友查看升级；记录 AP/SP 前后、截图、页面错误。规则/静态：K01/K02/K03。",
+      "actual": "us019-commander.test 12 项全绿（K01 无攻击/吃子与预览/提交一致拒绝、K02 buff 保留与对象排除、K03 禁止主帅升级且队友可升级）；静态定位 app.js“纯辅助（无攻击）”“主帅纯辅助：不能购买任何个人升级”等文案。浏览器正常步骤、AP/SP 前后记录、截图与 pageerror 记录均未取得。",
+      "evidence": ["node/us019-commander.test.log", "static-ui-inspection.log", "browser-blocker.json"],
+      "notes": "K08 正常入口浏览器证据缺失。"
+    },
+    {
+      "id": "A19-02",
+      "type": "正常流程 + 专项",
+      "status": "规则通过；浏览器未验",
+      "steps": "规则：宫内横竖一步、中心↔四角米字斜走、其他斜向禁止；横竖一步可出宫/回宫、斜向不可跨界、宫外仅横竖；回宫恢复米字。浏览器：正常走位与专项遍历。",
+      "actual": "us019-commander.test K04/K05 用例全绿。正常走位截图/步骤与浏览器专项未取得。",
+      "evidence": ["node/us019-commander.test.log", "browser-blocker.json"],
+      "notes": "合同要求高亮/提示与执行一致，仅静态定位不足以证明。"
+    },
+    {
+      "id": "A19-03",
+      "type": "专项（强制位移/水/桥）",
+      "status": "规则通过；浏览器未验",
+      "steps": "规则：推/拉/撞击可把帅移出九宫并正常扣血；强制入水立即死亡失败；主动入水拒绝不耗行动；桥按陆地；不穿阻挡/叠子/出棋盘。浏览器：至少各演示一次强制出宫与强制入水。",
+      "actual": "us019-commander.test K06/K07/K10 用例全绿（友军牵引出宫、冲击接口推出九宫、同路径强制入水立即判负、桥格不判死、主动入水拒绝）。浏览器前后与即时失败截图未取得。",
+      "evidence": ["node/us019-commander.test.log", "browser-blocker.json"],
+      "notes": "使用了现有位移接口，未新增敌方技能；但浏览器专项缺失。"
+    },
+    {
+      "id": "A19-04",
+      "type": "正常流程（跨关/重试/双显示）",
+      "status": "规则快照通过；浏览器未验",
+      "steps": "规则：跨波 buff 保留、下关替换不叠加、出宫不失效；失败重试/跨关保持新帅规则；检查攻击/升级入口。浏览器：网页与手机横版切换、跨关/重试。",
+      "actual": "us019-commander.test K02/K11 用例全绿（含真实 nextLevel 跨关后攻击 0、无升级、宫内外走法保持）；未迁移用户旧局。浏览器跨关/重试与双显示模式证据未取得。",
+      "evidence": ["node/us019-commander.test.log", "browser-blocker.json"],
+      "notes": "双显示模式只做了静态代码定位，不构成浏览器证据。"
+    },
+    {
+      "id": "A19-05",
+      "type": "专项（规则/共享 SP）",
+      "status": "规则通过；共享 SP 浏览器证据未验",
+      "steps": "定向回归敌将/敌士、公共 SP、合法队友升级及快照；核对旧 SP 浏览器策略调整。",
+      "actual": "us019-commander K09（敌将九宫限制/牵引限制）通过；us018-advisor S03 断言敌士 1/1/1、宫内米字与不能出宫不变；shared-sp.test 11 项通过（SP 不被帅扣、队友可消费、快照恢复）；legacy-rules 26 项通过。共享 SP 浏览器证据按合同可并入 A18-01，但 A18-01 未执行。",
+      "evidence": ["node/us019-commander.test.log", "node/shared-sp.test.log", "node/legacy-rules.test.log", "browser-blocker.json"],
+      "notes": "浏览器部分缺失；未以主帅死亡当成功。"
+    }
+  ],
+  "commands": [
+    {"command": "node tests/us019-commander.test.cjs", "result": "PASS 12 / FAIL 0"},
+    {"command": "node tests/shared-sp.test.cjs", "result": "PASS 11 / FAIL 0"},
+    {"command": "node tests/legacy-rules.test.cjs", "result": "PASS 26 / FAIL 0"},
+    {"command": "node tests/rules.test.cjs", "result": "PASS 9 / FAIL 0"},
+    {"command": "node tests/static-check.cjs", "result": "PASS（DOM ids 55 / rules APIs 36 / static check: OK）"}
+  ],
+  "notRun": [
+    "任何浏览器脚本（shared-sp-browser / us019-king-browser / v1-flow-browser / ui-headless / display-*）",
+    "terrain.test / v23-contract.test / ui-static.test（与本需求无关的既有基线红项，未扩修）"
+  ]
+}

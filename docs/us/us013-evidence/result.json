@@ -40,8 +40,8 @@
         "actor": "king",
         "type": "move",
         "to": {
-          "x": 3,
-          "y": 1
+          "x": 2,
+          "y": 0
         },
         "kills": 2,
         "hp": 3
@@ -51,18 +51,7 @@
         "actor": "king",
         "type": "move",
         "to": {
-          "x": 4,
-          "y": 1
-        },
-        "kills": 2,
-        "hp": 3
-      },
-      {
-        "turn": 7,
-        "actor": "king",
-        "type": "move",
-        "to": {
-          "x": 3,
+          "x": 1,
           "y": 0
         },
         "kills": 2,
@@ -70,11 +59,11 @@
       },
       {
         "turn": 7,
-        "actor": "starting-spearman",
+        "actor": "king",
         "type": "move",
         "to": {
-          "x": 7,
-          "y": 4
+          "x": 1,
+          "y": 1
         },
         "kills": 2,
         "hp": 3
@@ -83,17 +72,6 @@
         "turn": 8,
         "actor": "king",
         "type": "move",
-        "to": {
-          "x": 3,
-          "y": 1
-        },
-        "kills": 2,
-        "hp": 3
-      },
-      {
-        "turn": 8,
-        "actor": "rook",
-        "type": "rook-move",
         "to": {
           "x": 0,
           "y": 1
@@ -102,47 +80,14 @@
         "hp": 3
       },
       {
-        "turn": 8,
-        "actor": "starting-spearman",
-        "type": "move",
-        "to": {
-          "x": 7,
-          "y": 5
-        },
-        "kills": 2,
-        "hp": 3
-      },
-      {
         "turn": 9,
         "actor": "king",
         "type": "move",
         "to": {
-          "x": 3,
+          "x": 0,
           "y": 2
         },
         "kills": 2,
-        "hp": 3
-      },
-      {
-        "turn": 9,
-        "actor": "rook",
-        "type": "attack",
-        "to": {
-          "x": 4,
-          "y": 1
-        },
-        "kills": 3,
-        "hp": 3
-      },
-      {
-        "turn": 9,
-        "actor": "starting-spearman",
-        "type": "directional",
-        "to": {
-          "x": 8,
-          "y": 5
-        },
-        "kills": 4,
         "hp": 3
       },
       {
@@ -150,10 +95,10 @@
         "actor": "king",
         "type": "move",
         "to": {
-          "x": 4,
+          "x": 1,
           "y": 2
         },
-        "kills": 4,
+        "kills": 2,
         "hp": 3
       },
       {
@@ -161,21 +106,10 @@
         "actor": "king",
         "type": "move",
         "to": {
-          "x": 5,
-          "y": 2
+          "x": 1,
+          "y": 1
         },
-        "kills": 4,
-        "hp": 3
-      },
-      {
-        "turn": 11,
-        "actor": "rook",
-        "type": "rook-move",
-        "to": {
-          "x": 4,
-          "y": 0
-        },
-        "kills": 4,
+        "kills": 2,
         "hp": 3
       }
     ],
@@ -192,17 +126,17 @@
       "phase": "intermission",
       "turn": 11,
       "wave": 2,
-      "gold": 4,
-      "kills": 4,
+      "gold": 2,
+      "kills": 2,
       "seen5": true,
       "seen6": true
     },
     "purchase": {
       "status": "本次实得不足8，不购买；未增发奖励或调难度",
-      "gold": 4
+      "gold": 2
     },
     "level2": {
-      "gold": 4,
+      "gold": 2,
       "cannon": null
     },
     "retry": "真实第二关失败后快照恢复"
@@ -226,10 +160,10 @@
   ],
   "errors": [],
   "result": "PASS",
-  "finishedAt": "2026-10-11T14:25:32.057Z",
+  "finishedAt": "2026-10-17T16:41:47.140Z",
   "versions": {
-    "web/index.html": "0f3076ca609665980917f232796640e546190dd9f8620a513e9d3661a0feeeb7",
-    "web/js/app.js": "c9b5e19037da4e1b1f55649e42508882d9cf07591a0a7fe7fdc250c872ec3fa0",
-    "web/js/rules.js": "06c5ec57f0cd094433ae4e7f266acf8eac2f01c98081a127de29b5d7c100cd16"
+    "web/index.html": "4975f872053f672bcbdb2c230317ca167dd511acd5fc23261711bf9d95778e96",
+    "web/js/app.js": "382f0d7255609c4d8cf3579906563f70beb271642d26d695097f739d3bd129ef",
+    "web/js/rules.js": "1a6e7f3a852b1a1687d853e13327849f1251e7f2771d60b08a63734e09ac2ace"
   }
 }

@@ -1,0 +1,77 @@
+{
+  "scope": "US-019 A19-03 强制出宫/强制入水/主动入水/桥格；专项注入局面，不新增敌方技能",
+  "cases": [
+    {
+      "id": "A19-03a",
+      "type": "专项",
+      "title": "K06/K07 现有冲击接口把帅从宫内推出宫，正常扣血，出宫后立即用宫外走法",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "冲击推出宫：位置/血量/宫内外",
+          "before": [
+            3,
+            0
+          ],
+          "after": [
+            2,
+            0
+          ],
+          "hp": 2,
+          "inPalace": false
+        },
+        {
+          "text": "出宫后立即采用宫外直向走法",
+          "afterMove": [
+            1,
+            0
+          ],
+          "hp": 2
+        }
+      ],
+      "evidence": [
+        "docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-forced-out.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-forced-out-walk.png"
+      ]
+    },
+    {
+      "id": "A19-03b",
+      "type": "专项",
+      "title": "K06/K10 同一冲击接口把帅推入水格：立即死亡并失败，不等回合末；主动入水拒绝、桥格通行",
+      "status": "pass",
+      "steps": [
+        {
+          "text": "强制入水：立即失败，回合未递增",
+          "turn": 1,
+          "phase": "result",
+          "result": "dead"
+        },
+        {
+          "text": "主动入水拒绝且不耗行动",
+          "ap": 1
+        },
+        {
+          "text": "桥格通行不判死",
+          "pos": [
+            4,
+            4
+          ],
+          "hp": 3
+        }
+      ],
+      "evidence": [
+        "docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-forced-water.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-active-water-rejected.png",
+        "docs/us/us019-evidence/round-20261019-dsh/browser-special/a19-03-bridge.png"
+      ]
+    }
+  ],
+  "errors": [],
+  "finishedAt": "2026-10-18T18:26:23.934Z",
+  "files": {
+    "web/index.html": "5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602",
+    "web/js/app.js": "1ed21a249dbc37b407724f1c9a0a7dbeee8389da3d588974f09ae85f237cde14",
+    "web/js/rules.js": "ca2136687ece0afcd44ca3d32fa16d68fc4c109624776e303e94949b8096990a"
+  },
+  "result": "PASS"
+}

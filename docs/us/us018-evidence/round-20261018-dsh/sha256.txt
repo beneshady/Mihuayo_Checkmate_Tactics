@@ -1,0 +1,75 @@
+# 本轮验收相关文件 SHA256（2026-10-18，浏览器阻塞轮）
+branch=codex/web-gameplay-validation
+head=8d2a9d273084794a3d36808fcf411d1c0ab5a57f
+
+## 相关文件 git 状态（其余既有未提交改动保持原样）
+ M tests/legacy-rules.test.cjs
+ M web/desktop.css
+ M web/index.html
+ M web/js/app.js
+ M web/js/campaign.js
+ M web/js/rules.js
+ M web/js/ui.js
+ M web/mobile.css
+ M web/ui.css
+?? docs/us/US-018-advisor-defense-tower.md
+?? docs/us/US-019-commander-support-movement.md
+?? docs/us/us018-evidence/round-20261018-dsh/browser-blocker.json
+?? docs/us/us018-evidence/round-20261018-dsh/results.json
+?? docs/us/us018-evidence/round-20261018-dsh/rules-normal-flow-sim.json
+?? docs/us/us019-evidence/round-20261018-dsh/browser-blocker.json
+?? docs/us/us019-evidence/round-20261018-dsh/results.json
+?? tests/shared-sp-browser.cjs
+?? tests/shared-sp.test.cjs
+?? tests/us018-advisor-browser.cjs
+?? tests/us018-advisor.test.cjs
+?? tests/us019-commander.test.cjs
+?? tmp/us018-normal-flow-sim.cjs
+?? web/display.css
+?? web/js/display.js
+
+## SHA256（共 44 个文件）
+ca2136687ece0afcd44ca3d32fa16d68fc4c109624776e303e94949b8096990a  web/js/rules.js
+1ed21a249dbc37b407724f1c9a0a7dbeee8389da3d588974f09ae85f237cde14  web/js/app.js
+78e80a8a260c8f37470be08cfd226f9829adda3b37c1157eb7662462678ce489  web/js/campaign.js
+e3db77cb508cd442e55bde72ade2d4d2d5ec781659cf64a836367cb419a50015  web/js/ui.js
+a73c99c48638e011e7a98a6c2f46cbab2c6320ca5c4d142078a4f7d64f4c2932  web/js/display.js
+5644cde84be36eae1f5cf9a067de75884bf6311fcd357ea7aae0c9097ec8c602  web/index.html
+79f2f1286cff175e4c99acd7d82db758861a035d489fda46bbdef10e18a0416a  web/display.css
+716729508e3eb46f0a90e8b42a4d8874a23f6cb70b283bb97c6864cae4cd9bd8  web/ui.css
+8986eadfc1dea0eafe47c628c59df8e33daf18f0429c39ca90502adac42be38b  web/desktop.css
+50562405350bfb494dcf81eebcba01f9f5cab3bed8d126ddc05c69805b9f8f55  web/mobile.css
+c3806c7bf18a0a9b29fab79f0dfedefe090792050eb3eb3bcba8ec68103195b6  tests/us018-advisor.test.cjs
+e222316a870eb668f5c806afa3750bc45ce4b43b03dacc94b5e78cd84ff1d047  tests/us018-advisor-browser.cjs
+8c0ce05694880722ef0a9d894f52a1321ae12f2c3809ce81c1096e0ae712c2cb  tests/us019-commander.test.cjs
+74dcc689ef94327717e8877f147b4d9d692ac5ce7e5e73680fec2fa39db2bffd  tests/shared-sp.test.cjs
+6ad30fbd4d81edbe7c00ca75eecdef25032ffbb3324e8d99bda4a495cc97f88a  tests/shared-sp-browser.cjs
+055300901a872a19938e565bfc346a2b98e0e01333f19e5cc49ebacd1829f283  tests/legacy-rules.test.cjs
+e2c5b1ead4844798d4dc5cf2a681532434539cfb3734ed9d0ce776f587c6eb3b  tests/static-check.cjs
+a9ee7a63c59fa8ad7c021c57704cd8360f68a5743c2a71c938410922d1f91ba1  docs/us/US-018-advisor-defense-tower.md
+86e3b6125ff010dbe0a5a9d85da47c4bb2555c88140593fe307ea5efee848122  docs/us/US-019-commander-support-movement.md
+83bda7175c067b6e5cc7b110f28894f4e00900792ba9d8dfdab95add943ab337  tmp/us018-normal-flow-sim.cjs
+7fdbd1c7879cbd5347f8ded9f38730f6db0bc73be00992f9f38ee676e8f07d84  docs/us/us018-evidence/round-20261018-dsh/browser-blocker.json
+9a44b37d275fc9c8c0c07b46eb1ea2a0b4eff21b0b9e846fb2a5de05cc77ed39  docs/us/us018-evidence/round-20261018-dsh/results.json
+e0b7a7c32938109b9a850b2da7786296733341fc62b3808c40d28786ad1699d7  docs/us/us018-evidence/round-20261018-dsh/rules-normal-flow-sim.json
+f657e8748f1ce602ff3a91ffffc0bd3afd563e8051c9fc10318ab67d4b9f6ed5  docs/us/us018-evidence/round-20261018-dsh/static-ui-inspection.log
+68ad4838818989232a2a90fe5b55cdb9608c905be8c0290ed3f19d2fdce72ab5  docs/us/us018-evidence/round-20261018-dsh/browser-probe/headless-single-process-dumpdom.log
+93cec1b2f3561ce88490d842411527276b3c7f2f15158c5143ec964e2ec988d9  docs/us/us018-evidence/round-20261018-dsh/browser-probe/headless-single-process.log
+abe4dde86d4fcaa8328a25975d74ab4e530f8888869b5995f36b767d44ace080  docs/us/us018-evidence/round-20261018-dsh/browser-probe/headless-verbose.log
+3af8c2bc2e944956457feb9186ca2d774617eeeda58cad96da669855fd9fb287  docs/us/us018-evidence/round-20261018-dsh/browser-probe/system-chrome-headless.log
+74b648fbd94e64611620048defa311441ba38a96942ef717b43d7ecc65ae3806  docs/us/us018-evidence/round-20261018-dsh/browser-probe/system-chrome-networkflags.log
+9477723e1b6e14893a76a47cc514a0d2e0581613456bf473b9e33456eee4aa7a  docs/us/us018-evidence/round-20261018-dsh/node/cannon-purchase.test.log
+d7a2380daac591f94e94614d3b5ce60a51a283b4fe6527174aa582eeb3f84bcb  docs/us/us018-evidence/round-20261018-dsh/node/legacy-rules.test.log
+b39a1a7696692cd38b6dc938bd91d596cb2da6436b7f5acdbe2dd6569c9fada2  docs/us/us018-evidence/round-20261018-dsh/node/rules.test.log
+e38771d356e934f68c34e45d1d0ea78d5f54e3cc8d2a10e0dd9464e920bf3bf3  docs/us/us018-evidence/round-20261018-dsh/node/shared-sp.test.log
+e8d5e45b5f926881b0e032d01f3d0ca9022057bdbc3d08e57ccd947bcccab2cb  docs/us/us018-evidence/round-20261018-dsh/node/static-check.log
+8388daeff611448fb3856103d4bc742680fe20b1aec4fecfbfbcd74074e2c00e  docs/us/us018-evidence/round-20261018-dsh/node/us018-advisor.test.log
+3104bbc8e30f7a7ed1f5276cd51b6d324dbf6f9a50a55b2ecf3bb02dd249799b  docs/us/us018-evidence/round-20261018-dsh/node/us019-commander.test.log
+7fdbd1c7879cbd5347f8ded9f38730f6db0bc73be00992f9f38ee676e8f07d84  docs/us/us019-evidence/round-20261018-dsh/browser-blocker.json
+1e0af02840aeda54dc86478cd112facff604276b7186a8332d7751fa446217c4  docs/us/us019-evidence/round-20261018-dsh/results.json
+f657e8748f1ce602ff3a91ffffc0bd3afd563e8051c9fc10318ab67d4b9f6ed5  docs/us/us019-evidence/round-20261018-dsh/static-ui-inspection.log
+d7a2380daac591f94e94614d3b5ce60a51a283b4fe6527174aa582eeb3f84bcb  docs/us/us019-evidence/round-20261018-dsh/node/legacy-rules.test.log
+b39a1a7696692cd38b6dc938bd91d596cb2da6436b7f5acdbe2dd6569c9fada2  docs/us/us019-evidence/round-20261018-dsh/node/rules.test.log
+e38771d356e934f68c34e45d1d0ea78d5f54e3cc8d2a10e0dd9464e920bf3bf3  docs/us/us019-evidence/round-20261018-dsh/node/shared-sp.test.log
+e8d5e45b5f926881b0e032d01f3d0ca9022057bdbc3d08e57ccd947bcccab2cb  docs/us/us019-evidence/round-20261018-dsh/node/static-check.log
+3104bbc8e30f7a7ed1f5276cd51b6d324dbf6f9a50a55b2ecf3bb02dd249799b  docs/us/us019-evidence/round-20261018-dsh/node/us019-commander.test.log

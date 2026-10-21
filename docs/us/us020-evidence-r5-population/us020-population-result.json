@@ -1,0 +1,130 @@
+{
+  "scope": "US-020 R04 人口方案 P01～P08 浏览器验收（正常入口真实招募 1 条；其余边界专项夹具；双横版关键 UI）",
+  "branch": "codex/web-gameplay-validation",
+  "head": "e9b2120f1877bdf4e05fb891fca5703ca4979793",
+  "base": "http://127.0.0.1:8777",
+  "results": [
+    {
+      "id": "P01",
+      "type": "正常浏览器（真实教学+真实招募）",
+      "result": "通过",
+      "detail": "独立上下文实际完成 7 步教学→主营地：初始部署上限 4、上阵 4；真实换下马后以自然猫粮 9 连续招募 3 名兵（9→6→3→0）。营地显示「队友总数：7（其中后备3）」「部署人口：4／4」，主帅与仕单独显示（仕 0/2 座），部署上限仍 4；名单上阵 4、后备 3。",
+      "evidence": "p08-first-guide.png,p01-camp-start.png,p01-camp-seven.png,p01-camp-seven.json"
+    },
+    {
+      "id": "P02",
+      "type": "正常浏览器（真实招募）",
+      "result": "通过",
+      "detail": "同一正常链路：换下马空出名额后招募 recruit-pawn-0 → 默认上阵且不改变原上阵顺序；随后两次招募（recruit-pawn-1/2）在上阵 4/4 满员时进入后备，activeIds 与满员时完全一致（[\"rook\",\"starting-pawn\",\"starting-pawn-2\",\"recruit-pawn-0\"]），未替换任何旧队友。",
+      "evidence": "p01-camp-seven.png,p01-camp-seven.json"
+    },
+    {
+      "id": "P07",
+      "type": "正常浏览器（刷新）",
+      "result": "通过",
+      "detail": "同一旅程刷新后：部署上限 4、上阵 4、后备 3 与上阵名单全部恢复，营地仍显示「队友总数：7（其中后备3）」「部署人口：4／4」。",
+      "evidence": "p07-refresh-camp.png,p07-refresh.json"
+    },
+    {
+      "id": "P05",
+      "type": "正常浏览器（上限人数）",
+      "result": "通过",
+      "detail": "同一正常链路进入第一关布阵：上阵普通队友 4 名等于部署上限 4，布阵文案「部署人口：4／4」并单独显示主帅 1、仕 0 座；新招募的 recruit-pawn-0 已带入布阵名单，后备 recruit-pawn-1/2 未自动上阵；确认布阵后进入我方行动（允许等于上限）。",
+      "evidence": "p01-deploy.png,p01-deploy.json"
+    },
+    {
+      "id": "P04",
+      "type": "专项（预置猫粮 10）",
+      "result": "通过",
+      "detail": "专项夹具余额 10：连续两次点击「部署上限 +1 · 5猫粮」→ 余额 10→5→0、部署上限 4→5→6，持有队友/上阵/后备名单完全不变；余额不足按钮禁用但仍显示价格。",
+      "evidence": "p04-expand.png,p04-expand.json"
+    },
+    {
+      "id": "P03",
+      "type": "专项（预置上限 8）",
+      "result": "通过",
+      "detail": "专项夹具部署上限 8、持有 10（上阵 8、后备 2）：营地显示「队友总数：10（其中后备2）」「部署人口：8／8」，扩编按钮禁用；继续招募 1 名兵后持有 11（后备 3），上阵名单与 8／8 完全不变。",
+      "evidence": "p03-nine-held.png,p03-nine-held.json"
+    },
+    {
+      "id": "P05",
+      "type": "专项（构造 0 名普通队友）",
+      "result": "通过",
+      "detail": "专项夹具上阵 0 名普通队友：营地显示「部署人口：0／4」；布阵续局中确认布阵被拒绝并提示「至少部署 1 名普通队友：主帅与仕不能代替」，主帅不能代替这 1 名，仍停留在布阵。",
+      "evidence": "p05-zero-camp.png,p05-zero.png,p05-zero.json"
+    },
+    {
+      "id": "P05",
+      "type": "专项（构造超出部署人口名单）",
+      "result": "通过",
+      "detail": "专项夹具上阵 6 名普通队友／上限 4：布阵显示 6／4，确认被拒绝并提示「超过部署人口 6／4：请先换下部分普通队友，或到主营地提升部署上限」，仍停留在布阵；1 人路径与等于上限路径由专项规则与正常链路覆盖。",
+      "evidence": "p05-over.png,p05-over.json"
+    },
+    {
+      "id": "P05",
+      "type": "专项（仅 1 名普通队友）",
+      "result": "通过",
+      "detail": "专项夹具仅 1 名普通队友上阵：布阵显示 1／4，确认布阵后进入我方行动（允许不满编，但至少 1 名普通队友）。",
+      "evidence": "p05-one.png,p05-one.json"
+    },
+    {
+      "id": "P06",
+      "type": "专项（预置两座仕）",
+      "result": "通过",
+      "detail": "专项夹具两座仕：营地「队友总数：4（其中后备0）」「部署人口：4／4」保持不变，主帅 1 与仕 2/2 座单独显示，仕招募按钮禁用；入关后两座仕单独上阵，布阵文案「部署人口：4／4（上阵普通队友／部署上限，至少 1 名；主帅 1 与仕 2 座单独计数，不计入部署人口）」，均不计入部署人口。",
+      "evidence": "p06-advisors.png,p06-advisors.json"
+    },
+    {
+      "id": "P07",
+      "type": "专项（预置失败续局）",
+      "result": "通过",
+      "detail": "专项夹具部署上限 6、持有 8（上阵 6、后备 2）的失败续局：加载后显示失败结算且不能回营；点击「从本关布阵重试」回到布阵，部署上限 6、上阵 6、后备 2 与入关名单一致，布阵显示 6／6。",
+      "evidence": "p07-failure.png,p07-retry.png,p07-retry.json"
+    },
+    {
+      "id": "P08/*desktop",
+      "type": "专项（真实按钮切换显示模式）",
+      "result": "通过",
+      "detail": "1280×720（desktop，实际视口 1280×720）：营地「队友总数：7（其中后备3）」「部署人口：4／4」，主帅与仕单独显示；扩编/招募/名单/帮助按钮均在视口内、命中自身且可点击（bbox {\"left\":292,\"top\":342,\"right\":441,\"bottom\":378}）。实际点击换人后两个数字同步（3／4、后备 4），点击「部署上限 +1 · 5猫粮」后 3／5、余额 20→15；帮助可重看且解释两个概念，查看帮助不扣资源；进入布阵显示「部署人口：3／5」且确认布阵按钮可点并成功进入我方行动。",
+      "evidence": "p08-desktop.png,p08-desktop-deploy.png,p08-desktop.json"
+    },
+    {
+      "id": "P08/*mobile",
+      "type": "专项（真实按钮切换显示模式）",
+      "result": "通过",
+      "detail": "844×390（mobile，实际视口 844×390）：营地「队友总数：7（其中后备3）」「部署人口：4／4」，主帅与仕单独显示；扩编/招募/名单/帮助按钮均在视口内、命中自身且可点击（bbox {\"left\":445,\"top\":175,\"right\":604,\"bottom\":214}）。实际点击换人后两个数字同步（3／4、后备 4），点击「部署上限 +1 · 5猫粮」后 3／5、余额 20→15；帮助可重看且解释两个概念，查看帮助不扣资源；进入布阵显示「部署人口：3／5」且确认布阵按钮可点并成功进入我方行动。",
+      "evidence": "p08-mobile.png,p08-mobile-deploy.png,p08-mobile.json"
+    }
+  ],
+  "shots": [
+    "p08-first-guide.png",
+    "p01-camp-start.png",
+    "p01-camp-seven.png",
+    "p07-refresh-camp.png",
+    "p01-deploy.png",
+    "p04-expand.png",
+    "p03-nine-held.png",
+    "p05-zero-camp.png",
+    "p05-zero.png",
+    "p05-over.png",
+    "p05-one.png",
+    "p06-advisors.png",
+    "p07-failure.png",
+    "p07-retry.png",
+    "p08-desktop.png",
+    "p08-desktop-deploy.png",
+    "p08-mobile.png",
+    "p08-mobile-deploy.png"
+  ],
+  "pageErrors": [],
+  "hashes": {
+    "web/index.html": "2082a6b2cf71559bb9028a875c78a5a4897f9e2137a192d79734eafeb3d3fafb",
+    "web/js/rules.js": "7339218438e41cdcb9f683e8d1c586e64f88ff872e5974be230ec0d330d700b8",
+    "web/js/app.js": "47713fb24fbb09688b61e8ffefe67ce91fe585f4ed956fb436a5a9d6fa79142d",
+    "web/js/campaign.js": "6b29c81f1bf01d15fb9130ad5c37e69fa83e8006aa25fda1af04c42814fe1b6b",
+    "web/js/journey.js": "3f5fa260fef670f0a64e00d665bff7b62323acc4f5f4e2338eba69f3aa9925b4",
+    "tests/us020-camp.test.cjs": "0c7467479832b7a3f3cfed55033c4a1b066153e006ef9f6439b45671c74c868c",
+    "tests/us020-population-browser.cjs": "9bb3dd196e9185b796c1d3dfef587e30cd6b2349b8a81af4f23f7fce71516fd2"
+  },
+  "finishedAt": "2026-10-21T08:32:09.145Z"
+}
