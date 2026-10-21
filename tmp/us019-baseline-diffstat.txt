@@ -1,0 +1,22 @@
+ AGENTS.md                        | 132 ++++++++++++++++++++++-----------------
+ tests/find-playthrough.cjs       |   2 +-
+ tests/legacy-rules.test.cjs      |  67 ++++++++++----------
+ tests/maps.test.cjs              |   4 +-
+ tests/normal-playthrough.cjs     |   2 +-
+ tests/replay.test.cjs            |   4 +-
+ tests/rules.test.cjs             |   4 +-
+ tests/terrain-editor-browser.cjs |   2 +-
+ tests/terrain.test.cjs           |   6 +-
+ tests/ui-headless.test.cjs       |  14 ++---
+ tests/v1-flow-browser.cjs        |   6 +-
+ tests/v23-contract.test.cjs      |  10 +--
+ web/campaign.css                 |   8 +--
+ web/desktop.css                  |  23 ++++---
+ web/index.html                   |  32 +++++-----
+ web/js/app.js                    |  28 ++++-----
+ web/js/campaign.js               |   2 +-
+ web/js/rules.js                  |  30 ++++-----
+ web/js/ui.js                     |  33 +++++-----
+ web/mobile.css                   |  17 ++---
+ web/ui.css                       |  38 +++++------
+ 21 files changed, 244 insertions(+), 220 deletions(-)

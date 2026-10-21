@@ -1,0 +1,10 @@
+const {spawn}=require('node:child_process');
+const path=require('node:path'),fs=require('node:fs'),http=require('node:http');
+const exe=path.join(process.env.LOCALAPPDATA,'ms-playwright','chromium_headless_shell-1234','chrome-headless-shell-win64','chrome-headless-shell.exe');
+const ud=path.join(process.cwd(),'tmp','dsh-browser-profile-sp');
+fs.mkdirSync(ud,{recursive:true});
+const log=fs.openSync(path.join(process.cwd(),'tmp','dsh-headless-sp.log'),'w');
+const ch=spawn(exe,['--headless','--no-sandbox','--single-process','--no-zygote','--disable-gpu','--remote-debugging-port=9335','--user-data-dir='+ud,'about:blank'],{stdio:['ignore',log,log],windowsHide:true});
+ch.on('exit',(c,s)=>console.log('chrome exit',c,s));
+console.log('pid',ch.pid);
+setInterval(()=>{},60000);

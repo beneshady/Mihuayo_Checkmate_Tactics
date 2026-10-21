@@ -1,0 +1,3 @@
+const path=require('node:path');
+const pw=require(path.join(process.env.USERPROFILE,'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
+(async()=>{const t=Date.now();const b=await pw.chromium.connectOverCDP('http://127.0.0.1:9333');const c=b.contexts()[0]||await b.newContext();const p=await c.newPage();await p.goto('http://127.0.0.1:8791/index.html');await p.waitForTimeout(500);console.log('TITLE',await p.title());console.log('HAS_DEBUG',await p.evaluate(()=>!!window.__M0_DEBUG__));await p.screenshot({path:path.join(process.cwd(),'tmp','dsh-browser-smoke.png')});console.log('SMOKE OK',Date.now()-t+'ms');await b.close();})().catch(e=>{console.error('FAIL',e.message);process.exitCode=1;});

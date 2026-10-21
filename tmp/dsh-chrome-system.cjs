@@ -1,0 +1,12 @@
+const {spawn}=require('node:child_process');
+const path=require('node:path'),fs=require('node:fs'),http=require('node:http');
+const exe='C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const ud=path.join(process.cwd(),'tmp','dsh-chrome-profile');
+fs.mkdirSync(ud,{recursive:true});
+const log=fs.openSync(path.join(process.cwd(),'tmp','dsh-chrome-stderr.log'),'w');
+const ch=spawn(exe,['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port=9334','--user-data-dir='+ud,'--no-first-run','--disable-extensions','about:blank'],{stdio:['ignore',log,log],windowsHide:true});
+ch.on('exit',(c,s)=>console.log('chrome exit',c,s));
+console.log('pid',ch.pid);
+const t0=Date.now();
+const poll=()=>{http.get('http://127.0.0.1:9334/json/version',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{console.log('CDP OK after',Date.now()-t0+'ms');console.log(d.slice(0,160));process.exit(0);});}).on('error',()=>{if(Date.now()-t0>15000){console.log('CDP TIMEOUT');process.exit(1);}setTimeout(poll,300);});};
+poll();

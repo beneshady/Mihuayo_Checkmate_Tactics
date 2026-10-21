@@ -1,0 +1,10 @@
+const {spawn}=require('node:child_process');
+const path=require('node:path'),os=require('node:os'),fs=require('node:fs'),http=require('node:http');
+const exe=path.join(process.env.LOCALAPPDATA,'ms-playwright','chromium_headless_shell-1234','chrome-headless-shell-win64','chrome-headless-shell.exe');
+const ud=path.join(process.cwd(),'tmp','dsh-browser-profile');
+fs.rmSync(ud,{recursive:true,force:true});fs.mkdirSync(ud,{recursive:true});
+const ch=spawn(exe,['--headless','--no-sandbox','--disable-gpu','--remote-debugging-port=9333','--user-data-dir='+ud,'about:blank'],{detached:true,stdio:'ignore',windowsHide:true});
+ch.unref();
+console.log('spawned',ch.pid);
+setTimeout(()=>{http.get('http://127.0.0.1:9333/json/version',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>console.log('CDP VERSION OK',d.slice(0,200)));}).on('error',e=>console.log('CDP ERR',e.message));},2500);
+setTimeout(()=>{try{process.kill(ch.pid);}catch(e){};process.exit(0);},5000);

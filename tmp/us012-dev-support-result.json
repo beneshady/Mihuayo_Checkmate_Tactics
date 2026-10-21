@@ -1,0 +1,19 @@
+{
+  "time": "2026-10-07T15:04:31.5651758+08:00",
+  "port": 8777,
+  "pid": 9768,
+  "stoppedVerifiedPids": [
+    17368,
+    31940
+  ],
+  "editorHTTP": 200,
+  "editorBytes": 3486,
+  "iabFreshTabLoaded": true,
+  "runtimeFrozenFiles": 20,
+  "runtimeChanged": false,
+  "otherServicesOrUserTabsTouched": false,
+  "storageCleared": false,
+  "stdout": "tmp/us012-dev-support-out.log",
+  "stderr": "tmp/us012-dev-support-error.log",
+  "scope": "启动支持，仅清理本次重复自建服务并提升权限隐藏启动单一服务；未复跑基本测试"
+}
