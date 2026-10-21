@@ -1,6 +1,8 @@
 const test=require('node:test'),A=require('node:assert/strict');const {generate,R}=require('./normal-playthrough.cjs');
 // 保留原US010收益/救援回放，使用明示的历史无山林/赠炮专项地图；新首关由terrain-editor-browser正常实测。
-function legacyStart(){const map=R.defaultMap();map.name='US010历史回归地图';for(const k of Object.keys(map.tiles))if(['mountain','forest'].includes(map.tiles[k]))map.tiles[k]='land';map.units.splice(2,0,{id:'starting-cannon',side:'player',kind:'cannon',x:1,y:2});const s=R.newTestGame(map);s.phase='deploy';return s;}
+// US-020 2026-10-21：正式初始阵容已改为兵×2、马×1、车×1；本文件是 US-010 历史回放专项夹具，
+// 按历史自带弓/枪阵容显式构造，不随新初始阵容替换（保留原回放路径与救援结论）。
+function legacyStart(){const map=R.defaultMap();map.name='US010历史回归地图';for(const k of Object.keys(map.tiles))if(['mountain','forest'].includes(map.tiles[k]))map.tiles[k]='land';map.units=[{id:'king',side:'player',kind:'king',x:4,y:0},{id:'rook',side:'player',kind:'rook',x:0,y:0},{id:'starting-cannon',side:'player',kind:'cannon',x:1,y:2},{id:'starting-pawn',side:'player',kind:'pawn',x:1,y:3},{id:'starting-archer',side:'player',kind:'archer',x:4,y:3},{id:'starting-spearman',side:'player',kind:'spearman',x:7,y:3}].concat(map.units.filter(u=>u.side==='enemy'));const s=R.newTestGame(map);s.phase='deploy';return s;}
 test('历史地图合法回放：手动布阵、固定两波、真实杀敌结算、购买、换人、下关及失败重试',()=>{
  const {steps,state}=generate('move',legacyStart());let s=state;A.ok(steps.some(x=>x.expected.turn===5));A.ok(steps.some(x=>x.expected.wave===2));A.equal(s.gold,s.kills);A.equal(s.turn,11);
  const entryGold=s.gold;s.population=8;/* US-020：人口默认 4，本回放验证购买/换人/下关链路，人口规则另由 US-020 用例覆盖 */s=R.buy(s,'pawn');s=R.buy(s,'pawn');A.equal(s.gold,entryGold-6);const recruits=s.party.filter(u=>u.id.startsWith('recruit-pawn'));A.equal(recruits.length,2);A.notEqual(recruits[0].id,recruits[1].id);

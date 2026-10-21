@@ -173,10 +173,17 @@ function renderCamp(state){
  current=state;
  const buffs=state.buffs||{};
  const limit=rules().populationLimit(state),actives=rules().activeOrdinary(state).length;
+ // US-020 R04：持有普通队友总数（含后备）与部署人口／上限分开显示，均不限持有数量；
+ // 主帅与仕单独显示，且都不计入这两个普通队友数字。
+ const total=(state.party||[]).filter(u=>u.kind!=='advisor'&&u.kind!=='king').length;
+ const backups=Math.max(0,total-actives),advisors=(state.party||[]).filter(u=>u.kind==='advisor').length;
  const summary=[
   ['猫粮',`<b class="camp-value">${state.gold}</b>`],
   ['公共 SP',`<b class="camp-value">${state.teamSp}</b>（全队共用，与猫粮分开）`],
-  ['人口',`上阵普通队友 ${actives}/${limit} · 上限 8（主帅与仕不占人口）`],
+  ['队友总数：',`<b class="camp-value">${total}</b>（其中后备 ${backups}）· 持有普通队友数量不限`],
+  ['部署人口：',`<b class="camp-value">${actives}／${limit}</b>（上阵普通队友／部署上限，后备不占部署人口）`],
+  ['主帅：',`1 · 自动上场（不计入队友总数与部署人口）`],
+  ['仕：',`${advisors}/2 座 · 固定上阵、无后备（不计入队友总数与部署人口）`],
   ['旅程进度',`已通关 ${state.completed||0}/3 · 下一个挑战：第 ${(state.completed||0)+1} 关`],
   ['旅程增益',`${buffs.health?'<span class="ok">坚守 ✓</span>':'<span class="warn">坚守 ×</span>'} ${buffs.move?'<span class="ok">疾行 ✓</span>':'<span class="warn">疾行 ×</span>'} ${buffs.rescue?'<span class="ok">救援 ✓</span>':'<span class="warn">救援 ×</span>'}`],
   ['教学结果',state.tutorial==='completed'?'已完成（本次旅程）':state.tutorial==='skipped'?'本次已跳过（历史资格保留）':'未处理']
@@ -188,25 +195,25 @@ function renderCamp(state){
   const on=(state.activeIds||[]).indexOf(u.id)>=0;
   return `<button class="camp-unit ${on?'active':''}" data-camp-roster="${esc(u.id)}">${on?'上阵':'后备'} · ${KIND_LABEL[u.kind]||u.kind} · ${esc(u.id)} · Lv.${u.level} · 击杀 ${u.kills}</button>`;
  }).join('');
- $('camp-roster-hint').textContent=`上阵普通队友 ${actives}/${limit}；点击切换上阵/后备。超过人口时先换下一名，后备不占人口也无法出售。`;
+ $('camp-roster-hint').textContent=`队友总数：${total}（其中后备 ${backups}）· 部署人口：${actives}／${limit}；点击切换上阵/后备。后备不占部署人口，持有普通队友数量不限、不能出售。`;
  $('camp-roster').querySelectorAll('[data-camp-roster]').forEach(b=>b.onclick=()=>{
   const id=b.dataset.campRoster,ids=(state.activeIds||[]).indexOf(id)>=0?state.activeIds.filter(v=>v!==id):state.activeIds.concat(id);
-  if(!campAction({type:'roster',ids}))toast(`上阵普通队友已达人口上限 ${limit}：请先换下一名，或在营地扩编人口`);
+  if(!campAction({type:'roster',ids}))toast(`部署人口已达上限 ${actives}／${limit}：请先换下一名，或提升部署上限（按钮“部署上限 +1 · 5猫粮”）`);
  });
  $('camp-recruit').innerHTML=RECRUITS.map(([kind,label,desc])=>{
-  const price=PRICES[kind],advisors=(state.party||[]).filter(u=>u.kind==='advisor').length,full=kind==='advisor'&&advisors>=2;
+  const price=PRICES[kind],full=kind==='advisor'&&advisors>=2;
   return `<div class="good"><b>${label}</b><p>${desc}</p><button data-recruit="${kind}" ${state.gold<price||full?'disabled':''}>招募${label}（${price} 猫粮）</button>${full?'<small>已达上限：最多两座仕</small>':''}</div>`;
  }).join('');
  $('camp-recruit').querySelectorAll('[data-recruit]').forEach(b=>b.onclick=()=>{
-  if(!campAction({type:'buy',kind:b.dataset.recruit}))toast('猫粮不足或已达上限，未扣款');
+  if(!campAction({type:'buy',kind:b.dataset.recruit}))toast('猫粮不足或已达上限（仕最多两座），未扣款');
  });
- const canExpand=(state.population||4)<8&&state.gold>=5,health=buffs.health,move=buffs.move,rescue=buffs.rescue;
+ const canExpand=limit<8&&state.gold>=5,health=buffs.health,move=buffs.move,rescue=buffs.rescue;
  $('camp-growth').innerHTML=[
-  `<div class="growth-row"><div><b>扩编人口</b><p>当前 ${limit}/8 · 每次 5 猫粮，+1 名可部署普通队友</p></div><button data-camp-expand ${canExpand?'':'disabled'}>扩编（5 猫粮）</button></div>`,
+  `<div class="growth-row"><div><b>部署上限 +1</b><p>部署上限 ${limit}/8${limit>=8?' · 已达上限 8':''} · 每次 5 猫粮，只提高 1 名可部署普通队友上限（不增加持有队友、不赠送棋子）</p></div><button data-camp-expand ${canExpand?'':'disabled'}>部署上限 +1 · 5猫粮</button></div>`,
   `<div class="growth-row"><div><b>疾行</b><p>普通队友移动 +1${move?' · <span class="ok">已解锁</span>':''}${health?'':' · <span class="warn">需先获得坚守</span>'}</p></div><button data-camp-buff="move" ${!health||move||state.gold<5?'disabled':''}>${move?'已解锁':'解锁（5 猫粮）'}</button></div>`,
   `<div class="growth-row"><div><b>救援</b><p>每关第二波开始前一次救援机会${rescue?' · <span class="ok">已解锁</span>':''}${move?'':' · <span class="warn">先解锁移动增益</span>'}</p></div><button data-camp-buff="rescue" ${!move||rescue||state.gold<5?'disabled':''}>${rescue?'已解锁':'解锁（5 猫粮）'}</button></div>`
  ].join('');
- $('camp-growth').querySelectorAll('[data-camp-expand]').forEach(b=>b.onclick=()=>{if(!campAction({type:'expand'}))toast('猫粮不足或人口已满，未扣款');});
+ $('camp-growth').querySelectorAll('[data-camp-expand]').forEach(b=>b.onclick=()=>{if(!campAction({type:'expand'}))toast('猫粮不足或部署上限已满 8，未扣款');});
  $('camp-growth').querySelectorAll('[data-camp-buff]').forEach(b=>b.onclick=()=>{
   const key=b.dataset.campBuff;
   if(!campAction({type:'buff',key}))toast(key==='rescue'?'需先解锁移动增益或猫粮不足，未扣款':'未满足条件或猫粮不足，未扣款');

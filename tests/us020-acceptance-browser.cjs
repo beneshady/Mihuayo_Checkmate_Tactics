@@ -180,7 +180,7 @@ async function enterLevel(p,n){await p.locator(`#campaign button[data-region="${
  A.equal(camp1.population,4);
  A.equal(camp1.teamSp,0);
  A.deepEqual(camp1.buffs,{health:true,move:false,rescue:false});
- A.deepEqual(camp1.party.map(u=>u.kind).sort(),['archer','pawn','rook','spearman'],'无炮无仕');
+ A.deepEqual(camp1.party.map(u=>u.kind).sort(),['horse','pawn','pawn','rook'],'新初始阵容：兵2马1车1，无弓枪炮仕');
  A.equal(camp1.party.every(u=>u.hp===u.maxHp),true,'队伍满血');
  A.equal(camp1.party.find(u=>u.id==='rook').maxHp,3,'坚守 +1');
  await shot(p1,'c03-camp-completed.png');
@@ -259,9 +259,9 @@ async function enterLevel(p,n){await p.locator(`#campaign button[data-region="${
  await pc12.locator('#camp-leave').click();await waitView(pc12,'map');
  await pc12.locator('#campaign button[data-region="0"]').click();await pc12.locator('#flow-enter').click();await waitView(pc12,'battle');
  const lvl12=await st(pc12);
- const rook12=lvl12.units.find(u=>u.id==='rook'),archer12=lvl12.units.find(u=>u.id==='starting-archer'),king12=lvl12.units.find(u=>u.id==='king');
+ const rook12=lvl12.units.find(u=>u.id==='rook'),pawn12=lvl12.units.find(u=>u.id==='starting-pawn-2'),king12=lvl12.units.find(u=>u.id==='king');
  A.equal(rook12.maxHp,3,'车 HP 2+1');A.equal(rook12.commanderMove,1,'车移速 +1');
- A.equal(archer12.maxHp,2,'弓 HP 1+1');A.equal(archer12.attack,2,'攻击不变');
+ A.equal(pawn12.maxHp,2,'兵 HP 1+1');A.equal(pawn12.attack,1,'攻击不变（新初始阵容无自带弓）');
  A.equal(king12.commanderMove,0,'主帅不继承');A.equal(king12.maxHp,3);
  await pc12.reload();await waitView(pc12,'battle');
  const reCamp=await st(pc12);
@@ -334,7 +334,7 @@ async function enterLevel(p,n){await p.locator(`#campaign button[data-region="${
  /* C03 跳过路径对照 */
  A.equal(skipState.population,4);A.equal(skipState.teamSp,0);
  A.deepEqual(skipState.buffs,{health:true,move:false,rescue:false});
- A.deepEqual(skipState.party.map(u=>u.kind).sort(),['archer','pawn','rook','spearman']);
+ A.deepEqual(skipState.party.map(u=>u.kind).sort(),['horse','pawn','pawn','rook']);
  A.equal(skipState.party.every(u=>u.hp===u.maxHp),true);
  record('C03-跳过路径','专项',true,`跳过路径：猫粮 8（无教学收益）、人口 4、SP 0、车兵弓枪无炮仕、坚守自动生效且满血。与完成路径的差别仅教学猫粮 G=${G}。`,'c02-skip.png');
  await c2.close();await c2b.close();
@@ -399,7 +399,7 @@ async function enterLevel(p,n){await p.locator(`#campaign button[data-region="${
  record('C05','正常浏览器',true,`入关前可在地图↔主营地往返且猫粮/增益不退（余额 ${backToMapGold}）；确认进入关卡后只有布阵界面；布阵中刷新/继续仍恢复本关布阵，快照不变，菜单不能回营或重选关。`,'c05-deploy.png');
  await c1.close();
  /* C08 人口与编队（专项） */
- const party8=[['rook','rook'],['starting-pawn','pawn'],['starting-archer','archer'],['starting-spearman','spearman']];
+ const party8=[['rook','rook'],['starting-pawn','pawn'],['starting-pawn-2','pawn'],['starting-horse','horse']];
  const c8=await newContext({save:JSON.stringify({version:1,player:{tutorialCompleted:true,campGuideSeen:true},journey:campRecord({gold:40,population:5,teamSp:0})})});
  const p8=await openMenu(c8);await waitView(p8,'camp');
  for(let i=0;i<3;i++)await p8.locator('[data-recruit="pawn"]').click();
@@ -612,10 +612,10 @@ async function enterLevel(p,n){await p.locator(`#campaign button[data-region="${
  await p18.evaluate(()=>{
   const d=window.__M0_DEBUG__,s=d.getState();
   s.phase='intermission';s.level=1;s.completed=0;s.result='victory';s.gold=12;
-  const pawn=s.units.find(u=>u.id==='starting-pawn'),spear=s.units.find(u=>u.id==='starting-spearman');
+  const pawn=s.units.find(u=>u.id==='starting-pawn'),pawn2=s.units.find(u=>u.id==='starting-pawn-2');
   if(pawn)pawn.hp=0;
-  if(spear){spear.hp=1;spear.level=3;spear.kills=2;}
-  s.party.forEach(u=>{if(u.id==='starting-pawn')u.hp=0;if(u.id==='starting-spearman'){u.hp=1;u.level=3;u.kills=2;}});
+  if(pawn2){pawn2.hp=1;pawn2.level=3;pawn2.kills=2;}
+  s.party.forEach(u=>{if(u.id==='starting-pawn')u.hp=0;if(u.id==='starting-pawn-2'){u.hp=1;u.level=3;u.kills=2;}});
   const adv=window.M0.unit('adv-c18','player','advisor',3,1);adv.towerInterval=2;adv.hp=0;
   s.party.push(adv);s.activeIds.push('adv-c18');s.units.push(Object.assign({},adv));
   d.setState(s);
@@ -623,8 +623,8 @@ async function enterLevel(p,n){await p.locator(`#campaign button[data-region="${
  await waitView(p18,'camp');
  const healed18=await st(p18);
  A.equal(healed18.party.find(u=>u.id==='starting-pawn').hp,healed18.party.find(u=>u.id==='starting-pawn').maxHp,'阵亡普通队友入营满血');
- A.equal(healed18.party.find(u=>u.id==='starting-spearman').hp,healed18.party.find(u=>u.id==='starting-spearman').maxHp,'伤员入营满血');
- A.equal(healed18.party.find(u=>u.id==='starting-spearman').level,3,'成长保留');
+ A.equal(healed18.party.find(u=>u.id==='starting-pawn-2').hp,healed18.party.find(u=>u.id==='starting-pawn-2').maxHp,'伤员入营满血');
+ A.equal(healed18.party.find(u=>u.id==='starting-pawn-2').level,3,'成长保留');
  A.equal(healed18.party.find(u=>u.id==='adv-c18').hp,2,'被毁仕入营满血');
  A.equal(healed18.party.find(u=>u.id==='adv-c18').towerInterval,2,'仕档位保留');
  A.equal(healed18.gold,12,'不重复发首次入营奖励');

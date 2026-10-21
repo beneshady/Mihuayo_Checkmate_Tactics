@@ -40,7 +40,8 @@ test('C04 首次奖励与队伍状态全队一致：主帅与仕不受坚守影�
  A.equal(P(s,'adv-1').maxHp,2,'仕不享受坚守');
  A.equal(G(s,'king')&&G(s,'king').maxHp,3,'主帅不享受坚守');
  A.equal(P(s,'starting-pawn').maxHp,2,'兵 1→2');
- A.equal(P(s,'starting-spearman').maxHp,3,'枪兵 2→3');
+ A.equal(P(s,'starting-pawn-2').maxHp,2,'第二个兵 1→2');
+ A.equal(P(s,'starting-horse').maxHp,2,'马 1→2');
 });
 
 test('C07 人口扩编：4→8 每次 5 猫粮，满级拒绝，余额 4 拒绝 5 通过',()=>{
@@ -125,12 +126,13 @@ test('C10/C11 旅程增益顺序解锁：坚守→疾行→救援，各 5 猫粮
 test('C12 增益继承：普通队友 +1 HP/+1 移速，主帅与仕排除，攻击与射程不变',()=>{
  let s=camp(0);s.buffs={health:true,move:true,rescue:false};
  s=R.applyJourneyBuffs(s);
- const rook=P(s,'rook'),archer=P(s,'starting-archer');
+ const rook=P(s,'rook'),pawn2=P(s,'starting-pawn-2');
  A.equal(rook.maxHp,3);A.equal(rook.commanderMove,1);
  A.equal(rook.rookMoveRange+rook.commanderMove,5,'车移动 4→5');
  A.equal(rook.attack,1,'攻击不变');
- A.equal(archer.attack,2,'弓攻击不变');
- A.equal(archer.commanderMove,1);
+ A.equal(pawn2.attack,1,'新初始阵容无自带弓，攻击不变');
+ A.equal(pawn2.commanderMove,1);
+ A.equal(pawn2.maxHp,2,'兵 1+坚守 1');
  const level=R.startLevel(s,R.defaultMap());
  A.equal(G(level,'rook').maxHp,3,'入关继承且只加一次');
  A.equal(G(level,'rook').commanderMove,1);
@@ -141,7 +143,7 @@ test('C12 增益继承：普通队友 +1 HP/+1 移速，主帅与仕排除，攻
  A.equal(next.level,2);
  A.equal(P(next,'rook').maxHp,3,'跨关不重复叠加');
  A.equal(P(next,'rook').commanderMove,1);
- A.equal(P(next,'starting-archer').maxHp,2);
+ A.equal(P(next,'starting-pawn-2').maxHp,2,'新阵容兵跨关保持 +1 上限');
  // 反复应用不叠加
  const twice=R.applyJourneyBuffs(R.applyJourneyBuffs(s));
  A.equal(P(twice,'rook').maxHp,3);
@@ -213,18 +215,18 @@ test('C14 救援回满按含增益上限；跳过后本关不再触发；无目�
  A.equal(board.phase,'player');
  let cur=R.copy(board);
  cur.turn=5;cur.wave=1;
- G(cur,'starting-spearman').hp=1;
+ G(cur,'starting-pawn-2').hp=1;
  const out=R.endTurn(cur).state;
  A.equal(out.phase,'rescue','第 5→6 回合进入救援');
  A.equal(out.turn,6);
- G(out,'starting-archer').hp=1;                      // 专项：确保存在受伤目标
- const healed=R.rescue(out,'starting-archer');
- A.equal(G(healed,'starting-archer').hp,G(healed,'starting-archer').maxHp,'回复到含增益上限');
- A.equal(G(healed,'starting-archer').maxHp,2,'弓 1+坚守 1');
+ G(out,'starting-horse').hp=1;                       // 专项：确保存在受伤目标（马含坚守上限 2）
+ const healed=R.rescue(out,'starting-horse');
+ A.equal(G(healed,'starting-horse').hp,G(healed,'starting-horse').maxHp,'回复到含增益上限');
+ A.equal(G(healed,'starting-horse').maxHp,2,'马 1+坚守 1');
  A.equal(healed.wave,2);
- A.strictEqual(R.rescue(healed,'starting-spearman'),healed,'本关只触发一次');
+ A.strictEqual(R.rescue(healed,'starting-pawn-2'),healed,'本关只触发一次');
  // 跳过
- let skip=R.copy(board);skip.turn=5;skip.wave=1;G(skip,'starting-spearman').hp=1;
+ let skip=R.copy(board);skip.turn=5;skip.wave=1;G(skip,'starting-pawn-2').hp=1;
  const atRescue=R.endTurn(skip).state;
  A.equal(atRescue.phase,'rescue');
  const skipped=R.rescueSkip(atRescue);
@@ -246,16 +248,16 @@ test('C18 回营恢复：满血、阵亡队友与仕恢复，身份与成长保�
  const level=R.startLevel(s,R.defaultMap());
  const hurt=R.copy(level);
  G(hurt,'starting-pawn').hp=0;
- G(hurt,'starting-spearman').hp=1;
- G(hurt,'starting-spearman').level=3;P(hurt,'starting-spearman').level=3;
+ G(hurt,'starting-pawn-2').hp=1;
+ G(hurt,'starting-pawn-2').level=3;P(hurt,'starting-pawn-2').level=3;
  hurt.party.push(R.unit('adv-1','player','advisor',3,1));
  hurt.units.push(Object.assign(R.unit('adv-1','player','advisor',3,1),{device:true,towerInterval:2,hp:0}));
  P(hurt,'adv-1').towerInterval=2;                    // 专项：同步成长（正常流程由 syncParty 完成）
  const goldBefore=hurt.gold;
  const recovered=R.enterCamp(hurt);
  A.equal(P(recovered,'starting-pawn').hp,P(recovered,'starting-pawn').maxHp,'阵亡队友恢复满血');
- A.equal(P(recovered,'starting-spearman').hp,P(recovered,'starting-spearman').maxHp,'伤员恢复满血');
- A.equal(P(recovered,'starting-spearman').level,3,'成长保留');
+ A.equal(P(recovered,'starting-pawn-2').hp,P(recovered,'starting-pawn-2').maxHp,'伤员恢复满血');
+ A.equal(P(recovered,'starting-pawn-2').level,3,'成长保留');
  A.equal(P(recovered,'adv-1').hp,2,'仕恢复');
  A.equal(P(recovered,'adv-1').towerInterval,2,'仕档位保留');
  A.equal(recovered.gold,goldBefore,'不重复发首次入营奖励');
@@ -263,16 +265,16 @@ test('C18 回营恢复：满血、阵亡队友与仕恢复，身份与成长保�
 });
 
 test('C18 回营恢复：满血、阵亡队友与仕恢复，身份与成长保留（含二次恢复）',()=>{
- let s=camp(0);s.firstEntryRewarded=true;
+ let s=camp(0);s.firstEntryRewarded=true;s.buffs={health:true,move:false,rescue:false};s=R.applyJourneyBuffs(s);   // 已有坚守：伤员上限为 2
  const level=R.startLevel(s,R.defaultMap());
  const hurt=R.copy(level);
  G(hurt,'starting-pawn').hp=0;
- G(hurt,'starting-spearman').hp=1;
- G(hurt,'starting-spearman').level=3;P(hurt,'starting-spearman').level=3;
+ G(hurt,'starting-pawn-2').hp=1;
+ G(hurt,'starting-pawn-2').level=3;P(hurt,'starting-pawn-2').level=3;
  const recovered=R.enterCamp(hurt);
  A.equal(P(recovered,'starting-pawn').hp,P(recovered,'starting-pawn').maxHp,'阵亡队友恢复');
- A.equal(P(recovered,'starting-spearman').hp,P(recovered,'starting-spearman').maxHp,'伤员满血');
- A.equal(P(recovered,'starting-spearman').level,3,'成长保留');
+ A.equal(P(recovered,'starting-pawn-2').hp,P(recovered,'starting-pawn-2').maxHp,'伤员满血');
+ A.equal(P(recovered,'starting-pawn-2').level,3,'成长保留');
  A.equal(recovered.phase,'intermission');
  A.equal(recovered.gold,0,'已领过首次奖励时不再发');
 });
@@ -345,7 +347,7 @@ test('C17 救援使用/跳过：本关一次、下一关重置、失败重试恢
  let s=camp(0);s.buffs={health:true,move:false,rescue:true};s=R.applyJourneyBuffs(s);s.firstEntryRewarded=true;
  let level=R.confirmDeployment(R.startLevel(s,R.defaultMap()));
  level.turn=5;level.wave=1;
- G(level,'starting-spearman').hp=1;
+ G(level,'starting-pawn-2').hp=1;
  const at=R.endTurn(level).state;
  A.equal(at.phase,'rescue');
  const skipped=R.rescueSkip(at);
@@ -355,19 +357,19 @@ test('C17 救援使用/跳过：本关一次、下一关重置、失败重试恢
  const victory=R.copy(skipped);victory.phase='intermission';victory.result='victory';victory.level=1;victory.completed=1;
  const next=R.nextLevel(victory,R.defaultMap());
  A.equal(next.level,2);A.equal(next.rescueUsed,false,'下一关重新拥有机会');
- const nextBoard=R.confirmDeployment(next);nextBoard.turn=5;nextBoard.wave=1;G(nextBoard,'starting-spearman').hp=1;
+ const nextBoard=R.confirmDeployment(next);nextBoard.turn=5;nextBoard.wave=1;G(nextBoard,'starting-pawn-2').hp=1;
  A.equal(R.endTurn(nextBoard).state.phase,'rescue','下一关第 6 回合再次触发');
  // 失败重试恢复到入关快照：本关消耗清除、wave1、到第二波可再次触发一次
  const board=R.confirmDeployment(R.startLevel(s,R.defaultMap()));
- G(board,'starting-spearman').hp=1;
+ G(board,'starting-pawn-2').hp=1;
  board.phase='rescue';board.rescueRequired=true;
- const used=R.rescue(board,'starting-spearman');
+ const used=R.rescue(board,'starting-pawn-2');
  A.equal(used.rescueUsed,true);
  const dead=Object.assign(R.copy(used),{phase:'result',result:'dead'});
  const retry=R.retryLevel(dead);
  A.equal(retry.phase,'deploy');A.equal(retry.rescueUsed,false);A.equal(retry.wave,1);
  const retryBoard=R.confirmDeployment(retry);retryBoard.turn=5;retryBoard.wave=1;
- const hurt=G(retryBoard,'starting-spearman');hurt.hp=1;
+ const hurt=G(retryBoard,'starting-pawn-2');hurt.hp=1;
  const retryRescue=R.endTurn(retryBoard).state;
  A.equal(retryRescue.phase,'rescue','重试推进到第 6 回合可再次触发');
  A.equal(R.rescueSkip(retryRescue).rescueUsed,true);
@@ -470,4 +472,203 @@ test('C23-M2 规则：攻击结算含先前移动与击杀，失败重试仍按�
  A.deepEqual([G(retry,'starting-pawn').x,G(retry,'starting-pawn').y],[1,3],'重试回到入关站位');
  A.deepEqual([G(retry,'rook').x,G(retry,'rook').y],[0,0]);
  A.equal(retry.killLedger['w1-0'],undefined,'重试不保留本关击杀账本');
+});
+
+// US-020 2026-10-21 初始阵容调整验收（A01～A03 规则层）；浏览器实际证据见 docs/us/us020-evidence-r4-lineup/。
+const BASE_IDS=['rook','starting-pawn','starting-pawn-2','starting-horse'];
+test('A01 新旅程基础阵容：兵2马1车1、主帅保留、人口4、ID互异、站位合法、满血与初营 HP 增益',()=>{
+ const s=R.newGame();
+ A.deepEqual(s.party.map(u=>u.id),BASE_IDS,'普通队友：车×1、兵×2、马×1');
+ A.equal(new Set(BASE_IDS).size,BASE_IDS.length,'两个普通兵使用不同稳定 ID');
+ A.deepEqual(s.party.map(u=>u.kind),['rook','pawn','pawn','horse']);
+ A.equal(s.party.filter(u=>u.kind==='pawn').length,2,'两个普通兵');
+ const players=s.units.filter(u=>u.side==='player');
+ A.equal(players.filter(u=>u.kind==='king').length,1,'主帅保留');
+ A.equal(players.some(u=>['archer','spearman','cannon','advisor'].includes(u.kind)),false,'无初始弓/枪/炮/仕');
+ A.equal(s.population,4,'人口仍为 4');A.equal(s.activeIds.length,4);A.equal(new Set(s.activeIds).size,4);
+ A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length,'站位合法无重叠');
+ players.forEach(u=>{A.equal(R.inside(u),true);A.equal(R.mountain(s,u),false,'不能站山');A.equal(R.isWater(u,s),false,'不能站水');A.ok(u.y<4,'我方半场');});
+ players.filter(u=>u.kind!=='king').forEach(u=>A.equal(u.hp,u.maxHp,'新局满血'));
+ const camp=R.enterCamp(s);
+ A.equal(camp.gold,8,'首次入营 8 猫粮');A.equal(camp.teamSp,0,'公共 SP 0');
+ A.deepEqual(camp.buffs,{health:true,move:false,rescue:false},'免费坚守');
+ A.deepEqual(camp.party.map(u=>[u.id,u.maxHp,u.hp,u.commanderHealth]),[['rook',3,3,1],['starting-pawn',2,2,1],['starting-pawn-2',2,2,1],['starting-horse',2,2,1]],'初营 HP 增益只加一次且满血');
+ const level=R.startLevel(camp,R.defaultMap());
+ const board=R.confirmDeployment(level);
+ A.notStrictEqual(board,level,'四人布阵合法');
+ A.equal(board.phase,'player');
+ A.equal(board.units.filter(u=>u.side==='player'&&u.kind!=='king').length,4,'人口 4 全部上阵');
+ A.equal(board.units.some(u=>u.side==='player'&&['archer','spearman','cannon','advisor'].includes(u.kind)),false);
+ A.equal(board.units.filter(u=>u.side==='player'&&u.kind==='king').length,1,'主帅保留');
+});
+test('A02 完成与跳过同一基础阵容；新旅程重置；旧局与跨关队伍不改写',()=>{
+ const completed=R.journeyRecord(R.newGame());
+ const skipped=R.journeyRecord(R.newGame());
+ A.deepEqual(completed.party,skipped.party,'两条入营路径基础阵容一致');
+ A.deepEqual(skipped.party.map(u=>u.id),BASE_IDS);
+ A.deepEqual([skipped.gold,skipped.teamSp,skipped.population,skipped.completed,skipped.firstEntryRewarded],[0,0,4,0,false],'新旅程重置：猫粮/SP/人口/进度');
+ A.deepEqual(skipped.buffs,{health:false,move:false,rescue:false});
+ const camped=R.enterCamp(R.newGame());
+ A.deepEqual([camped.gold,camped.teamSp],[8,0],'跳过路径只发首营 8 猫粮，不补发教学收益');
+ A.deepEqual(camped.buffs,{health:true,move:false,rescue:false},'两条路径首营增益一致');
+ const storage=memory();
+ J.write(storage,{player:{tutorialCompleted:true,campGuideSeen:true},journey:R.journeyRecord(Object.assign(R.newGame(),{completed:2,gold:30,teamSp:5}))});
+ const before=J.read(storage);
+ J.write(storage,{player:before.player,journey:R.journeyRecord(R.newGame())});
+ const after=J.read(storage);
+ A.equal(after.player.tutorialCompleted,true,'教学跳过资格不被新旅程清空');
+ A.deepEqual(after.journey.party.map(u=>u.id),BASE_IDS,'新旅程回到基础阵容');
+ A.deepEqual([after.journey.completed,after.journey.gold,after.journey.population],[0,0,4]);
+ const legacy={gold:12,teamSp:3,population:5,buffs:{health:true,move:true,rescue:false},party:[R.unit('rook','player','rook',0,0),R.unit('starting-pawn','player','pawn',1,3),R.unit('starting-archer','player','archer',4,3),R.unit('starting-spearman','player','spearman',7,3)],activeIds:['rook','starting-pawn','starting-archer','starting-spearman'],bench:[],completed:1,tutorial:'completed',firstEntryRewarded:true};
+ const restored=R.stateFromJourney(legacy);
+ A.deepEqual(restored.party.map(u=>u.id),legacy.party.map(u=>u.id),'旧局队伍原样恢复，不迁移成新阵容');
+ A.deepEqual(restored.activeIds,legacy.activeIds);
+ const cross=R.nextLevel(restored,R.defaultMap());
+ A.deepEqual(cross.party.map(u=>u.kind).sort(),['archer','pawn','rook','spearman'],'跨关保留旧队伍');
+ A.equal(cross.units.some(u=>u.id==='starting-pawn-2'||u.id==='starting-horse'),false,'不向旧局注入新初始单位');
+ A.equal(cross.gold,12,'跨关资源沿用');
+});
+test('A03 两个普通兵分别转职弓/枪：独立、费用与技能沿用原规则（专项：注入公共 SP）',()=>{
+ let s=R.newGame();s.phase='intermission';s.teamSp=6;   // 专项：注入公共 SP，仅验证转职链路
+ A.equal(s.party.filter(u=>u.kind==='pawn').length,2,'新旅程有两个普通兵');
+ const archer=R.purchaseUpgrade(s,'starting-pawn','promote-archer');
+ A.notStrictEqual(archer,s);A.equal(archer.teamSp,4,'转职弓兵 2 SP');
+ A.deepEqual([P(archer,'starting-pawn').kind,P(archer,'starting-pawn').attack,P(archer,'starting-pawn').maxHp],['archer',2,1],'弓攻击 +1、不额外加血');
+ A.equal(P(archer,'starting-pawn-2').kind,'pawn','另一兵未受影响');
+ const both=R.purchaseUpgrade(archer,'starting-pawn-2','promote-spearman');
+ A.equal(both.teamSp,2,'第二兵独立 2 SP');
+ A.deepEqual([P(both,'starting-pawn-2').kind,P(both,'starting-pawn-2').hp,P(both,'starting-pawn-2').maxHp],['spearman',2,2],'枪当前/最大 HP 各 +1');
+ A.equal(P(both,'starting-pawn').kind,'archer','两兵职业各自独立');
+ A.strictEqual(R.purchaseUpgrade(both,'starting-pawn','promote-spearman'),both,'已转职兵不能重复转职');
+ const poor=Object.assign(R.copy(s),{teamSp:1});
+ A.strictEqual(R.purchaseUpgrade(poor,'starting-pawn','promote-archer'),poor,'SP 不足拒绝且不扣款');
+ A.strictEqual(R.purchaseUpgrade(both,'rook','promote-archer'),both,'非普通兵不能转职');
+ const level=R.startLevel(both,R.defaultMap());
+ const board=R.confirmDeployment(level);
+ A.notStrictEqual(board,level,'转职后四人布阵合法');
+ const archerUnit=board.units.find(u=>u.id==='starting-pawn'),spearUnit=board.units.find(u=>u.id==='starting-pawn-2');
+ A.deepEqual([archerUnit.kind,R.directionRange(archerUnit,0)],['archer',{min:2,max:2}],'弓初始射程沿用');
+ A.equal(R.directionalAction(board,'starting-pawn',0),undefined,'弓相邻 1 格盲区沿用');
+ A.deepEqual([spearUnit.kind,spearUnit.hp,spearUnit.maxHp],['spearman',2,2],'入关保留枪转职加成');
+ A.ok(R.directionalAction(board,'starting-pawn-2',0),'枪四向攻击可用');
+});
+
+// US-020 R04（2026-10-21 再确认）普通队友持有数、部署人口与招募：P01～P07 规则断言。
+// P01～P06 的余额/名单边界属专项夹具；P07 的存档往返与失败重试为规则/存档断言。P08 为帮助文案，见浏览器脚本。
+test('P01 持有 7、上阵 4、后备 3、部署上限 4 分别计数：持有数量不限',()=>{
+ let s=camp(9);
+ s=R.setActiveRoster(s,s.activeIds.filter(id=>id!=='starting-horse'));   // 主动换下 1 人，空出部署名额
+ for(let i=0;i<3;i++)s=R.buy(s,'pawn');                                  // 9 猫粮 → 3 名兵
+ const ordinary=s.party.filter(u=>u.kind!=='advisor'&&u.kind!=='king');
+ A.equal(ordinary.length,7,'队友总数 7（含后备）');
+ A.equal(R.activeOrdinary(s).length,4,'部署人口 4');
+ A.equal(ordinary.length-R.activeOrdinary(s).length,3,'其中后备 3');
+ A.equal(R.populationLimit(s),4,'部署上限仍为 4');
+ A.equal(s.gold,0,'3 名兵各 3 猫粮');
+ A.equal(s.party.filter(u=>u.kind==='advisor').length,0,'无仕时普通总数不受影响');
+ A.equal(new Set(s.party.map(u=>u.id)).size,7,'持有 ID 互异');
+});
+
+test('P02 招募：空位默认上阵，满员进入后备且不替换原上阵名单',()=>{
+ let s=camp(30);
+ s=R.setActiveRoster(s,s.activeIds.filter(id=>id!=='rook'));
+ const beforeActive=R.activeOrdinary(s).slice();
+ const recruit=R.buy(s,'pawn');
+ A.equal(R.activeOrdinary(recruit).length,4,'有空余名额时新招募默认上阵');
+ A.ok(recruit.activeIds.includes('recruit-pawn-0'),'新招募进入上阵名单');
+ A.deepEqual(R.activeOrdinary(recruit).slice(0,beforeActive.length),beforeActive,'不替换原有上阵队友及其顺序');
+ const activeBeforeBench=recruit.activeIds.slice();
+ const benched=R.buy(recruit,'pawn');
+ A.deepEqual(benched.activeIds,activeBeforeBench,'满员招募不替换任何已上阵队友');
+ A.ok(benched.bench.includes('recruit-pawn-1'),'满员招募进入后备');
+ A.equal(R.activeOrdinary(benched).length,4,'上阵仍为 4');
+ A.equal(benched.party.length,6,'持有数量不受部署上限阻断');
+});
+
+test('P03 部署上限 8 时仍可持有 9 名以上普通队友',()=>{
+ let s=camp(200);
+ for(let i=0;i<4;i++)s=R.expandPopulation(s);
+ A.equal(R.populationLimit(s),8,'部署上限到 8');
+ for(let i=0;i<9;i++)s=R.buy(s,'pawn');
+ A.equal(s.party.filter(u=>u.kind!=='advisor').length,13,'持有 13 名普通队友（初始 4＋招募 9）');
+ A.equal(R.activeOrdinary(s).length,8,'上阵 8');
+ A.equal(s.party.length-R.activeOrdinary(s).length,5,'后备 5');
+ A.equal(s.bench.length,5,'后备名单与实际一致');
+ const more=R.buy(s,'pawn');
+ A.equal(more.party.length,14,'满部署与上限 8 都不阻止继续招募');
+ A.equal(R.activeOrdinary(more).length,8,'继续招募只进后备');
+ A.strictEqual(R.setActiveRoster(more,more.activeIds.concat('recruit-pawn-8')),more,'超过部署上限 8 拒绝编队');
+});
+
+test('P04 部署上限 +1 只提高上限：5 猫粮固定，不增加数量、不赠送棋子',()=>{
+ let s=camp(5);
+ const before={party:s.party.map(u=>u.id),active:s.activeIds.slice(),bench:s.bench.slice(),limit:R.populationLimit(s)};
+ const n=R.expandPopulation(s);
+ A.equal(n.gold,0,'固定 5 猫粮');
+ A.equal(R.populationLimit(n),5,'部署上限 4→5');
+ A.deepEqual(n.party.map(u=>u.id),before.party,'不增加持有队友');
+ A.deepEqual(n.activeIds,before.active,'不赠送上阵棋子');
+ A.deepEqual(n.bench,before.bench,'不改后备名单');
+ A.strictEqual(R.expandPopulation(n),n,'余额不足拒绝且不扣款');
+ const poor=camp(4);A.strictEqual(R.expandPopulation(poor),poor,'余额 4 拒绝（不显示差额）');
+ const exact=camp(5);A.equal(R.expandPopulation(exact).population,5,'余额 5 恰好成功');
+ let maxed=camp(50);for(let i=0;i<4;i++)maxed=R.expandPopulation(maxed);
+ A.strictEqual(R.expandPopulation(maxed),maxed,'达到上限 8 后拒绝，不赠送第 9 人口');
+ A.equal(R.populationLimit({population:12}),8,'越界存档按上限 8 收敛');
+});
+
+test('P05 至少 1 名普通队友：0 人与超限不能开战，1 人与部署上限人数合法',()=>{
+ const board=()=>R.startLevel(camp(30),R.defaultMap());
+ const zero=board();zero.units=zero.units.filter(u=>u.side==='enemy'||u.kind==='king');
+ A.strictEqual(R.confirmDeployment(zero),zero,'0 名普通队友拒绝（主帅不能代替）');
+ const one=board();one.units=one.units.filter(u=>u.side==='enemy'||u.kind==='king'||u.id==='starting-pawn');
+ A.equal(R.confirmDeployment(one).phase,'player','1 名普通队友允许出战');
+ const over=board();over.units.push(R.unit('extra-x','player','pawn',2,1));
+ A.strictEqual(R.confirmDeployment(over),over,'超过部署上限 4 拒绝');
+ over.population=5;A.equal(R.confirmDeployment(over).phase,'player','提升上限后同样 5 人合法');
+ let full=camp(200);for(let i=0;i<4;i++)full=R.expandPopulation(full);
+ for(let i=0;i<8;i++)full=R.buy(full,'pawn');
+ const atLimit=R.startLevel(full,R.defaultMap());
+ A.equal(atLimit.units.filter(u=>u.side==='player'&&u.kind!=='king').length,8,'8 名普通队友上阵');
+ A.equal(R.confirmDeployment(atLimit).phase,'player','等于部署上限 8 合法');
+});
+
+test('P06 主帅与两座仕单独计数，均不计入普通总数、后备数或部署人口',()=>{
+ let s=camp(20);
+ s=R.buy(s,'advisor');s=R.buy(s,'advisor');
+ A.equal(s.party.filter(u=>u.kind==='advisor').length,2,'仕最多两座');
+ A.equal(s.party.some(u=>u.kind==='king'),false,'主帅不在普通持有名单（单独显示）');
+ A.equal(s.party.filter(u=>u.kind!=='advisor'&&u.kind!=='king').length,4,'普通队友总数仍为 4');
+ A.equal(R.activeOrdinary(s).length,4,'仕不计入部署人口');
+ A.ok(s.activeIds.includes('recruit-advisor-0')&&s.activeIds.includes('recruit-advisor-1'),'两座仕固定上阵');
+ A.strictEqual(R.buy(s,'advisor'),s,'第三座仕拒绝');
+ const bench=R.buy(s,'pawn');
+ A.ok(bench.bench.includes('recruit-pawn-0'),'普通队友满员时进入后备，仕不占其部署名额');
+ A.equal(R.activeOrdinary(bench).length,4,'招募普通队友不改变仕与部署人口计数');
+ const level=R.startLevel(bench,R.defaultMap());
+ A.equal(level.units.filter(u=>u.side==='player'&&u.kind==='advisor').length,2,'入关仕单独上阵');
+ A.equal(level.units.filter(u=>u.side==='player'&&u.kind!=='king'&&u.kind!=='advisor').length,4,'主帅与仕不计入普通部署人口');
+});
+
+test('P07 存档与失败重试恢复名单、后备与部署上限',()=>{
+ let s=camp(30);
+ s=R.expandPopulation(s);s=R.expandPopulation(s);                 // 部署上限 6
+ s=R.setActiveRoster(s,s.activeIds.filter(id=>id!=='starting-horse'));
+ for(let i=0;i<4;i++)s=R.buy(s,'pawn');                            // 上阵 6、后备 2、持有 8
+ const record=R.journeyRecord(s);
+ const storage=memory();J.write(storage,{player:{tutorialCompleted:true,campGuideSeen:true},journey:record});
+ const restored=R.stateFromJourney(J.read(storage).journey);
+ A.equal(R.populationLimit(restored),6,'刷新后恢复部署上限 6');
+ A.equal(R.activeOrdinary(restored).length,6,'刷新后恢复上阵 6');
+ A.equal(restored.party.length-R.activeOrdinary(restored).length,2,'刷新后恢复后备 2');
+ A.deepEqual(restored.activeIds.slice().sort(),s.activeIds.slice().sort(),'上阵名单一致');
+ A.deepEqual(restored.party.map(u=>u.id),s.party.map(u=>u.id),'持有名单一致');
+ const board=R.startLevel(s,R.defaultMap());
+ const dead=R.copy(board);dead.phase='result';dead.result='dead';
+ const retried=R.retryLevel(dead);
+ A.equal(retried.phase,'deploy','失败重试回到布阵');
+ A.equal(R.populationLimit(retried),6,'失败重试恢复部署上限 6');
+ A.equal(R.activeOrdinary(retried).length,6,'失败重试恢复上阵名单');
+ A.equal(retried.party.length-R.activeOrdinary(retried).length,2,'失败重试恢复后备名单');
+ A.deepEqual(retried.activeIds.slice().sort(),s.activeIds.slice().sort(),'失败重试名单与入关时一致');
 });

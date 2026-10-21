@@ -160,7 +160,7 @@ test('US-002 河道、宫、外缘与炮跨8步',()=>{
 
 test('US-013 覆盖US003初始赠炮/售价：新局无炮、关间8金币购炮',()=>{
  let s=game();A.equal(G(s,'starting-cannon'),undefined);s.phase='intermission';s.gold=8;s.population=5;/* US-020：人口默认 4，本条验证炮的跨关属性，故先扩到 5 */s=R.buy(s,'cannon');const id=s.party.find(u=>u.id.startsWith('recruit-cannon')).id;A.equal(s.gold,0);s=R.nextLevel(s);A.ok(G(s,id));A.deepEqual([G(s,id).kind,G(s,id).hp,G(s,id).attack,G(s,id).level,s.teamSp],['cannon',2,2,1,0]);
- for(let i=0;i<3;i++){const z=game();A.deepEqual(z.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-pawn','starting-archer','starting-spearman']);A.equal(G(z,'cannon'),undefined);}
+ for(let i=0;i<3;i++){const z=game();A.deepEqual(z.units.filter(u=>u.side==='player').map(u=>u.id),['king','rook','starting-pawn','starting-pawn-2','starting-horse']);A.equal(G(z,'cannon'),undefined);}
 });
 
 test('US-005 我方炮可移动后攻击，额度独立且敌炮不变',()=>{
@@ -193,24 +193,26 @@ test('US-006 纵推连推、炮架和冻结攻击边界',()=>{
 });
 
 test('US-008 初始兵系阵容、攻击、成长、跨波与重开',()=>{
- const starter=['king','rook','starting-pawn','starting-archer','starting-spearman'];
+ // US-020 2026-10-21：正式新旅程初始普通队友为兵×2、马×1、车×1，无初始弓/枪；弓/枪只由普通兵转职获得。
+ const starter=['king','rook','starting-pawn','starting-pawn-2','starting-horse'];
  let s=game(),players=s.units.filter(u=>u.side==='player');
  A.deepEqual(players.map(u=>u.id),starter);A.equal(s.units.filter(u=>u.side==='enemy').length,8);A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);A.ok(s.intents.length===8);
- for(const [id,kind,x,y,hp,attack] of [['starting-pawn','pawn',1,3,1,1],['starting-archer','archer',4,3,1,2],['starting-spearman','spearman',7,3,2,1]]){
+ for(const [id,kind,x,y,hp,attack] of [['starting-pawn','pawn',1,3,1,1],['starting-pawn-2','pawn',4,3,1,1],['starting-horse','horse',7,3,1,1]]){
   const u=G(s,id);A.deepEqual([u.kind,u.x,u.y,u.hp,u.maxHp,u.attack,u.level,u.kills,Object.hasOwn(u,'sp'),u.directionPaid],[kind,x,y,hp,hp,attack,1,0,false,[0,0,0,0]]);
  }
- for(const [id,target] of [['starting-pawn',{x:1,y:4}],['starting-spearman',null]]){
-  s=game();const before=G(s,id),out=target?R.submit(s,id,target):R.submitDirection(s,id,0),u=G(out.state,id);
+ for(const [id,target] of [['starting-pawn',{x:1,y:4}],['starting-pawn-2',{x:4,y:4}]]){
+  s=game();const before=G(s,id),out=R.submit(s,id,target),u=G(out.state,id);
   A.ok(out.effect);A.deepEqual([u.x,u.y,u.ap,u.kills,u.level,out.state.teamSp],[before.x,before.y,0,1,2,1]);
  }
- s=grant(game(),'starting-spearman',1);s=up(s,'starting-spearman','direction',0);s.units.push(U('pierce-target','enemy','pawn',7,5));let pierce=R.submitDirection(s,'starting-spearman',0);A.deepEqual(pierce.effect.victims.sort(),['pierce-target','w1-2']);
+ // 自带弓/枪已移除：改由普通兵转职后验证四向枪贯穿（原 US-008 自带兵系覆盖不删除）。
+ s=grant(game(),'starting-pawn-2',3);s=up(s,'starting-pawn-2','promote-spearman');s=up(s,'starting-pawn-2','direction',0);s.units.push(U('pierce-target','enemy','pawn',4,5));let pierce=R.submitDirection(s,'starting-pawn-2',0);A.deepEqual(pierce.effect.victims.sort(),['pierce-target','w1-1']);
  for(const kind of ['archer','spearman']){
   s=game();s=R.submit(s,'starting-pawn',{x:1,y:4}).state;R.resetTurn(G(s,'starting-pawn'));s.units.push(U('promotion-target','enemy','pawn',1,4));s=R.submit(s,'starting-pawn',{x:1,y:4}).state;A.deepEqual([G(s,'starting-pawn').kills,s.teamSp],[2,2]);s=up(s,'starting-pawn','promote-'+kind);const u=G(s,'starting-pawn');
   A.deepEqual([u.id,u.kind,u.x,u.y,u.level,u.kills,s.teamSp,u.attack,u.hp,u.maxHp],["starting-pawn",kind,1,3,3,2,0,kind==='archer'?2:1,kind==='archer'?1:2,kind==='archer'?1:2]);
  }
- s=grant(game(),'starting-archer',1);s=up(s,'starting-archer','direction',1);A.deepEqual(G(s,'starting-archer').directionPaid,[0,1,0,0]);A.deepEqual(G(s,'starting-spearman').directionPaid,[0,0,0,0]);s=grant(s,'starting-spearman',1);s=up(s,'starting-spearman','direction',2);A.deepEqual(G(s,'starting-spearman').directionPaid,[0,0,1,0]);
+ s=grant(game(),'starting-pawn',3);s=up(s,'starting-pawn','promote-archer');s=up(s,'starting-pawn','direction',1);A.deepEqual(G(s,'starting-pawn').directionPaid,[0,1,0,0]);A.deepEqual(G(s,'starting-pawn-2').directionPaid,[0,0,0,0]);s=grant(s,'starting-pawn-2',3);s=up(s,'starting-pawn-2','promote-spearman');s=up(s,'starting-pawn-2','direction',2);A.deepEqual(G(s,'starting-pawn-2').directionPaid,[0,0,1,0]);
  s=game();grant(s,'starting-pawn',2);s=up(s,'starting-pawn','promote-archer');s.phase='intermission';s.gold=5;s.population=5;/* US-020：人口默认 4 */s=R.buy(s,'horse');s=R.nextLevel(s);A.deepEqual([G(s,'starting-pawn').kind,G(s,'starting-pawn').x,G(s,'starting-pawn').y],['archer',1,3]);A.ok(s.units.some(u=>u.kind==='horse'));A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);
- s=game();s.units=s.units.filter(u=>u.id!=='starting-spearman');s.phase='intermission';s.gold=8;s.population=5;/* US-020：人口默认 4 */s=R.buy(s,'cannon');s=R.nextLevel(s);A.ok(G(s,'starting-spearman'));A.equal(s.units.filter(u=>u.side==='player'&&u.kind==='cannon').length,1);A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);
+ s=game();s.units=s.units.filter(u=>u.id!=='starting-horse');s.phase='intermission';s.gold=8;s.population=5;/* US-020：人口默认 4 */s=R.buy(s,'cannon');s=R.nextLevel(s);A.ok(G(s,'starting-horse'));A.equal(s.units.filter(u=>u.side==='player'&&u.kind==='cannon').length,1);A.equal(new Set(s.units.map(u=>u.x+','+u.y)).size,s.units.length);
  s=game();players=s.units.filter(u=>u.side==='player');A.deepEqual(players.map(u=>u.id),starter);A.equal(players.some(u=>u.id==='horse'||u.id==='cannon'),false);
 });
 
