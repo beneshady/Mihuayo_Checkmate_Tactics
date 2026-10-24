@@ -1,0 +1,27 @@
+const path = require('node:path');
+const { startServer } = require('../tests/us011-static-server.cjs');
+const pw = require(path.join(process.env.USERPROFILE, '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
+(async () => {
+  const { port, close } = await startServer(path.join(__dirname, '..', 'web'));
+  const browser = await pw.chromium.launch({ headless: true });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await context.newPage();
+  page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
+  page.on('dialog', async (d) => { console.log('DIALOG', d.type(), d.message().slice(0, 80)); await d.dismiss(); });
+  await page.goto('http://127.0.0.1:' + port + '/?probe=1');
+  await page.waitForFunction(() => window.M0Campaign && window.M0Campaign.info().view === 'menu');
+  console.log('storage at menu:', await page.evaluate(() => Object.keys(localStorage)));
+  await page.locator('#flow-new').click();
+  console.log('view after new:', await page.evaluate(() => window.M0Campaign.info().view));
+  console.log('tutorial screen hidden:', await page.evaluate(() => document.getElementById('flow-tutorial').hidden));
+  await page.locator('#tutorial-enter').click();
+  await page.waitForTimeout(1500);
+  console.log('view after tutorial enter:', await page.evaluate(() => window.M0Campaign.info().view));
+  console.log('storage after tutorial enter:', await page.evaluate(() => Object.keys(localStorage)));
+  console.log('journey:', (await page.evaluate(() => localStorage.getItem('m0-journey-v1')))?.slice(0, 200));
+  console.log('pause visible:', await page.locator('#ov-pause').evaluate((el) => el.classList.contains('show')));
+  console.log('menu-pause visible:', await page.locator('#btn-menu-pause').isVisible());
+  console.log('state phase:', await page.evaluate(() => window.__M0_DEBUG__.getState().phase));
+  console.log('state units:', await page.evaluate(() => window.__M0_DEBUG__.getState().units.map((u) => [u.id, u.side, u.kind, u.x, u.y])));
+  await browser.close(); await close();
+})().catch((e) => { console.error('FAIL', e); process.exitCode = 1; });

@@ -1,0 +1,578 @@
+{
+  "scope": "US-021 H01～H20 实际浏览器验收（正常入口 + 专项夹具 + 旧档副本）",
+  "startedAt": "2026-10-24T02:42:55.028Z",
+  "steps": [
+    {
+      "id": "H20-1",
+      "kind": "正常入口（新旅程→跳过教学→营地）",
+      "pass": true,
+      "detail": "正常点击进入营地：猫粮 8、公共 SP 0、队伍 rook/pawn/pawn/horse",
+      "evidence": null
+    },
+    {
+      "id": "H20-2",
+      "kind": "正常入口：商店招募马",
+      "pass": true,
+      "detail": "点击招募马：猫粮 8→3，recruit-horse-0 进入后备（上阵 4/4）",
+      "evidence": null
+    },
+    {
+      "id": "H20-3",
+      "kind": "正常入口：营地换阵让招募马出战",
+      "pass": true,
+      "detail": "名单切换上阵 rook,starting-pawn,starting-pawn-2,recruit-horse-0；猫粮 3；截图 h20-camp-roster.png",
+      "evidence": null
+    },
+    {
+      "id": "H06/H13-营地技能面板",
+      "kind": "营地技能面板：马三项价格与 SP 不足禁用",
+      "pass": true,
+      "detail": "营地清单含马三项成长（1/2/2 SP），SP 0 时按钮禁用；截图 h06-camp-skills.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-4",
+      "kind": "正常入口：离开营地→选关→布阵",
+      "pass": true,
+      "detail": "布阵确认后进入我方行动：新马 (7,3)、SP 0、回合 1",
+      "evidence": null
+    },
+    {
+      "id": "H19-界面",
+      "kind": "我方马只有两个操作入口（无旧普通攻击）",
+      "pass": true,
+      "detail": "模式按钮=[\"普通移动\",\"跳跃攻击 2 格\"]；技能含强健/距离/伤害/推动；截图 h19-horse-modes.png",
+      "evidence": null
+    },
+    {
+      "id": "H02/H20-预览与取消",
+      "kind": "跳跃预览与取消：不改变资源、行动",
+      "pass": true,
+      "detail": "预览含“跳跃攻击/落地四邻格直接伤害 1 点/伤害范围”；取消后状态一致；截图 h20-jump-preview.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-5",
+      "kind": "正常入口：基础跳跃攻击（距离 2）落地击杀",
+      "pass": true,
+      "detail": "点击跳跃落点 (7,5)：击杀 w1-2、SP 0→1、马 [7,5]、ap 0；截图 h20-jump-executed.png",
+      "evidence": null
+    },
+    {
+      "id": "H01-界面",
+      "kind": "跳跃后本回合不能再普通移动",
+      "pass": true,
+      "detail": "跳跃后普通移动按钮禁用（disabled=true），强制点击也不改变状态",
+      "evidence": null
+    },
+    {
+      "id": "H06/H12-战斗购买",
+      "kind": "技能距离即时生效、不恢复行动、扣 1 SP",
+      "pass": true,
+      "detail": "点击“技能距离”：SP 1→0、距离 3、ap 仍 0、跳跃已用仍 true；截图 h12-buy-distance.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-6",
+      "kind": "走出回合并使用升级后的 3 格跳跃",
+      "pass": true,
+      "detail": "第 2 回合点击 3 格落点 (4,5)：预览“直线 3 格”、击杀 w1-1、SP 1；截图 h20-distance3-jump.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-7",
+      "kind": "正常入口：第 3 回合普通移动与撤回",
+      "pass": true,
+      "detail": "第 3 回合普通移动到 (5,3)（击杀/SP 不变、可撤回），撤回后回到 (4,5) 且 AP 恢复；截图 h20-normal-move.png,h20-normal-undo.png",
+      "evidence": null
+    },
+    {
+      "id": "H01-专项界面",
+      "kind": "先普通移动再释放跳跃：普通移动不伤害、跳跃照常结算",
+      "pass": true,
+      "detail": "普通移动 (4,4)→(5,6) 不造成伤害，随后跳跃 (5,5) 击杀 t、SP 1；截图 h01-move-then-jump.png",
+      "evidence": null
+    },
+    {
+      "id": "H15-专项界面",
+      "kind": "双王同亡：完整结算后失败优先（终局截图）",
+      "pass": true,
+      "detail": "同次技能击杀双方主将与其他方向目标，结果 dead/result；结算浮层含“主帅阵亡”；截图 h15-both-kings.png",
+      "evidence": null
+    },
+    {
+      "id": "H02/H03-专项界面",
+      "kind": "非法落点被拒绝并显示原因、不消耗技能",
+      "pass": true,
+      "detail": "依次点击 3 格/斜向/山/水/占用格：均显示对应原因且状态不变；点击自身格只选中；{\"x\":4,\"y\":1}→超过技能距离上限 2 格，不消耗技能；{\"x\":5,\"y\":5}→跳跃攻击只能选择上下左右直线方向，不能斜向；{\"x\":4,\"y\":2}→跳跃落点不能是山体，不消耗技能；{\"x\":4,\"y\":3}→跳跃落点不能是水格，不消耗技能；{\"x\":6,\"y\":4}→跳跃落点必须为空，不消耗技能；原地→选中自身（无技能结算）；截图 h03-illegal-targets.png",
+      "evidence": null
+    },
+    {
+      "id": "H04-专项界面",
+      "kind": "水中马不能跳跃、可普通移动离开",
+      "pass": true,
+      "detail": "水中跳跃被拒（提示含“水中”），随后普通移动离开到 (3,2) 且 HP 不变；截图 h04-water.png",
+      "evidence": null
+    },
+    {
+      "id": "H05/H07/H14-专项界面",
+      "kind": "推动预览、四邻伤害与推动结算",
+      "pass": true,
+      "detail": "购买推动(2SP)后预览含友军与推动；执行后敌方车→(4,0)、友军车→(2,2)、新友军尸体→(4,4)、既有尸体→(6,2)，击杀友军不计战绩；截图 h07-push-preview.png,h07-push-result.png",
+      "evidence": null
+    },
+    {
+      "id": "H10-专项界面",
+      "kind": "树林闪避分支（显式固定 rng）",
+      "pass": true,
+      "detail": "固定 rng 专项：seed0 双方闪避（伤害与推动都不生效）；seed200 双方命中并阵亡；截图 h10-forest-dodge.png,h10-forest-hit.png",
+      "evidence": null
+    },
+    {
+      "id": "H16-专项界面",
+      "kind": "疾行扩展移动真实点击（含马腿阻挡与解锁后免马腿）",
+      "pass": true,
+      "detail": "疾行夹具：扩展点 (2,4) 可点、无伤害、AP 只扣 1；解锁后 (4,3) 日字可通过原马腿位置；截图 h16-dash-move.png,h16-dash-unlocked.png",
+      "evidence": null
+    },
+    {
+      "id": "H11/H17-专项界面",
+      "kind": "普通移动可撤回；跳跃释放锁定撤回；购买清撤回且不刷新行动",
+      "pass": true,
+      "detail": "普通移动→撤回恢复 AP；移动后释放无伤害跳跃立即锁定撤回；购买成功后撤回清空、AP 仍为 0、跳跃仍可用；截图 h11-undo-lock.png",
+      "evidence": null
+    },
+    {
+      "id": "H19-专项界面",
+      "kind": "敌方马保持日字与旧攻击预告，无跳跃入口",
+      "pass": true,
+      "detail": "我方马入口 [\"普通移动\",\"跳跃攻击 2 格\"]；敌方意图面板正常（1将 · 待机已锁定 (9,9) → 当前落点 (9,9) · 待机2马 · 攻）；截图 h19-enemy-intents.png",
+      "evidence": null
+    },
+    {
+      "id": "H18-营地副本",
+      "kind": "旧旅程档加载：马自动接入基础技能、保留成长、不赠点不清档",
+      "pass": true,
+      "detail": "旧旅程副本：马 2/1/未解锁、击杀 2、HP 2/2、强健 1、SP 3、猫粮 4；截图 h18-old-camp.png",
+      "evidence": null
+    },
+    {
+      "id": "H18-续局副本",
+      "kind": "旧战斗续局加载：补齐基础技能、不赠点、不刷新已用行动",
+      "pass": true,
+      "detail": "旧续局副本：马字段 2/1/未解锁、horseJumpUsed=true、SP 3、跳跃入口禁用；截图 h18-old-battle.png",
+      "evidence": null
+    },
+    {
+      "id": "H18-重复恢复",
+      "kind": "重复恢复幂等：字段与行动不被重置或刷新",
+      "pass": true,
+      "detail": "第二次加载后字段仍为 2/1/未解锁、horseJumpUsed=true、SP 3",
+      "evidence": null
+    },
+    {
+      "id": "H13-专项界面",
+      "kind": "购买阶段限制：营地含后备、布阵/战斗仅场上存活",
+      "pass": true,
+      "detail": "专项阶段链：营地后备马购买(SP 5→4，距离 3)→布阵出战马购买(SP 4→3，距离 3)→战斗存活马购买(SP 3→1，伤害 2)；后备马未出战；截图 h13-camp-bench-buy.png,h13-battle-buy.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机-1",
+      "kind": "手机参考视口 448×924（Mate 40 Pro 竖屏基准，DPR2）：棋盘与血量标签可辨识",
+      "pass": true,
+      "detail": "448×924：棋盘区 432×534px，棋盘 303×296px，单格 38×37px，血量标签 13 个无重叠；截图 h20-mobile-board.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机-2",
+      "kind": "手机参考视口：经“我方队伍”选中马，两个战斗入口可达且不压缩棋盘",
+      "pass": true,
+      "detail": "点“我方队伍”→马：模式「普通移动 / 跳跃攻击 2 格」，摘要「马 (8,4) · Lv.1 · 攻 1 | 移动✓ · 跳跃✓2格 · 伤害1 · 推动×」；棋盘区高度 534px 未变；截图 h20-mobile-horse-selected.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机-3",
+      "kind": "手机参考视口：普通移动落点标记、点击移动、撤销恢复（可见界面）",
+      "pass": true,
+      "detail": "普通移动 (7,3)→(6,1) 后经“撤销移动”复位且额度 0→1；截图 h20-mobile-normal-move.png,h20-mobile-undo.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机-4",
+      "kind": "手机参考视口：跳跃落点选择、预览（落点/四邻范围）与确认执行",
+      "pass": true,
+      "detail": "点 (7,5) → 预览「跳跃落点 (8,6) / 伤害范围 (8,7)(9,6)(8,5)(7,6)」→“执行攻击”落地击杀 w1-2，SP 0→1；截图 h20-mobile-jump-preview.png、棋盘裁剪 h20-mobile-jump-board.png、执行后 h20-mobile-jump-executed.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机-5",
+      "kind": "手机参考视口：三项技能入口访问并在可见面板购买“技能距离”",
+      "pass": true,
+      "detail": "技能面板三项齐全（距离 1 SP / 伤害 2 SP / 推动＋解除绊马脚 2 SP，余额不足项禁用）；点击“技能距离”后 SP 1→0、距离 2→3，模式按钮变为“跳跃攻击 3 格”；截图 h20-mobile-skills.png,h20-mobile-upgraded-mode.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机-6",
+      "kind": "手机参考视口：第 2 回合普通移动仍可经可见界面完成",
+      "pass": true,
+      "detail": "第 2 回合普通移动至 (6,3) 且额度耗尽；棋盘区仍为 534px、单格 38×37px；截图 h20-mobile-turn2-move.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机横版",
+      "kind": "手机横版 844×390：招募/布阵/模式入口/跳跃预览与执行/普通移动可达（棋盘细节不在此判定）",
+      "pass": true,
+      "detail": "844×390：棋盘区仅 50px、单格 4×4px（棋盘 33×32px，血量标签重叠 63 对）——既有手机版行预算所限，马/车选中前后一致；核心操作仍可达。截图 h20-mobile-landscape-battle.png,h20-mobile-landscape-jump-preview.png,h20-mobile-landscape-jump.png,h20-mobile-landscape-move.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机横版-补充",
+      "kind": "手机版布局 900×700 横版窗口：棋盘可辨识且跳跃预览/确认可达",
+      "pass": true,
+      "detail": "900×700（手机版布局）：棋盘 432×360px、单格 30×29px、血量标签 13 个无重叠；跳跃落点预览与执行可用；截图 h20-mobile-landscape-wide-preview.png",
+      "evidence": null
+    }
+  ],
+  "pageErrors": [],
+  "versions": {
+    "web/index.html": "d65c03963e4ce6227b58c5fbf25bebb48877823ec05ff08d4804abe3c9761ac3",
+    "web/js/rules.js": "5d9c97f5d97064e8b7d0f6adcc2aee92a96a4029df3de919415f624dfe4b18fa",
+    "web/js/app.js": "55dc251cede73e97a53d824c9347bb980a45f7c4846f9be395678ed566555390",
+    "web/js/campaign.js": "43aa4a3a78032a0a854a2f963166ffccd8a168fcb872f5717dc0c31bf9fcf212",
+    "tests/us021-horse.test.cjs": "f670de44763bb9bbcefcbe8f36f186067f76f39e7599ef0bd161a59fdf557e04",
+    "tests/us021-acceptance-browser.cjs": "6fb4e92d3003d22bc0bf9b530502c368fb7b8230a206e83876c425109f813510"
+  },
+  "layout": {
+    "referenceBefore": {
+      "layout": "mobile",
+      "display": {
+        "width": 448,
+        "height": 924,
+        "scale": 1
+      },
+      "viewport": {
+        "w": 448,
+        "h": 924
+      },
+      "scene": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "canvas": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "cellW": 38,
+      "cellH": 37,
+      "boardW": 303,
+      "boardH": 296,
+      "boardInsideScene": true,
+      "hpLabels": 13,
+      "hpOverlaps": 0,
+      "modesInsidePanel": true,
+      "selectedInsidePanel": true,
+      "preview": {
+        "clientH": 19,
+        "scrollH": 19,
+        "clipped": false
+      },
+      "selection": {
+        "clientH": 102,
+        "scrollH": 102,
+        "clipped": false
+      },
+      "modes": []
+    },
+    "referenceHorse": {
+      "layout": "mobile",
+      "display": {
+        "width": 448,
+        "height": 924,
+        "scale": 1
+      },
+      "viewport": {
+        "w": 448,
+        "h": 924
+      },
+      "scene": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "canvas": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "cellW": 38,
+      "cellH": 37,
+      "boardW": 303,
+      "boardH": 296,
+      "boardInsideScene": true,
+      "hpLabels": 13,
+      "hpOverlaps": 0,
+      "modesInsidePanel": true,
+      "selectedInsidePanel": true,
+      "preview": {
+        "clientH": 19,
+        "scrollH": 19,
+        "clipped": false
+      },
+      "selection": {
+        "clientH": 102,
+        "scrollH": 102,
+        "clipped": false
+      },
+      "modes": [
+        "普通移动",
+        "跳跃攻击 2 格"
+      ]
+    },
+    "referencePreview": {
+      "layout": "mobile",
+      "display": {
+        "width": 448,
+        "height": 924,
+        "scale": 1
+      },
+      "viewport": {
+        "w": 448,
+        "h": 924
+      },
+      "scene": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "canvas": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "cellW": 38,
+      "cellH": 37,
+      "boardW": 303,
+      "boardH": 296,
+      "boardInsideScene": true,
+      "hpLabels": 14,
+      "hpOverlaps": 1,
+      "modesInsidePanel": true,
+      "selectedInsidePanel": true,
+      "preview": {
+        "clientH": 56,
+        "scrollH": 56,
+        "clipped": false
+      },
+      "selection": {
+        "clientH": 102,
+        "scrollH": 102,
+        "clipped": false
+      },
+      "modes": [
+        "普通移动",
+        "跳跃攻击 2 格"
+      ]
+    },
+    "referenceFinal": {
+      "layout": "mobile",
+      "display": {
+        "width": 448,
+        "height": 924,
+        "scale": 1
+      },
+      "viewport": {
+        "w": 448,
+        "h": 924
+      },
+      "scene": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "canvas": {
+        "x": 8,
+        "y": 54,
+        "w": 432,
+        "h": 534
+      },
+      "cellW": 38,
+      "cellH": 37,
+      "boardW": 303,
+      "boardH": 296,
+      "boardInsideScene": true,
+      "hpLabels": 11,
+      "hpOverlaps": 0,
+      "modesInsidePanel": true,
+      "selectedInsidePanel": true,
+      "preview": {
+        "clientH": 19,
+        "scrollH": 19,
+        "clipped": false
+      },
+      "selection": {
+        "clientH": 102,
+        "scrollH": 102,
+        "clipped": false
+      },
+      "modes": [
+        "普通移动",
+        "跳跃攻击 3 格"
+      ]
+    },
+    "landscape": {
+      "empty": {
+        "layout": "mobile",
+        "display": {
+          "width": 448,
+          "height": 390,
+          "scale": 1
+        },
+        "viewport": {
+          "w": 844,
+          "h": 390
+        },
+        "scene": {
+          "x": 206,
+          "y": 42,
+          "w": 432,
+          "h": 50
+        },
+        "canvas": {
+          "x": 206,
+          "y": 42,
+          "w": 432,
+          "h": 50
+        },
+        "cellW": 4,
+        "cellH": 4,
+        "boardW": 33,
+        "boardH": 32,
+        "boardInsideScene": true,
+        "hpLabels": 13,
+        "hpOverlaps": 63,
+        "modesInsidePanel": true,
+        "selectedInsidePanel": true,
+        "preview": {
+          "clientH": 15,
+          "scrollH": 15,
+          "clipped": false
+        },
+        "selection": {
+          "clientH": 98,
+          "scrollH": 98,
+          "clipped": false
+        },
+        "modes": []
+      },
+      "rookSelected": {
+        "layout": "mobile",
+        "display": {
+          "width": 448,
+          "height": 390,
+          "scale": 1
+        },
+        "viewport": {
+          "w": 844,
+          "h": 390
+        },
+        "scene": {
+          "x": 206,
+          "y": 42,
+          "w": 432,
+          "h": 50
+        },
+        "canvas": {
+          "x": 206,
+          "y": 42,
+          "w": 432,
+          "h": 50
+        },
+        "cellW": 4,
+        "cellH": 4,
+        "boardW": 33,
+        "boardH": 32,
+        "boardInsideScene": true,
+        "hpLabels": 11,
+        "hpOverlaps": 43,
+        "modesInsidePanel": true,
+        "selectedInsidePanel": true,
+        "preview": {
+          "clientH": 15,
+          "scrollH": 15,
+          "clipped": false
+        },
+        "selection": {
+          "clientH": 98,
+          "scrollH": 98,
+          "clipped": false
+        },
+        "modes": [
+          "普通移动"
+        ]
+      },
+      "note": "棋盘区高度由手机版固定行预算决定，与选中棋子种类无关"
+    },
+    "landscapeWide": {
+      "layout": "mobile",
+      "display": {
+        "width": 448,
+        "height": 700,
+        "scale": 1
+      },
+      "viewport": {
+        "w": 900,
+        "h": 700
+      },
+      "scene": {
+        "x": 234,
+        "y": 42,
+        "w": 432,
+        "h": 360
+      },
+      "canvas": {
+        "x": 234,
+        "y": 42,
+        "w": 432,
+        "h": 360
+      },
+      "cellW": 30,
+      "cellH": 29,
+      "boardW": 239,
+      "boardH": 234,
+      "boardInsideScene": true,
+      "hpLabels": 13,
+      "hpOverlaps": 0,
+      "modesInsidePanel": true,
+      "selectedInsidePanel": true,
+      "preview": {
+        "clientH": 15,
+        "scrollH": 15,
+        "clipped": false
+      },
+      "selection": {
+        "clientH": 98,
+        "scrollH": 98,
+        "clipped": false
+      },
+      "modes": []
+    }
+  },
+  "pageErrorsError": [],
+  "finishedAt": "2026-10-24T02:45:02.206Z",
+  "summary": {
+    "total": 33,
+    "pass": 33,
+    "fail": 0,
+    "pageErrors": 0
+  }
+}

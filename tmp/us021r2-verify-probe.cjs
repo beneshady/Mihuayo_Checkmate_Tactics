@@ -1,0 +1,47 @@
+// US-021 退修：核对手机版选中马后的坐标显示与实际状态是否一致（排查点击/显示偏差）。
+const path = require('node:path');
+let pw; try { pw = require('playwright'); } catch (e) { pw = require(path.join(process.env.USERPROFILE, '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
+const base = process.env.M0_TEST_URL || 'http://127.0.0.1:8787';
+(async () => {
+  const browser = await pw.chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 448, height: 924 }, deviceScaleFactor: 2 });
+  await ctx.addInitScript(`try{localStorage.setItem('m0-journey-v1',${JSON.stringify(JSON.stringify({ version: 1, player: { tutorialCompleted: true, campGuideSeen: true }, journey: null, battle: null }))});}catch(e){}`);
+  const p = await ctx.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
+  await p.goto(base + '/');
+  await p.waitForFunction(() => window.M0Campaign && window.M0Campaign.info().view === 'menu', null, { timeout: 25000 });
+  await p.locator('#flow-new').click(); await p.waitForFunction(() => window.M0Campaign.info().view === 'tutorial');
+  await p.locator('#tutorial-skip').click(); await p.locator('#tutorial-skip-yes').click();
+  await p.waitForFunction(() => window.M0Campaign.info().view === 'camp', null, { timeout: 25000 });
+  await p.locator('#camp-leave').click(); await p.waitForFunction(() => window.M0Campaign.info().view === 'map');
+  await p.locator('#flow-enter').click(); await p.waitForFunction(() => window.__M0_DEBUG__.getState().phase === 'deploy');
+  await p.locator('#btn-deploy-confirm').click(); await p.waitForFunction(() => window.__M0_DEBUG__.getState().phase === 'player');
+  await p.waitForTimeout(400);
+  const pos = s => { const h = s.units.find(u => u.id === 'starting-horse'); return [h.x, h.y]; };
+  console.log('A state horse', JSON.stringify(pos(await p.evaluate(() => window.__M0_DEBUG__.getState()))));
+  await p.locator('#mobile-tools [data-ui-view="units"]').click();
+  await p.waitForTimeout(200);
+  console.log('B sheet visible', await p.locator('#mobile-sheet-content').isVisible());
+  await p.locator('[data-unit="starting-horse"]').first().click();
+  await p.waitForTimeout(250);
+  console.log('C selected label', JSON.stringify(await p.locator('#mobile-selected').innerText()));
+  console.log('D state horse', JSON.stringify(pos(await p.evaluate(() => window.__M0_DEBUG__.getState()))));
+  if (await p.locator('#btn-mobile-info-close').isVisible()) await p.locator('#btn-mobile-info-close').click();
+  await p.waitForTimeout(200);
+  console.log('E after close selected label', JSON.stringify(await p.locator('#mobile-selected').innerText()));
+  await p.locator('[data-mode="horse-jump"]').click();
+  await p.waitForTimeout(150);
+  const xy = await p.evaluate(() => window.__M0_DEBUG__.grid.screenPoint({ x: 7, y: 5 }));
+  console.log('F click target', JSON.stringify(xy), 'canvas', JSON.stringify(await p.evaluate(() => { const r = document.querySelector('#scene canvas').getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; })));
+  console.log('G hit element', JSON.stringify(await p.evaluate(q => { const e = document.elementFromPoint(q.x, q.y); return e ? e.tagName + '#' + e.id : null; }, xy)));
+  await p.mouse.click(xy.x, xy.y);
+  await p.waitForTimeout(350);
+  console.log('H preview', JSON.stringify(await p.locator('#preview-box').innerText()));
+  console.log('I mobile preview', JSON.stringify(await p.locator('#mobile-preview').innerText()));
+  await p.locator('#btn-execute').click();
+  await p.waitForTimeout(350);
+  const s = await p.evaluate(() => window.__M0_DEBUG__.getState());
+  console.log('J state horse', JSON.stringify(pos(s)), 'sp', s.teamSp, 'kills', s.kills, 'w12', JSON.stringify(s.units.find(u => u.id === 'w1-2') || null));
+  await p.screenshot({ path: path.join('tmp', 'us021r2-verify-448x924.png') });
+  console.log('ERRORS', JSON.stringify(errors));
+  await browser.close();
+})().catch(e => { console.error(e); process.exit(1); });
