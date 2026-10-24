@@ -1,0 +1,243 @@
+{
+  "scope": "US-022 E01～E21 实际浏览器验收（正常入口 + 专项夹具 + 旧档副本）",
+  "startedAt": "2026-10-24T02:35:59.945Z",
+  "steps": [
+    {
+      "id": "E01-正常入口",
+      "kind": "正常入口（新旅程→跳过教学→主营地）",
+      "pass": true,
+      "detail": "正常点击进入主营地：猫粮 8、公共 SP 0、队伍 rook/pawn/pawn/horse、无象；招募区显示象 5 猫粮（截图 e01-camp-recruit.png）",
+      "evidence": null
+    },
+    {
+      "id": "E20-1",
+      "kind": "正常入口：第 1 关布阵与真实战斗赚猫粮/SP",
+      "pass": true,
+      "detail": "第 1 关布阵后真实点击完成 8 回合（第 1 次尝试）：胜利、击杀 10、公共 SP 10、猫粮 22（截图 e20-deploy.png、e20-level1-earn.png）",
+      "evidence": null
+    },
+    {
+      "id": "E01-购象",
+      "kind": "营地招募象：5 猫粮、1 基础 HP、坚守后 2 HP、可多购、满员后备、猫粮不足不扣款",
+      "pass": true,
+      "detail": "点击招募象：猫粮 22→2（共 4 只，每只 5 猫粮），象 HP 2/2（坚守），满员时进入后备；猫粮不足 5 时按钮禁用、点击不扣款（截图 e01-elephant-recruited.png、e01-recruit-insufficient.png）",
+      "evidence": null
+    },
+    {
+      "id": "E20-2",
+      "kind": "营地换阵：让象上阵（保留车，换下兵）",
+      "pass": true,
+      "detail": "名单切换：上阵 rook,starting-pawn-2,starting-horse,recruit-elephant-0；猫粮 2、公共 SP 10（截图 e20-camp-roster.png）",
+      "evidence": null
+    },
+    {
+      "id": "E20-3",
+      "kind": "正常入口：第 2 关布阵，象进场",
+      "pass": true,
+      "detail": "第 2 关布阵：象 (7,3)、车 (9,1)；敌方预置 pawn@(2,5) hp1 | pawn@(5,5) hp1 | pawn@(8,5) hp1 | rook@(9,5) hp2 | cannon@(5,8) hp2 | advisor@(4,9) hp1 | advisor@(6,9) hp1 | king@(5,9) hp5（截图 e20-deploy-elephant.png）",
+      "evidence": null
+    },
+    {
+      "id": "E20-4",
+      "kind": "正常入口：象普通移动（田字）与撤销",
+      "pass": true,
+      "detail": "真实点击田字落点 (9,1)：移动后 ap 0、技能未用、撤销按钮可用；撤销后回到 (7,3) 且额度恢复（截图 e20-elephant-move.png）",
+      "evidence": "e20-elephant-move.png"
+    },
+    {
+      "id": "E20-5",
+      "kind": "正常入口：象牵引（真实点击目标、按实际距离一半拉近）",
+      "pass": true,
+      "detail": "真实点击牵引目标 rook（实际距离 3 → 位移 1 格）：预览“象 · 牵引：(9,1) → (9,4)”，执行后技能已用、移动锁定、目标存活并到达 (9,3)（截图 e20-pull-preview.png、e20-pull-result.png）",
+      "evidence": "e20-pull-preview.png,e20-pull-result.png"
+    },
+    {
+      "id": "E20-6",
+      "kind": "正常入口：技能面板解锁冰封（2 SP）",
+      "pass": true,
+      "detail": "真实点击“解锁冰封”：公共 SP 10→8，模式按钮显示“冰封 1 阶段”（截图 e20-freeze-unlock.png）",
+      "evidence": "e20-freeze-unlock.png"
+    },
+    {
+      "id": "E20-7a",
+      "kind": "正常入口：冰封敌人（5×5 单体、真实点击）",
+      "pass": true,
+      "detail": "冰封 w1-3（HP 2，冻结 1 阶段）：预览“象 · 冰封：(7,3) → (9,5)”，意图列表显示待机（截图 e20-freeze-preview.png、e20-freeze-applied.png）",
+      "evidence": "e20-freeze-preview.png,e20-freeze-applied.png"
+    },
+    {
+      "id": "E20-7b",
+      "kind": "正常入口：对冰冻敌人造成非致命伤害 → 解冻但本回合待机",
+      "pass": true,
+      "detail": "真实点击造成 1 点非致命伤害：w1-3 剩余 HP 1、frozen 清零、受伤解冻待机；随后敌方阶段该单位仍待机（帅与友军 HP 未变、frozen 待机标志已清除）（截图 e20-thaw.png、e20-thaw-standby-enemy-phase.png）",
+      "evidence": "e20-thaw.png,e20-thaw-standby-enemy-phase.png"
+    },
+    {
+      "id": "E20-8",
+      "kind": "正常入口：技能升级使用（真实点击技能面板）",
+      "pass": true,
+      "detail": "真实点击“牵引射程”：3→4 格、公共 SP 8→7，模式按钮“牵引 4 格”（截图 e20-upgrade.png）",
+      "evidence": "e20-upgrade.png"
+    },
+    {
+      "id": "E02-专项",
+      "kind": "专项夹具：无移动增益的田字落点、象眼阻挡与非法拒绝",
+      "pass": true,
+      "detail": "专项夹具：仅 (7,5) 合法田字落点，非法点击给出“象眼 (6,2) 被阻挡，不消耗移动”且不移动；河道水格可落（截图 e02-dian-illegal.png、e02-water-landing.png）",
+      "evidence": null
+    },
+    {
+      "id": "E03-专项",
+      "kind": "专项夹具：疾行扩展落点与参照/象眼限制（真实点击）",
+      "pass": true,
+      "detail": "专项夹具：无疾行 2 个田字落点；疾行后 16 个落点（含邻格），一次点击到扩展最终格且只消耗一次移动（截图 e03-dash.png）",
+      "evidence": null
+    },
+    {
+      "id": "E04-专项",
+      "kind": "专项夹具：先移动再施法、施法后锁移动、下一回合恢复（真实按钮）",
+      "pass": true,
+      "detail": "专项夹具：先田字移动到 (3,3)→ 再冰封 (5,7)，技能与移动都锁定；结束回合后两项恢复（截图 e04-action-order.png）",
+      "evidence": null
+    },
+    {
+      "id": "E05/E06-专项",
+      "kind": "专项夹具：牵引可选友军/敌军/尸体/主帅，拒绝自身/仕/山/太近；可越障且首次碰撞停止",
+      "pass": true,
+      "detail": "专项夹具：牵引目标集合含友军/主帅/尸体/敌军，拒绝太近与仕；越障预览“牵引目标 单位 t @ (6,5) · 实际距离 5 格 → 计划位移 2 格（floor(距离/2)）”，执行后目标停在障碍前（截图 e05-pull-targets.png、e06-over-obstacle.png）",
+      "evidence": null
+    },
+    {
+      "id": "E07-专项",
+      "kind": "专项夹具：牵引射程 4 向 +1、上限 8、SP 不足与超限（真实技能面板）",
+      "pass": true,
+      "detail": "专项夹具：真实点击“牵引射程”3→4 格并扣 1 SP、四向同步；SP 不足与上限 8 均禁用（截图 e07-range-upgrade.png）",
+      "evidence": null
+    },
+    {
+      "id": "E11-专项",
+      "kind": "专项夹具：牵引撞山只扣 1 耐久、两次变碎石地且可通行（真实点击 + 棋盘重绘）",
+      "pass": true,
+      "detail": "专项夹具：牵引撞山第一次“牵引目标 单位 t @ (3,5) · 实际距离 2 格 → 计划位移 1 格（floor(距离/2)）”→ 开裂，第二次 → 碎石地，棋盘重绘可见“碎石”，不再阻挡/占位（截图 e11-mountain-cracked.png、e11-mountain-cracked-board.png、e11-rubble.png、e11-rubble-board.png）",
+      "evidence": null
+    },
+    {
+      "id": "E12/E16-专项",
+      "kind": "专项夹具：只强化所选象；重复冰封取 max 不叠加不缩短（真实点击）",
+      "pass": true,
+      "detail": "专项夹具：只强化所选象（a 解锁、b 未解锁）；a 冻 1 阶段后 b 再冻 → 剩余 3 阶段（取 max），剩余 3 时再冻 1 阶段仍为 3（截图 e12-two-elephants.png）",
+      "evidence": null
+    },
+    {
+      "id": "E13-专项",
+      "kind": "专项夹具：冰封 5×5 范围标记、目标类型与越障/跨河（真实点击）",
+      "pass": true,
+      "detail": "专项夹具：5×5 共 25 格标记、可越障选敌、友军被拒绝并提示“冰封只能选择敌方单位，不能选友军”、目标无伤害（截图 e13-freeze-zone.png、e13-freeze-zone-board.png）",
+      "evidence": null
+    },
+    {
+      "id": "E14-专项",
+      "kind": "专项夹具：冻结 2 个敌方行动阶段，逐阶段待机并在到期恢复（真实结束回合）",
+      "pass": true,
+      "detail": "专项夹具：冻结 2 阶段后连续两次结束回合，剩余 2→1→0、两个敌方阶段都不攻击且意图显示待机，到期恢复正常意图（截图 e14-freeze-phase1.png、e14-freeze-expired.png）",
+      "evidence": null
+    },
+    {
+      "id": "E17-专项",
+      "kind": "专项夹具：牵引碰撞击杀归施法象、友军死亡无奖励（真实点击 + 顶栏）",
+      "pass": true,
+      "detail": "专项夹具：碰撞击杀敌人 → 象击杀 1、公共 SP 1、顶栏同步；友军被撞死 → 不奖励击杀与 SP（截图 e17-kill-credit.png）",
+      "evidence": null
+    },
+    {
+      "id": "E18-副本",
+      "kind": "副本续局：普通移动可撤不保存；成功施法/升级保存并锁撤；刷新后按保存点恢复",
+      "pass": true,
+      "detail": "副本续局：移动不保存且可撤销 → 刷新回到保存点；冰封成功写入续局、锁撤，刷新后冻结与锁定状态正确恢复；升级写入续局；取消不写入（截图 e18-move-unsaved.png、e18-reload-after-move.png、e18-cast-saved.png、e18-reload-after-cast.png、e18-upgrade-saved.png）",
+      "evidence": null
+    },
+    {
+      "id": "E19-副本",
+      "kind": "旧档副本：象缺新字段只补默认、不赠 SP、不刷新已用行动，升级保留",
+      "pass": true,
+      "detail": "旧档副本：象字段补齐为射程 3 / 未解锁 / 技能已用，公共 SP 仍为 3（不赠点），界面显示“冰封未解锁（2 SP）”可正常解锁；带升级的旧档保留射程 5、冰封 2 阶段（截图 e19-legacy-battle.png）",
+      "evidence": null
+    },
+    {
+      "id": "E21-448x924",
+      "kind": "手机 448x924：招募/升级/技能目标操作可达性（既有布局问题单列）",
+      "pass": true,
+      "detail": "手机 448x924（布局 mobile）：招募象按钮可见并可点击（e21-448x924-camp-recruit.png）、营地技能面板可见（e21-448x924-camp-skills.png）、战斗模式按钮“牵引/冰封”可点（高度 44px，e21-448x924-modes.png）、冰封 5×5 标记 25 格、目标点击可用（e21-448x924-freeze-target.png）；棋盘 303×296px、单格 38×37px",
+      "evidence": null
+    },
+    {
+      "id": "E21-844x390",
+      "kind": "手机 844x390：招募/升级/技能目标操作可达性（既有布局问题单列）",
+      "pass": true,
+      "detail": "手机 844x390（布局 mobile）：招募象按钮可见并可点击（e21-844x390-camp-recruit.png）、营地技能面板可见（e21-844x390-camp-skills.png）、战斗模式按钮“牵引/冰封”可点（高度 44px，e21-844x390-modes.png）、冰封 5×5 标记 25 格、目标点击可用（e21-844x390-freeze-target.png）；棋盘 33×32px、单格 4×4px；棋盘单格仅 4×4px（棋盘区 432×50px），属既有手机版行预算问题，本次不重做布局",
+      "evidence": null
+    }
+  ],
+  "pageErrors": [],
+  "layout": {
+    "normal": {
+      "level1": {
+        "phase": "intermission",
+        "result": "victory",
+        "turn": 9,
+        "kills": 10,
+        "teamSp": 10,
+        "gold": 22,
+        "attempts": 1
+      }
+    },
+    "mobile-448x924": {
+      "viewport": {
+        "w": 448,
+        "h": 924
+      },
+      "layoutMode": "mobile",
+      "scene": {
+        "w": 432,
+        "h": 534
+      },
+      "boardW": 303,
+      "boardH": 296,
+      "cellW": 38,
+      "cellH": 37,
+      "boardInsideScene": true
+    },
+    "mobile-844x390": {
+      "viewport": {
+        "w": 844,
+        "h": 390
+      },
+      "layoutMode": "mobile",
+      "scene": {
+        "w": 432,
+        "h": 50
+      },
+      "boardW": 33,
+      "boardH": 32,
+      "cellW": 4,
+      "cellH": 4,
+      "boardInsideScene": true
+    }
+  },
+  "save": {},
+  "versions": {
+    "web/index.html": "d65c03963e4ce6227b58c5fbf25bebb48877823ec05ff08d4804abe3c9761ac3",
+    "web/js/rules.js": "5d9c97f5d97064e8b7d0f6adcc2aee92a96a4029df3de919415f624dfe4b18fa",
+    "web/js/app.js": "55dc251cede73e97a53d824c9347bb980a45f7c4846f9be395678ed566555390",
+    "web/js/campaign.js": "43aa4a3a78032a0a854a2f963166ffccd8a168fcb872f5717dc0c31bf9fcf212",
+    "tests/us022-elephant.test.cjs": "2254610e704fca671a60ef55a48563657765c9d6e552fcf6a49ab269e1b5a875",
+    "tests/us022-acceptance-browser.cjs": "1b1760114854190a96de3f41d9ced2a1e53e8e68b6fdbd1fc3a7212689dd570a"
+  },
+  "finishedAt": "2026-10-24T02:38:34.481Z",
+  "summary": {
+    "total": 25,
+    "pass": 25,
+    "fail": 0,
+    "pageErrors": []
+  }
+}

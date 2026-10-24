@@ -131,3 +131,155 @@
 试玩：从正式页点“地图编辑器”，编辑并保存甲图→用于第2关→另存乙图→刷新分别读取；开始测试，行动后返回并取消/重开核对原稿。正式页从正常首关通过两波、商店、下一关检查绑定图和队伍/经济。重新绑定后应在下一次新进入该关才生效。[绑定第2关](us007-us011-evidence/bound-level2.png)。
 
 待策划：独立试玩验收并给出本批结论；S3 续局、真实切页、IAB历史异常仍按原边界处理。本批没有云保存、导出、关卡平衡验收或战斗自动存档。
+
+## 2026-10-23 增补：标准地图 JSON 导入与保存并导出
+
+状态：2026-10-23 按已确认规则实施完成，本轮自测与浏览器验收通过，待主策划审阅结论（见本节末“2026-10-23 实施交付与验收”）。本节仅覆盖前文“不做导入导出”的旧边界，其他地图编辑、保存、试玩隔离及关卡绑定规则继续有效。
+
+### 目标及兼容依据
+
+- 编辑器直接交换关卡初始布局，包括地形及双方棋子，不交换战斗中途进度。不改变战斗玩法或添加未实现兵种。
+- 用户参考文件（只读）：`D:\Projects\mihuayou\develop_suzukaze\MihuayoCheckmateTactics\assets\resources\Levels\level-01.json`。
+- 接收方纯数据解析及校验（只读）：同项目 `assets/Scripts/Core/BattleState.ts` 中 `parseBattleState` / `validateMap` 及其 `Config.ts` 依赖。须以实际解析器验明可读取，不以“JSON 能解析”冒充兼容。不得写入外部项目或引入其运行工具链。
+- 已核对：格式版本 2；9×9，零基 x/y 坐标不旋转不翻转；稀疏 tiles 缺省 land；地形 land/water/bridge/mountain/cracked/forest；棋种 king/rook/horse/cannon/pawn/archer/spearman/advisor；车职业 base/charge/pull。开裂山受支持，象当前不受支持。格式兼容不等于两个项目战斗行为完全一致，不导出本项目马新技能等运行时数据。
+
+### 已确认交互
+
+1. 可见入口为“导入地图 JSON”和“保存并导出”。保留已有普通保存、另存为和绑定能力，既有非法草稿仍可普通保存。
+2. 提供关卡编号（如 level-01）、关卡名称；导入回填，编辑/保存/读取/撤销时同步维护。新草稿编号默认 level-01，名称复用当前地图名，用户可改。
+3. 保存并导出顺序：校验当前草稿及交换格式 → 保存本机地图库 → 下载 `<关卡编号>.json`。对当前编辑内容操作，不要求预先保存。不自动绑定关卡，不覆盖外部样例。
+4. 编号非空且适合文件名，拒绝路径分隔符、目录跳转和系统非法文件名；名称非空。不得静默把用户编号改成其他编号。普通名称冲突及保存身份沿用地图库处理，不覆盖别图。
+5. 校验不通过不保存也不下载，列明字段、棋子或格子及原因；本机保存失败不下载、不虚报成功。保存成功但可检测的下载启动失败，明确“已保存，导出失败”并允许重试。浏览器无法确认用户最终写盘时只提示已保存并发起下载，不声称文件已写入磁盘。
+6. 导入仅成为当前草稿，不自动保存、不绑定；有未保存修改先确认替换，取消不变。导入作为一次可撤销编辑，撤销/重做涵盖布局和元信息。导入后与原已保存地图身份脱离，避免保存时无意覆盖原图；用户可按既有流程明确选择覆盖或另存。
+7. 导入先解析和校验，成功才替换草稿。坏 JSON、未知版本、非初始战局、未知棋种/地形、非法坐标/重复编号/叠子等明确拒绝；失败保留草稿、地图库、撤销记录及正式存档。
+8. 不能无损表达或接收方不支持的内容，明确拒绝，不静默删除/降级。对可选展示元信息（如 map.name 与 displayName 不同）保留原值；导入带有本编辑器无法保留的额外业务字段时报告字段路径，不因接收方忽略未知字段就假装兼容。
+
+### 文件合同
+
+- `formatVersion: 2`。
+- `meta.kind: "battleInit"`；`meta.battleId` 为关卡编号；`meta.displayName` 为关卡名称。
+- `map.name` 为地图名称；新草稿默认与关卡名称一致。`map.tiles` 导出稀疏字典，可省略 land；导入补齐编辑器内部 81 格 land，不补成默认河道。
+- `units` 包括双方初始棋子，保留 id/side/kind/x/y，以及棋子实际使用的兼容 rookRole 等布局属性。不写入当前试玩残血、行动、成长、SP、金币等运行状态；不静默丢弃导入的无法表达属性，而是拒绝并说明。
+- `turn: {round: 1, phase: "player"}`、`result: null`、`history: {commands: []}`。导入要求初始类型与上述状态，不接受 battleSave、中途回合、非空结果/历史及其他战斗进度。
+- 每次导出重新随机生成有效的 32 位无符号整数 `rng`，不复用导入种子；文件包含实际生成值。不使用正式战斗随机源，不扰动当前对局，也不承诺同一布局多次导出得到相同随机结果。导入校验其类型和值但不新增种子编辑功能。
+- 本次无第二波编辑或导出、无地图发布、无自动写入其他项目。现有编辑器校验继续适用；参考项目独有而当前编辑器不能处理的文件明确拒绝，不擅自放宽旧校验。
+
+### 本轮主要验收点（J01～J11，执行结果见本节末）
+
+| ID | 前置与操作 | 预期 | 证据 |
+| --- | --- | --- | --- |
+| J01 | 从正常入口打开编辑器，选择用户参考 JSON 导入 | 双方棋种/坐标/职业及全部地形一致，缺省格为陆地，元信息回填 | 实际文件选择、截图及字段对照 |
+| J02 | 修改地形和双方位置、编号名称，点击保存并导出 | 校验后本机保存，再产生实际下载；文件名及合同正确，刷新可读取保存版本 | 浏览器下载文件、保存前后记录、刷新操作 |
+| J03 | 将实际下载文件送入接收方纯数据解析器与地图校验 | 可读取且语义一致，无未知棋种/地形或坐标转换；记录调用方式、来源版本/哈希 | 解析输出及字段对照，不改外部项目 |
+| J04 | 导出文件再导入，另测 map.name/displayName 不同 | 地形、双方棋子、元信息无损；导入不自动保存绑定，可撤销重做回原稿 | 往返字段断言和浏览器操作 |
+| J05 | 未保存草稿时选择导入，分别取消/确认；导入坏 JSON | 取消及失败完全不改变原稿/历史/库；确认仅替换草稿，与旧保存身份隔离 | 浏览器状态对照 |
+| J06 | 初始类型不符、版本不符、中途回合、非空历史结果、未知地形/兵种/额外业务字段 | 明确拒绝并定位原因，不改草稿、不偷偷删字段 | 专项文件与界面报错 |
+| J07 | 重复ID、叠子、越界、九宫不合法、非法编号名称；含正常开裂山 | 非法项阻止保存并导出，无下载/保存副作用；合法开裂山原样交换 | 边界断言与代表性界面操作 |
+| J08 | 正常保存及模拟存储失败、下载启动异常 | 顺序正确；保存失败不下载，下载失败保留已保存结果且明确提示可重试 | 专项失败注入记录，区别正常流程证据 |
+| J09 | 同布局连续执行保存并导出 | 每次调用独立生成合法 rng，不使用或改变正式局随机状态；其余内容稳定 | 下载对照及可控随机源专项，不以随机偶然相同判失败 |
+| J10 | 两张已保存地图、现有正式绑定和正式存档 | 导入/导出/保存/刷新后检查；试玩行动后再导出 | 不覆盖其他地图，不自动绑定、不污染正式局；导出仍为编辑原稿 | 实际流程及保存快照对照 |
+| J11 | 桌面及窄屏编辑器 | 实际选择文件、修改元信息、查看错误、保存并下载 | 按钮输入可见可达，不靠脚本改DOM打开控件；图片可辨，错误不遮住操作 | 双视口截图及操作日志 |
+
+### 派发与交付边界
+
+- 默认允许修改 `web/editor.html`、编辑器样式、`web/js/editor.js`、`web/js/maps.js`，必要时新增小型纯格式转换模块；相应测试及本节证据。不要修改马战斗规则、游戏主界面、协作脚本、AGENTS.md 或美术资产。
+- 接收方解析器可只读引用/在临时验证目录转译其纯数据模块，不引入引擎依赖、不改外部仓库。若无法实际验证兼容须报告未验阻塞，不标 J03 通过。
+- 已有未提交马实现、协作维护、美术资产及临时文件全部保留，不清理、不 reset/checkout、不提交推送合并部署。开始前核对没有另一修改任务，冲突时停下报告。
+- Harness 负责实现、定向回归和实际浏览器导入下载验收；逐项 J01～J11 写明通过/失败/未验证、命令/步骤、证据、版本哈希、遗留及未提交状态。正常流程不得以注入草稿或直接调用下载函数替代点击操作。旧证据不覆盖，新证据放本任务独立目录。
+
+### 2026-10-23 实施交付与验收
+
+状态：2026-10-23 本次 JSON 导入/保存并导出范围 Harness 已验收通过、Codex 已审阅证据。未提交、未推送、未合并、未部署。此结论不扩展为历史 US-011 全部需求、真机或跨项目战斗行为一致性验收。
+
+#### 交付摘要
+
+编辑器新增“标准地图 JSON（formatVersion 2）”区块：从可见入口选择 JSON 导入当前草稿；编辑关卡编号/名称并在保存、读取、撤销、重做中同步；“保存并导出”依次做交换格式与布局校验、本机地图库保存、下载 `<关卡编号>.json`。导入失败、保存失败与下载启动失败均不丢原稿/地图库/撤销记录，并区分“未保存未下载”“已保存但导出失败（可重试）”“已保存并已发起下载，浏览器无法确认写盘”。导入拒绝未知版本、非初始战局、未知棋种/地形、非法坐标/重复 ID/叠子、编辑器无法无损保留的额外字段，并报告字段路径。导出每次独立生成 uint32 `rng`，不使用战斗随机源；不自动绑定关卡，不写外部项目。旧证据目录未改动，本轮证据在新目录 `us011-json-evidence/`。
+
+#### 主要变化
+
+- 新增 `web/js/mapjson.js`：纯格式转换（`parseDocument`/`buildDocument`/`validateMeta`/`filenameError`/`generateRng`），不依赖 `rules.js` 或战斗状态；导入导出合同与拒绝原因带 `$...` 字段路径。
+- `web/editor.html`、`web/editor.css`：新增可见的“导入地图 JSON（原生文件输入）”“关卡编号/关卡名称”“保存并导出”“重试下载”和 JSON 错误列表；桌面与窄屏换行且不遮挡。
+- `web/js/editor.js`：草稿内维护 `levelCode`/`levelName`，撤销/保存/读取同步；导入先解析并校验、有未保存修改先确认、成功仅替换草稿且脱离原保存身份、作为一次可撤销编辑；保存并导出按“校验 → 本机保存 → 下载”顺序执行并区分三种结果；下载失败保留已保存结果可重试。
+- 测试与工具：`tests/mapjson.test.cjs`、`tests/us011-mapjson-fixtures.cjs`、`tests/us011-mapjson-browser.cjs`、`tests/us011-mapjson-receiver.cjs`、`tests/us011-static-server.cjs`、`tests/us011-evidence-check.cjs`、`tests/us011-evidence-manifest.cjs`。
+- 未修改：马战斗规则、游戏主界面、协作脚本、`AGENTS.md`、美术资产；`web/js/maps.js` 未改（编号/名称随草稿经现有地图库原样保存与读取）。
+
+#### 逐项验收结果（J01～J11）
+
+| ID | 结果 | 实际操作与断言 | 证据 |
+| --- | --- | --- | --- |
+| J01 | 通过 | 正常入口：新旅程→实际完成教学→主营地→第1关布阵页→点“地图编辑器”打开独立编辑页；用原生文件输入真实选择外部参考 `level-01.json`。断言 81 格地形（23 处非陆地、58 格缺省陆地）、14 枚双方棋子 id/阵营/棋种/坐标/rookRole、`map.name=三桥山口`、编号 `level-01`、名称 `第一关 · 三桥山口`，导入不自动保存 | `us011-json-evidence/browser-result.json`（J01）、`screenshots/j01-imported-desktop.png`、`manifest.json` 外部样例哈希 |
+| J02 | 通过 | 实际画树林、移动我方帅（4,0）→（3,0）与敌方兵（1,5）→（0,5）、修改地图名称/编号/名称后点“保存并导出”：先出现本机记录 v1 且无绑定，再触发下载 `level-02.json`；断言稀疏地形（无 `land` 键）、`turn/result/history`、uint32 `rng`；刷新后从“已保存地图”读取，地形/阵容/编号/名称恢复 | J02 记录、`downloads/level-02.json`、`screenshots/j02-exported-desktop.png` |
+| J03 | 通过 | 8 个实际下载文件交给接收方 `BattleState.ts`（只读复制到 `tmp`，仅把 ESM 说明符 `./Config` 改为 `./Config.ts`，Node 24 类型剥离运行）：`parseBattleState` 全部成功、`validateMap` 0 错误、81 格地形与棋子 id/阵营/棋种/坐标与编辑器草稿逐项一致；同一解析器对 `unknown-kind` 夹具报 `$.units[1].kind`，证明校验非空转 | `us011-json-evidence/receiver-result.json`；接收方 HEAD `7b31368…` 与源码哈希见 `manifest.json` |
+| J04 | 通过 | 把实际下载的 `level-02.json` 再导入（有未保存修改→确认）：地形、14 枚棋子、元信息往返一致；`map.name=三桥山口甲` 与 displayName `第二关 · 测试` 不同仍各自保留；导入后 `getId()=null`、地图库字节不变；撤销恢复导入前草稿与元信息，重做恢复导入内容 | J04 记录；`downloads/level-02.json` |
+| J05 | 通过 | 未保存草稿导入：取消确认→草稿/撤销链/地图库完全不变；确认→仅替换草稿、`getId()=null`、库不变；导入坏 JSON→错误提示且草稿/历史/库不变 | J05 记录 |
+| J06 | 通过 | 逐项导入 25 个专项夹具均拒绝并定位 `$` 路径：版本 3/字符串、battleSave、round 2、enemy phase、非空 result/history、未知地形/棋种、根/meta/棋子额外字段、坐标越界与非规范坐标键、rng 字符串/负数/小数、缺 result/history、重复 id、叠子、越界、非车 rookRole、带空格/路径字符编号；每例均验证草稿、历史、地图库不变 | J06 记录；`fixtures/` |
+| J07 | 通过 | 重复 id/叠子/越界在导入阶段拒绝（正常点击编辑无法产生这些状态）；九宫外棋子导入被现有编辑器校验拒绝；非法编号 `level/02`、空名称、删除帅后的非法布局均阻止保存并导出（无下载、地图库不变）；合法开裂山+我方冲锋车导入后导出，`cracked` 与 `rookRole: charge` 原样保留 | J07 记录；`downloads/level-cracked.json` |
+| J08 | 通过 | 专项失败注入（独立步骤，非正常流程）：覆盖 `Storage.prototype.setItem` 抛错→提示保存失败、无下载、地图库不变；恢复后覆盖 `URL.createObjectURL` 抛错→本机保存版本+1 但明确“已保存，导出下载启动失败”、显示重试；恢复后“重试下载”产生真实下载 `level-04.json` | J08 记录；`downloads/level-04-retry.json`、`screenshots/j08-download-retry-desktop.png` |
+| J09 | 通过 | 同布局连续两次保存并导出：两次 `rng` 均为 uint32（本轮 3435335153 / 2458055956，未复用导入种子 305419896），除 `rng` 外文档逐字段相同，草稿未被改变；正式局状态与 `m0-journey-v1` 全程不变；单元测试断言格式模块不引用战斗随机源 | J09 记录；`downloads/j09-export-1.json`、`j09-export-2.json` |
+| J10 | 通过 | 两张已保存地图 + 编辑器“应用保存版本”建立的第2关正式绑定 + 真实教学产生的正式旅程存档：导入/导出/保存/刷新后其他地图名称与版本不变、绑定快照逐字节不变且未新增绑定、正式战局与旅程存档不变；编辑器独立测试中实际移动主帅一次后返回，导出仍为编辑原稿而非测试位移 | J10 记录；`screenshots/j10-test-action-desktop.png` |
+| J11 | 通过 | 桌面 1280×900 与窄屏 390×844 均实际点击原生文件输入选择文件、修改编号/名称、触发并查看编号错误、修正后保存并下载；`#level-code/#level-name/#import-file/#save-export/#editor-status` 均可见、`elementFromPoint` 命中自身（未被遮挡）、页面无横向溢出，窄屏错误出现后按钮仍可点击 | `screenshots/j11-*.png`、`browser-result.json` 的 `desktopLayout`/`narrowErrorLayout` |
+
+#### 命令与结果
+
+| 命令 | 结果 |
+| --- | --- |
+| `node --test tests/mapjson.test.cjs tests/maps.test.cjs` | 19/19 通过（含既有 9 项地图回归），日志 `unit-tests.log` |
+| `node tests/us011-mapjson-browser.cjs` | PASS，12 条记录、浏览器错误 0；`browser-result.json`、`browser-run.log` |
+| `node tests/us011-mapjson-receiver.cjs` | PASS，8 个实际下载文件 + 1 个拒绝对照；`receiver-result.json`、`receiver-run.log` |
+| `node tests/us011-evidence-check.cjs` | PASS，8 张 PNG 解码/尺寸/关键 UI 颜色像素；`screenshot-check.json`、`screenshot-check.log` |
+| `node tests/us011-evidence-manifest.cjs` | 生成 `manifest.json`（本轮全部哈希与未提交状态） |
+| `node --check web/js/mapjson.js`、`node --check web/js/editor.js` | 语法检查通过 |
+
+浏览器环境：Playwright Chromium headless；静态服务器 `tests/us011-static-server.cjs` 仅本地回环。真实文件选择经原生文件输入触发 filechooser，下载经 Playwright download 事件保存为证据文件；未用脚本改 DOM 打开控件，也未直接调用下载函数；仅 J08 的存储/下载失败为专项注入。
+
+#### 证据位置
+
+- `us011-json-evidence/browser-result.json`、`browser-run.log`：正常入口与 J01～J11 实际浏览器记录、下载清单、页错误。
+- `us011-json-evidence/downloads/`：8 个实际下载文件（`level-02`、`level-cracked`、`level-04-retry`、`j09-export-1/2`、`level-05`、`level-05-after-play`、`level-narrow`）。
+- `us011-json-evidence/screenshots/`：桌面 5 张、窄屏 3 张。
+- `us011-json-evidence/receiver-result.json`、`receiver-run.log`：J03 接收方解析/校验输出与来源哈希。
+- `us011-json-evidence/screenshot-check.json`、`screenshot-check.log`：截图解码、尺寸与关键 UI 像素检查。
+- `us011-json-evidence/fixtures/`：由参考文件派生的导入/拒绝夹具与参考副本（副本与外部样例 sha256 相同）。
+- `us011-json-evidence/manifest.json`：完整哈希清单（源文件、全部证据、外部参考、接收方源码、未提交状态）。
+- 旧证据 `us007-us011-evidence/` 未改动。
+
+#### 版本、哈希与未提交状态
+
+- 分支 `codex/web-gameplay-validation`，HEAD `8ecbd9a4754a1d912577a6a984028d48a2fb2e7e`（2026-10-21 19:15:38 +0800）。本轮全部改动未提交、未推送、未合并、未部署。
+- 本轮源文件 SHA-256：
+
+| 文件 | SHA-256 |
+| --- | --- |
+| `web/js/mapjson.js` | `5f1a7ac4c852a04d8b679afa6c75f83963499ed6ed5c170ac7e1613c30d5d49b` |
+| `web/js/editor.js` | `09416c96db0f31328d7ba92e45df95cf9884575be975995097d1de665c123beb` |
+| `web/editor.html` | `cd3a5fb13d386abb33f25c6f4aa885c3e05bdf16c63c48befe42f879bfbdf0ef` |
+| `web/editor.css` | `314a6256fe5470eff040da57de8a2b7e35d526e47cd7b73b14649c723a13ad2c` |
+| `tests/mapjson.test.cjs` | `d5122806f66916f6451bf81004c5e8db0fe563dc064129f92dcd42b6aca50c89` |
+| `tests/us011-mapjson-browser.cjs` | `1762783fb3b6176db4ea4df17edfb5fde9d917966e1142c332684da43cc00097` |
+| `tests/us011-mapjson-fixtures.cjs` | `8e96a1a1bfb14feeab8fd3197af2ea642d7aa7f5f7084f6747285682be204968` |
+| `tests/us011-mapjson-receiver.cjs` | `90efb8550412c36f09ffd91a822558c420ac735d8799d9413dcc0bfb50332bb0` |
+| `tests/us011-static-server.cjs` | `e494c457d7b72a11c41c9c9afc3a90d42e0db168ff9b915ee2af2169b7ebd536` |
+| `tests/us011-evidence-check.cjs` | `070cf21274675f96d31e8c1c1c0d0e3ee5424c86cfa99b1c2206afe899e9094c` |
+| `tests/us011-evidence-manifest.cjs` | `958e2b5c1297b18bda14a4c7a8946286f9e11e4085dcb69023ea5d4a1139e83c` |
+
+- 结果文件 SHA-256：`browser-result.json` `ebd6ac9fb41ecf61bab7681a3812f56ef6a686476406307ad29426de4e2e9126`；`receiver-result.json` `b0ea6a4a3145377997f4368d6278b498ffe12b5564967d743cb108663ac091f4`；`screenshot-check.json` `1286eb87a6caebb2be268a04959119c483edeb2ad488314aab6b3d9f9d0f3211`（随最终重跑由 `manifest.json` 复核）。
+- 外部参考：`D:\Projects\mihuayou\develop_suzukaze\MihuayoCheckmateTactics\assets\resources\Levels\level-01.json`，sha256 `87100a77eb6b5314d6d6a948eeac851b4bf345f47d9349cf7f7a05b4fdd5b8a2`，只读，验收结束复算未变化。
+- 接收方：同项目 HEAD `7b313682060127c1ef568b2fb6e90de13b90f98f`；`BattleState.ts` sha256 `ecf2f6b2…2f9e`、`Config.ts` sha256 `6f013e85…6744`（完整值见 `manifest.json`）；未写入外部仓库。
+- 既有未提交的 US-021 马实现、协作脚本、`AGENTS.md`、美术 outputs、`tmp/*` 及其他历史改动均保留未动；本轮只新增/修改上表文件、测试与 `us011-json-evidence/`，并追加本节。
+
+#### 未验证、边界与遗留
+
+- 图像目视：本运行环境模型不接受图像输入，8 张截图未由 Harness 人工目视确认“清晰可辨”；已用 PNG 解码、尺寸、关键 UI 颜色像素、DOM 可见性与遮挡检查补充，截图保留给主策划直接查看。
+- 浏览器写盘：只能确认发起下载，无法确认用户最终写盘成功；界面文案已如实说明，未声称“文件已写入磁盘”。
+- 未覆盖：实体手机/触屏、非 Chromium 浏览器、中文编号在目标文件系统实际落盘、同名地图冲突时保存导出的浏览器级阻断（该路径复用既有地图库同名拒绝，单元测试覆盖库层，浏览器未单独复演）。
+- 格式兼容不等于行为一致：J03 只验证接收方纯数据解析与 `validateMap`，未运行其引擎、未比对战斗行为。
+- 导入比接收方解析更严格：导入后会执行编辑器现有完整布局校验（含双方将帅、九宫、致死水、固定出生点、首波 8 枚上限），因此接收方“可解析但编辑器不可测试”的文件会被拒绝；如需放宽需主策划确认。
+- 行为说明：初始默认草稿不再计为“未保存修改”，因此新建/读取/导入在纯默认草稿上不弹确认；读取本轮之前保存、没有编号/名称字段的旧草稿时，按新草稿规则补 `level-01` 与地图名称；导入成功后草稿视为未保存（`getId()=null`），普通保存会新建记录，覆盖既有图仍走“读取后保存/另存为”的既有流程。
+- 未做：第二波编辑/导出、地图发布分享、导入种子编辑、导入后自动保存或自动绑定、地图平衡验收。
+- 本轮未重跑 2026-10-06 的旧全量浏览器脚本（其部分选择器基于 US-020 前界面已过时），旧证据未覆盖；本轮以既有 `tests/maps.test.cjs` 9 项回归和新流程覆盖为准。
+
+#### Codex 交付审阅（2026-10-23）
+
+- 运行编号 `20261023T141319051Z-819e8000`。已审阅 J01～J11 记录、浏览器 PASS 结果、接收方真实解析器执行方法及 8 个下载文件的校验记录；未知棋种拒绝对照有效。未重复运行测试或亲自浏览器验收。
+- 只读核对 mapjson.js、editor.js、editor.html、editor.css 的 SHA-256 均匹配交付证据。抽查桌面及窄屏完整截图，新增输入、文件选择、保存并导出及反馈可辨，窄屏为正常纵向滚动布局。
+- 接受本次标准 JSON 功能交付；保留上述未验范围，不把解析/地图校验通过解释为接收方完整战斗测试通过。无后续开发派发，不提交推送。

@@ -1,0 +1,3879 @@
+{
+  "task": "US-011 2026-10-23 标准地图 JSON 导入/导出浏览器验收",
+  "runId": "20261023T141319051Z-819e8000",
+  "startedAt": "2026-10-23T14:34:59.933Z",
+  "environment": {
+    "node": "v24.15.0",
+    "playwright": "1.62.1",
+    "browser": "chromium headless"
+  },
+  "cases": [
+    {
+      "name": "入口：正常完成教学→主营地→第1关布阵页“地图编辑器”进入独立编辑页；正式战局与旅程存档已快照"
+    },
+    {
+      "name": "J01 实际选择用户参考 JSON：双方 14 枚棋子/23 处地形/81 格补陆地/元信息回填一致",
+      "reference": {
+        "path": "D:\\Projects\\mihuayou\\develop_suzukaze\\MihuayoCheckmateTactics\\assets\\resources\\Levels\\level-01.json",
+        "sha256": "87100a77eb6b5314d6d6a948eeac851b4bf345f47d9349cf7f7a05b4fdd5b8a2",
+        "fixtureCopySha256": "87100a77eb6b5314d6d6a948eeac851b4bf345f47d9349cf7f7a05b4fdd5b8a2"
+      }
+    },
+    {
+      "name": "J02 实际修改地形/双方位置/编号名称后保存并导出：先本机保存 v1 再下载 level-02.json，合同字段正确且未绑定",
+      "rng": 236193021,
+      "savedId": "map-mvl2nhaw-crn1rdpm"
+    },
+    {
+      "name": "J02/J05 刷新后读取保存版本：地形、双方棋子、关卡编号/名称恢复"
+    },
+    {
+      "name": "J04 实际导出文件再导入：地形/双方棋子/元信息往返无损，map.name 与 displayName 不同仍各自保留；导入不保存不绑定，撤销重做涵盖元信息"
+    },
+    {
+      "name": "J05 未保存草稿导入：取消与坏 JSON 均不改草稿/历史/地图库；确认仅替换草稿且与旧保存身份隔离"
+    },
+    {
+      "name": "J06 非初始类型/版本/中途回合/结果历史/未知地形兵种/额外业务字段/坐标/重复/重叠/rng 全部明确拒绝并定位，草稿库历史不变",
+      "cases": 25
+    },
+    {
+      "name": "J07 非法编号/名称与非法布局阻止保存导出且无副作用；开裂山与冲锋车原样交换"
+    },
+    {
+      "name": "J08 存储失败：不下载不改库；下载启动失败：已保存并明确导出失败、可重试，重试实际产生下载",
+      "rng": 2733936388
+    },
+    {
+      "name": "J09 同布局连续保存并导出：每次均为合法 uint32 rng，其余内容稳定，草稿未被随机过程改动",
+      "first": 3435335153,
+      "second": 2458055956,
+      "differ": true
+    },
+    {
+      "name": "J10 两张已保存地图、正式绑定与正式存档：导入/导出/保存/刷新不覆盖其他地图、不自动绑定、不污染正式局；试玩行动后导出仍为编辑原稿"
+    },
+    {
+      "name": "J11 桌面与窄屏：实际选择文件、修改元信息、查看错误、保存并下载；控件可见可点击、无横向溢出、错误不遮挡操作",
+      "desktop": {
+        "innerWidth": 1280,
+        "scrollWidth": 1280,
+        "controls": {
+          "level-code": {
+            "width": 130,
+            "height": 35,
+            "inViewport": true,
+            "hit": "level-code",
+            "hitInside": true
+          },
+          "level-name": {
+            "width": 210,
+            "height": 35,
+            "inViewport": true,
+            "hit": "level-name",
+            "hitInside": true
+          },
+          "import-file": {
+            "width": 250,
+            "height": 36,
+            "inViewport": true,
+            "hit": "import-file",
+            "hitInside": true
+          },
+          "save-export": {
+            "width": 83,
+            "height": 46,
+            "inViewport": true,
+            "hit": "save-export",
+            "hitInside": true
+          },
+          "editor-status": {
+            "width": 1068,
+            "height": 45,
+            "inViewport": true,
+            "hit": "editor-status",
+            "hitInside": true
+          }
+        }
+      },
+      "narrow": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "controls": {
+          "level-code": {
+            "width": 110,
+            "height": 35,
+            "inViewport": true,
+            "hit": "level-code",
+            "hitInside": true
+          },
+          "level-name": {
+            "width": 140,
+            "height": 35,
+            "inViewport": true,
+            "hit": "level-name",
+            "hitInside": true
+          },
+          "import-file": {
+            "width": 170,
+            "height": 36,
+            "inViewport": true,
+            "hit": "import-file",
+            "hitInside": true
+          },
+          "save-export": {
+            "width": 83,
+            "height": 36,
+            "inViewport": true,
+            "hit": "save-export",
+            "hitInside": true
+          },
+          "editor-status": {
+            "width": 370,
+            "height": 45,
+            "inViewport": true,
+            "hit": "editor-status",
+            "hitInside": true
+          }
+        }
+      }
+    }
+  ],
+  "checks": [],
+  "errors": [],
+  "artifacts": {
+    "j01-imported-desktop.png": "docs/us/us011-json-evidence/screenshots/j01-imported-desktop.png",
+    "j02-exported-desktop.png": "docs/us/us011-json-evidence/screenshots/j02-exported-desktop.png",
+    "j08-download-retry-desktop.png": "docs/us/us011-json-evidence/screenshots/j08-download-retry-desktop.png",
+    "j10-test-action-desktop.png": "docs/us/us011-json-evidence/screenshots/j10-test-action-desktop.png",
+    "j11-desktop-controls.png": "docs/us/us011-json-evidence/screenshots/j11-desktop-controls.png",
+    "j11-narrow-initial.png": "docs/us/us011-json-evidence/screenshots/j11-narrow-initial.png",
+    "j11-narrow-error.png": "docs/us/us011-json-evidence/screenshots/j11-narrow-error.png",
+    "j11-narrow-exported.png": "docs/us/us011-json-evidence/screenshots/j11-narrow-exported.png"
+  },
+  "downloads": {
+    "level-02.json": {
+      "file": "docs/us/us011-json-evidence/downloads/level-02.json",
+      "suggested": "level-02.json",
+      "sha256": "7b58cdf04dc12e460b6cf79a7e7c5ccc5b7ed132a7bb9bb9b2588ea9999fa8c5"
+    },
+    "level-cracked.json": {
+      "file": "docs/us/us011-json-evidence/downloads/level-cracked.json",
+      "suggested": "level-cracked.json",
+      "sha256": "4bbbdcd679bc1fb6a892441c896d94c3effa10877ab92e531fa6c7cdf1918888"
+    },
+    "level-04-retry.json": {
+      "file": "docs/us/us011-json-evidence/downloads/level-04-retry.json",
+      "suggested": "level-04.json",
+      "sha256": "68fdbfb907fbc69f806fc22dccb8a7228e642c55821d80bcfd498ffc61047677"
+    },
+    "j09-export-1.json": {
+      "file": "docs/us/us011-json-evidence/downloads/j09-export-1.json",
+      "suggested": "level-04.json",
+      "sha256": "5f01ae186dc582aab5317409d9ce0e2dddf4746841f7d8d732d7a244089943cd"
+    },
+    "j09-export-2.json": {
+      "file": "docs/us/us011-json-evidence/downloads/j09-export-2.json",
+      "suggested": "level-04.json",
+      "sha256": "64c0f281da18116fe4d10751366769bbf35f97b5803da984671811e518a9f400"
+    },
+    "level-05.json": {
+      "file": "docs/us/us011-json-evidence/downloads/level-05.json",
+      "suggested": "level-05.json",
+      "sha256": "1f594fb7921f3d1ffe6fc7e3bbcc141cf086228ce37a3036dad872b3801e6730"
+    },
+    "level-05-after-play.json": {
+      "file": "docs/us/us011-json-evidence/downloads/level-05-after-play.json",
+      "suggested": "level-05.json",
+      "sha256": "6bbdc84253d12dca75d745d8898f272ca7121d324495f753cbd74d0cba1592f0"
+    },
+    "level-narrow.json": {
+      "file": "docs/us/us011-json-evidence/downloads/level-narrow.json",
+      "suggested": "level-narrow.json",
+      "sha256": "8029362eca9a93957a0d4a0b90d7efa2301a037a3f9b51c3c923de854f6d4d24"
+    }
+  },
+  "fixtures": {
+    "reference": "docs/us/us011-json-evidence/fixtures/reference.json",
+    "version-3": "docs/us/us011-json-evidence/fixtures/version-3.json",
+    "version-string": "docs/us/us011-json-evidence/fixtures/version-string.json",
+    "battle-save": "docs/us/us011-json-evidence/fixtures/battle-save.json",
+    "mid-turn": "docs/us/us011-json-evidence/fixtures/mid-turn.json",
+    "enemy-phase": "docs/us/us011-json-evidence/fixtures/enemy-phase.json",
+    "result-not-null": "docs/us/us011-json-evidence/fixtures/result-not-null.json",
+    "history-nonempty": "docs/us/us011-json-evidence/fixtures/history-nonempty.json",
+    "unknown-terrain": "docs/us/us011-json-evidence/fixtures/unknown-terrain.json",
+    "unknown-kind": "docs/us/us011-json-evidence/fixtures/unknown-kind.json",
+    "extra-root-field": "docs/us/us011-json-evidence/fixtures/extra-root-field.json",
+    "extra-meta-field": "docs/us/us011-json-evidence/fixtures/extra-meta-field.json",
+    "unit-extra-field": "docs/us/us011-json-evidence/fixtures/unit-extra-field.json",
+    "tile-key-out-of-range": "docs/us/us011-json-evidence/fixtures/tile-key-out-of-range.json",
+    "tile-key-noncanonical": "docs/us/us011-json-evidence/fixtures/tile-key-noncanonical.json",
+    "rng-string": "docs/us/us011-json-evidence/fixtures/rng-string.json",
+    "rng-negative": "docs/us/us011-json-evidence/fixtures/rng-negative.json",
+    "rng-fraction": "docs/us/us011-json-evidence/fixtures/rng-fraction.json",
+    "missing-result": "docs/us/us011-json-evidence/fixtures/missing-result.json",
+    "missing-history": "docs/us/us011-json-evidence/fixtures/missing-history.json",
+    "duplicate-id": "docs/us/us011-json-evidence/fixtures/duplicate-id.json",
+    "overlap": "docs/us/us011-json-evidence/fixtures/overlap.json",
+    "out-of-bounds": "docs/us/us011-json-evidence/fixtures/out-of-bounds.json",
+    "king-out-of-palace": "docs/us/us011-json-evidence/fixtures/king-out-of-palace.json",
+    "non-rook-role": "docs/us/us011-json-evidence/fixtures/non-rook-role.json",
+    "nontrim-code": "docs/us/us011-json-evidence/fixtures/nontrim-code.json",
+    "bad-code-char": "docs/us/us011-json-evidence/fixtures/bad-code-char.json",
+    "cracked-rook-role": "docs/us/us011-json-evidence/fixtures/cracked-rook-role.json",
+    "explicit-land": "docs/us/us011-json-evidence/fixtures/explicit-land.json",
+    "no-map-name": "docs/us/us011-json-evidence/fixtures/no-map-name.json",
+    "no-display-name": "docs/us/us011-json-evidence/fixtures/no-display-name.json",
+    "bad-json": "docs/us/us011-json-evidence/fixtures/bad-json.json",
+    "referenceCopy": "docs/us/us011-json-evidence/fixtures/level-01-reference.json"
+  },
+  "exports": [
+    {
+      "name": "level-02.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-02.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-02",
+          "displayName": "第二关 · 测试"
+        },
+        "map": {
+          "name": "三桥山口甲",
+          "tiles": {
+            "0,1": "forest",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 236193021,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "三桥山口甲",
+        "levelCode": "level-02",
+        "levelName": "第二关 · 测试",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "forest",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 3,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 0,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "level-cracked.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-cracked.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-cracked",
+          "displayName": "开裂山测试关"
+        },
+        "map": {
+          "name": "开裂山甲图",
+          "tiles": {
+            "0,1": "cracked",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 1537792153,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "开裂山甲图",
+        "levelCode": "level-cracked",
+        "levelName": "开裂山测试关",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "cracked",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "level-04-retry.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-04-retry.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-04",
+          "displayName": "失败注入关"
+        },
+        "map": {
+          "name": "开裂山甲图",
+          "tiles": {
+            "0,1": "cracked",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 2733936388,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "开裂山甲图",
+        "levelCode": "level-04",
+        "levelName": "失败注入关",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "cracked",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "j09-export-1.json",
+      "file": "docs/us/us011-json-evidence/downloads/j09-export-1.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-04",
+          "displayName": "失败注入关"
+        },
+        "map": {
+          "name": "开裂山甲图",
+          "tiles": {
+            "0,1": "cracked",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 3435335153,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "开裂山甲图",
+        "levelCode": "level-04",
+        "levelName": "失败注入关",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "cracked",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "j09-export-2.json",
+      "file": "docs/us/us011-json-evidence/downloads/j09-export-2.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-04",
+          "displayName": "失败注入关"
+        },
+        "map": {
+          "name": "开裂山甲图",
+          "tiles": {
+            "0,1": "cracked",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 2458055956,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "开裂山甲图",
+        "levelCode": "level-04",
+        "levelName": "失败注入关",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "cracked",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "charge"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "level-05.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-05.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-05",
+          "displayName": "甲关导出"
+        },
+        "map": {
+          "name": "甲图导出",
+          "tiles": {
+            "0,1": "forest",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 1648638570,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "甲图导出",
+        "levelCode": "level-05",
+        "levelName": "甲关导出",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "forest",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 3,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 0,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "level-05-after-play.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-05-after-play.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-05",
+          "displayName": "甲关导出"
+        },
+        "map": {
+          "name": "甲图导出",
+          "tiles": {
+            "0,1": "forest",
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 3,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 0,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 772805483,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "甲图导出",
+        "levelCode": "level-05",
+        "levelName": "甲关导出",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "forest",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 3,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 0,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    },
+    {
+      "name": "level-narrow.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-narrow.json",
+      "doc": {
+        "formatVersion": 2,
+        "meta": {
+          "kind": "battleInit",
+          "battleId": "level-narrow",
+          "displayName": "窄屏关卡"
+        },
+        "map": {
+          "name": "三桥山口",
+          "tiles": {
+            "2,2": "mountain",
+            "2,3": "forest",
+            "3,3": "forest",
+            "0,4": "water",
+            "1,4": "bridge",
+            "2,4": "water",
+            "3,4": "water",
+            "4,4": "bridge",
+            "5,4": "water",
+            "6,4": "water",
+            "7,4": "bridge",
+            "8,4": "water",
+            "5,5": "forest",
+            "6,5": "forest",
+            "6,6": "mountain",
+            "7,6": "forest",
+            "8,6": "forest",
+            "0,7": "forest",
+            "7,7": "forest",
+            "0,8": "mountain",
+            "1,8": "mountain",
+            "7,8": "mountain",
+            "8,8": "mountain"
+          }
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8
+          }
+        ],
+        "turn": {
+          "round": 1,
+          "phase": "player"
+        },
+        "rng": 250926293,
+        "result": null,
+        "history": {
+          "commands": []
+        }
+      },
+      "draft": {
+        "version": 1,
+        "name": "三桥山口",
+        "levelCode": "level-narrow",
+        "levelName": "窄屏关卡",
+        "tiles": {
+          "0,0": "land",
+          "1,0": "land",
+          "2,0": "land",
+          "3,0": "land",
+          "4,0": "land",
+          "5,0": "land",
+          "6,0": "land",
+          "7,0": "land",
+          "8,0": "land",
+          "0,1": "land",
+          "1,1": "land",
+          "2,1": "land",
+          "3,1": "land",
+          "4,1": "land",
+          "5,1": "land",
+          "6,1": "land",
+          "7,1": "land",
+          "8,1": "land",
+          "0,2": "land",
+          "1,2": "land",
+          "2,2": "mountain",
+          "3,2": "land",
+          "4,2": "land",
+          "5,2": "land",
+          "6,2": "land",
+          "7,2": "land",
+          "8,2": "land",
+          "0,3": "land",
+          "1,3": "land",
+          "2,3": "forest",
+          "3,3": "forest",
+          "4,3": "land",
+          "5,3": "land",
+          "6,3": "land",
+          "7,3": "land",
+          "8,3": "land",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "0,5": "land",
+          "1,5": "land",
+          "2,5": "land",
+          "3,5": "land",
+          "4,5": "land",
+          "5,5": "forest",
+          "6,5": "forest",
+          "7,5": "land",
+          "8,5": "land",
+          "0,6": "land",
+          "1,6": "land",
+          "2,6": "land",
+          "3,6": "land",
+          "4,6": "land",
+          "5,6": "land",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "1,7": "land",
+          "2,7": "land",
+          "3,7": "land",
+          "4,7": "land",
+          "5,7": "land",
+          "6,7": "land",
+          "7,7": "forest",
+          "8,7": "land",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "2,8": "land",
+          "3,8": "land",
+          "4,8": "land",
+          "5,8": "land",
+          "6,8": "land",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        },
+        "units": [
+          {
+            "id": "king",
+            "side": "player",
+            "kind": "king",
+            "x": 4,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u1",
+            "side": "player",
+            "kind": "rook",
+            "x": 0,
+            "y": 0,
+            "rookRole": "base"
+          },
+          {
+            "id": "u2",
+            "side": "player",
+            "kind": "cannon",
+            "x": 1,
+            "y": 2,
+            "rookRole": "base"
+          },
+          {
+            "id": "u3",
+            "side": "player",
+            "kind": "pawn",
+            "x": 1,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u4",
+            "side": "player",
+            "kind": "archer",
+            "x": 4,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "u5",
+            "side": "player",
+            "kind": "spearman",
+            "x": 7,
+            "y": 3,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-0",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 1,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-1",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 4,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-2",
+            "side": "enemy",
+            "kind": "pawn",
+            "x": 7,
+            "y": 5,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-3",
+            "side": "enemy",
+            "kind": "rook",
+            "x": 8,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-4",
+            "side": "enemy",
+            "kind": "cannon",
+            "x": 1,
+            "y": 7,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-5",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 3,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-6",
+            "side": "enemy",
+            "kind": "advisor",
+            "x": 5,
+            "y": 8,
+            "rookRole": "base"
+          },
+          {
+            "id": "w1-7",
+            "side": "enemy",
+            "kind": "king",
+            "x": 4,
+            "y": 8,
+            "rookRole": "base"
+          }
+        ]
+      }
+    }
+  ],
+  "base": "http://127.0.0.1:46736",
+  "reference": {
+    "path": "D:\\Projects\\mihuayou\\develop_suzukaze\\MihuayoCheckmateTactics\\assets\\resources\\Levels\\level-01.json",
+    "sha256": "87100a77eb6b5314d6d6a948eeac851b4bf345f47d9349cf7f7a05b4fdd5b8a2",
+    "fixtureCopySha256": "87100a77eb6b5314d6d6a948eeac851b4bf345f47d9349cf7f7a05b4fdd5b8a2"
+  },
+  "rngSamples": [
+    3435335153,
+    2458055956
+  ],
+  "desktopLayout": {
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "controls": {
+      "level-code": {
+        "width": 130,
+        "height": 35,
+        "inViewport": true,
+        "hit": "level-code",
+        "hitInside": true
+      },
+      "level-name": {
+        "width": 210,
+        "height": 35,
+        "inViewport": true,
+        "hit": "level-name",
+        "hitInside": true
+      },
+      "import-file": {
+        "width": 250,
+        "height": 36,
+        "inViewport": true,
+        "hit": "import-file",
+        "hitInside": true
+      },
+      "save-export": {
+        "width": 83,
+        "height": 46,
+        "inViewport": true,
+        "hit": "save-export",
+        "hitInside": true
+      },
+      "editor-status": {
+        "width": 1068,
+        "height": 45,
+        "inViewport": true,
+        "hit": "editor-status",
+        "hitInside": true
+      }
+    }
+  },
+  "narrowErrorLayout": {
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "controls": {
+      "level-code": {
+        "width": 110,
+        "height": 35,
+        "inViewport": true,
+        "hit": "level-code",
+        "hitInside": true
+      },
+      "level-name": {
+        "width": 140,
+        "height": 35,
+        "inViewport": true,
+        "hit": "level-name",
+        "hitInside": true
+      },
+      "import-file": {
+        "width": 170,
+        "height": 36,
+        "inViewport": true,
+        "hit": "import-file",
+        "hitInside": true
+      },
+      "save-export": {
+        "width": 83,
+        "height": 36,
+        "inViewport": true,
+        "hit": "save-export",
+        "hitInside": true
+      },
+      "editor-status": {
+        "width": 370,
+        "height": 45,
+        "inViewport": true,
+        "hit": "editor-status",
+        "hitInside": true
+      }
+    }
+  },
+  "j02Export": {
+    "doc": {
+      "formatVersion": 2,
+      "meta": {
+        "kind": "battleInit",
+        "battleId": "level-02",
+        "displayName": "第二关 · 测试"
+      },
+      "map": {
+        "name": "三桥山口甲",
+        "tiles": {
+          "0,1": "forest",
+          "2,2": "mountain",
+          "2,3": "forest",
+          "3,3": "forest",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "5,5": "forest",
+          "6,5": "forest",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "7,7": "forest",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        }
+      },
+      "units": [
+        {
+          "id": "king",
+          "side": "player",
+          "kind": "king",
+          "x": 3,
+          "y": 0
+        },
+        {
+          "id": "u1",
+          "side": "player",
+          "kind": "rook",
+          "x": 0,
+          "y": 0,
+          "rookRole": "base"
+        },
+        {
+          "id": "u2",
+          "side": "player",
+          "kind": "cannon",
+          "x": 1,
+          "y": 2
+        },
+        {
+          "id": "u3",
+          "side": "player",
+          "kind": "pawn",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "u4",
+          "side": "player",
+          "kind": "archer",
+          "x": 4,
+          "y": 3
+        },
+        {
+          "id": "u5",
+          "side": "player",
+          "kind": "spearman",
+          "x": 7,
+          "y": 3
+        },
+        {
+          "id": "w1-0",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 0,
+          "y": 5
+        },
+        {
+          "id": "w1-1",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 4,
+          "y": 5
+        },
+        {
+          "id": "w1-2",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 7,
+          "y": 5
+        },
+        {
+          "id": "w1-3",
+          "side": "enemy",
+          "kind": "rook",
+          "x": 8,
+          "y": 7,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-4",
+          "side": "enemy",
+          "kind": "cannon",
+          "x": 1,
+          "y": 7
+        },
+        {
+          "id": "w1-5",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 3,
+          "y": 8
+        },
+        {
+          "id": "w1-6",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 5,
+          "y": 8
+        },
+        {
+          "id": "w1-7",
+          "side": "enemy",
+          "kind": "king",
+          "x": 4,
+          "y": 8
+        }
+      ],
+      "turn": {
+        "round": 1,
+        "phase": "player"
+      },
+      "rng": 236193021,
+      "result": null,
+      "history": {
+        "commands": []
+      }
+    },
+    "draft": {
+      "version": 1,
+      "name": "三桥山口甲",
+      "levelCode": "level-02",
+      "levelName": "第二关 · 测试",
+      "tiles": {
+        "0,0": "land",
+        "1,0": "land",
+        "2,0": "land",
+        "3,0": "land",
+        "4,0": "land",
+        "5,0": "land",
+        "6,0": "land",
+        "7,0": "land",
+        "8,0": "land",
+        "0,1": "forest",
+        "1,1": "land",
+        "2,1": "land",
+        "3,1": "land",
+        "4,1": "land",
+        "5,1": "land",
+        "6,1": "land",
+        "7,1": "land",
+        "8,1": "land",
+        "0,2": "land",
+        "1,2": "land",
+        "2,2": "mountain",
+        "3,2": "land",
+        "4,2": "land",
+        "5,2": "land",
+        "6,2": "land",
+        "7,2": "land",
+        "8,2": "land",
+        "0,3": "land",
+        "1,3": "land",
+        "2,3": "forest",
+        "3,3": "forest",
+        "4,3": "land",
+        "5,3": "land",
+        "6,3": "land",
+        "7,3": "land",
+        "8,3": "land",
+        "0,4": "water",
+        "1,4": "bridge",
+        "2,4": "water",
+        "3,4": "water",
+        "4,4": "bridge",
+        "5,4": "water",
+        "6,4": "water",
+        "7,4": "bridge",
+        "8,4": "water",
+        "0,5": "land",
+        "1,5": "land",
+        "2,5": "land",
+        "3,5": "land",
+        "4,5": "land",
+        "5,5": "forest",
+        "6,5": "forest",
+        "7,5": "land",
+        "8,5": "land",
+        "0,6": "land",
+        "1,6": "land",
+        "2,6": "land",
+        "3,6": "land",
+        "4,6": "land",
+        "5,6": "land",
+        "6,6": "mountain",
+        "7,6": "forest",
+        "8,6": "forest",
+        "0,7": "forest",
+        "1,7": "land",
+        "2,7": "land",
+        "3,7": "land",
+        "4,7": "land",
+        "5,7": "land",
+        "6,7": "land",
+        "7,7": "forest",
+        "8,7": "land",
+        "0,8": "mountain",
+        "1,8": "mountain",
+        "2,8": "land",
+        "3,8": "land",
+        "4,8": "land",
+        "5,8": "land",
+        "6,8": "land",
+        "7,8": "mountain",
+        "8,8": "mountain"
+      },
+      "units": [
+        {
+          "id": "king",
+          "side": "player",
+          "kind": "king",
+          "x": 3,
+          "y": 0,
+          "rookRole": "base"
+        },
+        {
+          "id": "u1",
+          "side": "player",
+          "kind": "rook",
+          "x": 0,
+          "y": 0,
+          "rookRole": "base"
+        },
+        {
+          "id": "u2",
+          "side": "player",
+          "kind": "cannon",
+          "x": 1,
+          "y": 2,
+          "rookRole": "base"
+        },
+        {
+          "id": "u3",
+          "side": "player",
+          "kind": "pawn",
+          "x": 1,
+          "y": 3,
+          "rookRole": "base"
+        },
+        {
+          "id": "u4",
+          "side": "player",
+          "kind": "archer",
+          "x": 4,
+          "y": 3,
+          "rookRole": "base"
+        },
+        {
+          "id": "u5",
+          "side": "player",
+          "kind": "spearman",
+          "x": 7,
+          "y": 3,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-0",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 0,
+          "y": 5,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-1",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 4,
+          "y": 5,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-2",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 7,
+          "y": 5,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-3",
+          "side": "enemy",
+          "kind": "rook",
+          "x": 8,
+          "y": 7,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-4",
+          "side": "enemy",
+          "kind": "cannon",
+          "x": 1,
+          "y": 7,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-5",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 3,
+          "y": 8,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-6",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 5,
+          "y": 8,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-7",
+          "side": "enemy",
+          "kind": "king",
+          "x": 4,
+          "y": 8,
+          "rookRole": "base"
+        }
+      ]
+    },
+    "file": "docs/us/us011-json-evidence/downloads/level-02.json"
+  },
+  "j10Export": {
+    "doc": {
+      "formatVersion": 2,
+      "meta": {
+        "kind": "battleInit",
+        "battleId": "level-05",
+        "displayName": "甲关导出"
+      },
+      "map": {
+        "name": "甲图导出",
+        "tiles": {
+          "0,1": "forest",
+          "2,2": "mountain",
+          "2,3": "forest",
+          "3,3": "forest",
+          "0,4": "water",
+          "1,4": "bridge",
+          "2,4": "water",
+          "3,4": "water",
+          "4,4": "bridge",
+          "5,4": "water",
+          "6,4": "water",
+          "7,4": "bridge",
+          "8,4": "water",
+          "5,5": "forest",
+          "6,5": "forest",
+          "6,6": "mountain",
+          "7,6": "forest",
+          "8,6": "forest",
+          "0,7": "forest",
+          "7,7": "forest",
+          "0,8": "mountain",
+          "1,8": "mountain",
+          "7,8": "mountain",
+          "8,8": "mountain"
+        }
+      },
+      "units": [
+        {
+          "id": "king",
+          "side": "player",
+          "kind": "king",
+          "x": 3,
+          "y": 0
+        },
+        {
+          "id": "u1",
+          "side": "player",
+          "kind": "rook",
+          "x": 0,
+          "y": 0,
+          "rookRole": "base"
+        },
+        {
+          "id": "u2",
+          "side": "player",
+          "kind": "cannon",
+          "x": 1,
+          "y": 2
+        },
+        {
+          "id": "u3",
+          "side": "player",
+          "kind": "pawn",
+          "x": 1,
+          "y": 3
+        },
+        {
+          "id": "u4",
+          "side": "player",
+          "kind": "archer",
+          "x": 4,
+          "y": 3
+        },
+        {
+          "id": "u5",
+          "side": "player",
+          "kind": "spearman",
+          "x": 7,
+          "y": 3
+        },
+        {
+          "id": "w1-0",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 0,
+          "y": 5
+        },
+        {
+          "id": "w1-1",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 4,
+          "y": 5
+        },
+        {
+          "id": "w1-2",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 7,
+          "y": 5
+        },
+        {
+          "id": "w1-3",
+          "side": "enemy",
+          "kind": "rook",
+          "x": 8,
+          "y": 7,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-4",
+          "side": "enemy",
+          "kind": "cannon",
+          "x": 1,
+          "y": 7
+        },
+        {
+          "id": "w1-5",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 3,
+          "y": 8
+        },
+        {
+          "id": "w1-6",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 5,
+          "y": 8
+        },
+        {
+          "id": "w1-7",
+          "side": "enemy",
+          "kind": "king",
+          "x": 4,
+          "y": 8
+        }
+      ],
+      "turn": {
+        "round": 1,
+        "phase": "player"
+      },
+      "rng": 1648638570,
+      "result": null,
+      "history": {
+        "commands": []
+      }
+    },
+    "draft": {
+      "version": 1,
+      "name": "甲图导出",
+      "levelCode": "level-05",
+      "levelName": "甲关导出",
+      "tiles": {
+        "0,0": "land",
+        "1,0": "land",
+        "2,0": "land",
+        "3,0": "land",
+        "4,0": "land",
+        "5,0": "land",
+        "6,0": "land",
+        "7,0": "land",
+        "8,0": "land",
+        "0,1": "forest",
+        "1,1": "land",
+        "2,1": "land",
+        "3,1": "land",
+        "4,1": "land",
+        "5,1": "land",
+        "6,1": "land",
+        "7,1": "land",
+        "8,1": "land",
+        "0,2": "land",
+        "1,2": "land",
+        "2,2": "mountain",
+        "3,2": "land",
+        "4,2": "land",
+        "5,2": "land",
+        "6,2": "land",
+        "7,2": "land",
+        "8,2": "land",
+        "0,3": "land",
+        "1,3": "land",
+        "2,3": "forest",
+        "3,3": "forest",
+        "4,3": "land",
+        "5,3": "land",
+        "6,3": "land",
+        "7,3": "land",
+        "8,3": "land",
+        "0,4": "water",
+        "1,4": "bridge",
+        "2,4": "water",
+        "3,4": "water",
+        "4,4": "bridge",
+        "5,4": "water",
+        "6,4": "water",
+        "7,4": "bridge",
+        "8,4": "water",
+        "0,5": "land",
+        "1,5": "land",
+        "2,5": "land",
+        "3,5": "land",
+        "4,5": "land",
+        "5,5": "forest",
+        "6,5": "forest",
+        "7,5": "land",
+        "8,5": "land",
+        "0,6": "land",
+        "1,6": "land",
+        "2,6": "land",
+        "3,6": "land",
+        "4,6": "land",
+        "5,6": "land",
+        "6,6": "mountain",
+        "7,6": "forest",
+        "8,6": "forest",
+        "0,7": "forest",
+        "1,7": "land",
+        "2,7": "land",
+        "3,7": "land",
+        "4,7": "land",
+        "5,7": "land",
+        "6,7": "land",
+        "7,7": "forest",
+        "8,7": "land",
+        "0,8": "mountain",
+        "1,8": "mountain",
+        "2,8": "land",
+        "3,8": "land",
+        "4,8": "land",
+        "5,8": "land",
+        "6,8": "land",
+        "7,8": "mountain",
+        "8,8": "mountain"
+      },
+      "units": [
+        {
+          "id": "king",
+          "side": "player",
+          "kind": "king",
+          "x": 3,
+          "y": 0,
+          "rookRole": "base"
+        },
+        {
+          "id": "u1",
+          "side": "player",
+          "kind": "rook",
+          "x": 0,
+          "y": 0,
+          "rookRole": "base"
+        },
+        {
+          "id": "u2",
+          "side": "player",
+          "kind": "cannon",
+          "x": 1,
+          "y": 2,
+          "rookRole": "base"
+        },
+        {
+          "id": "u3",
+          "side": "player",
+          "kind": "pawn",
+          "x": 1,
+          "y": 3,
+          "rookRole": "base"
+        },
+        {
+          "id": "u4",
+          "side": "player",
+          "kind": "archer",
+          "x": 4,
+          "y": 3,
+          "rookRole": "base"
+        },
+        {
+          "id": "u5",
+          "side": "player",
+          "kind": "spearman",
+          "x": 7,
+          "y": 3,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-0",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 0,
+          "y": 5,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-1",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 4,
+          "y": 5,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-2",
+          "side": "enemy",
+          "kind": "pawn",
+          "x": 7,
+          "y": 5,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-3",
+          "side": "enemy",
+          "kind": "rook",
+          "x": 8,
+          "y": 7,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-4",
+          "side": "enemy",
+          "kind": "cannon",
+          "x": 1,
+          "y": 7,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-5",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 3,
+          "y": 8,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-6",
+          "side": "enemy",
+          "kind": "advisor",
+          "x": 5,
+          "y": 8,
+          "rookRole": "base"
+        },
+        {
+          "id": "w1-7",
+          "side": "enemy",
+          "kind": "king",
+          "x": 4,
+          "y": 8,
+          "rookRole": "base"
+        }
+      ]
+    },
+    "file": "docs/us/us011-json-evidence/downloads/level-05.json"
+  },
+  "importedSeed": 305419896,
+  "formal": {
+    "stateEqual": true,
+    "journeyStorageEqual": true
+  },
+  "result": "PASS",
+  "finishedAt": "2026-10-23T14:35:31.221Z"
+}

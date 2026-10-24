@@ -3,14 +3,14 @@
   "failed": 0,
   "browserErrors": [],
   "versions": {
-    "web/index.html": "8a87862f09e576d3920c131e519a00373cc86816bb177bd4adda70a4082a1555",
-    "web/js/rules.js": "09428a0917c2f9908ebd168f29c7a77cb54325ff219e7e1e31ed7e72df2aa864",
-    "web/js/app.js": "c7342cd3b1b73c858b743aaf34c7a06b520d62e89d2f0d67b7c32e6c6bfd97f9",
+    "web/index.html": "d65c03963e4ce6227b58c5fbf25bebb48877823ec05ff08d4804abe3c9761ac3",
+    "web/js/rules.js": "5d9c97f5d97064e8b7d0f6adcc2aee92a96a4029df3de919415f624dfe4b18fa",
+    "web/js/app.js": "55dc251cede73e97a53d824c9347bb980a45f7c4846f9be395678ed566555390",
     "web/js/ui.js": "a7b33468f5c747e32a1df10bad2d682cb34e4a8f8716ecc988922da5be19fa15",
     "web/ui.css": "716729508e3eb46f0a90e8b42a4d8874a23f6cb70b283bb97c6864cae4cd9bd8",
     "web/desktop.css": "8986eadfc1dea0eafe47c628c59df8e33daf18f0429c39ca90502adac42be38b",
     "web/mobile.css": "50562405350bfb494dcf81eebcba01f9f5cab3bed8d126ddc05c69805b9f8f55"
   },
-  "finishedAt": "2026-10-21T07:36:50.633Z",
+  "finishedAt": "2026-10-24T02:42:48.654Z",
   "scope": "2 historical-map isolated chains (two waves + real kills only) + battle UI probes + US020 rescue list; camp purchase/roster/cross-level/retry now covered by us020-acceptance-browser.cjs normal entry"
 }

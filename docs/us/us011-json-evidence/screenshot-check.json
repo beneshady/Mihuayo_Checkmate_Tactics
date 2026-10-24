@@ -1,0 +1,129 @@
+{
+  "task": "US011 证据检查：截图解码、尺寸与关键 UI 像素",
+  "runId": "20261023T141319051Z-819e8000",
+  "startedAt": "2026-10-23T14:35:32.858Z",
+  "screenshots": [
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j01-imported-desktop.png",
+      "width": 1280,
+      "height": 1467,
+      "bytes": 140492,
+      "distinctColors": 2488,
+      "keyColors": {
+        "land": 139283,
+        "water": 18261,
+        "saveButton": 5637,
+        "status": 43959,
+        "errorText": 215,
+        "cracked": 0
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j02-exported-desktop.png",
+      "width": 1280,
+      "height": 1467,
+      "bytes": 145102,
+      "distinctColors": 2429,
+      "keyColors": {
+        "land": 149035,
+        "water": 3727,
+        "saveButton": 5637,
+        "status": 43105,
+        "errorText": 215,
+        "cracked": 0
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j08-download-retry-desktop.png",
+      "width": 1280,
+      "height": 1467,
+      "bytes": 149759,
+      "distinctColors": 2530,
+      "keyColors": {
+        "land": 149056,
+        "water": 18261,
+        "saveButton": 5637,
+        "status": 43613,
+        "errorText": 215,
+        "cracked": 2899
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j10-test-action-desktop.png",
+      "width": 1280,
+      "height": 900,
+      "bytes": 249159,
+      "distinctColors": 15276,
+      "keyColors": {
+        "land": 0,
+        "water": 0,
+        "saveButton": 0,
+        "status": 0,
+        "errorText": 0,
+        "cracked": 0
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j11-desktop-controls.png",
+      "width": 1280,
+      "height": 1467,
+      "bytes": 146439,
+      "distinctColors": 2436,
+      "keyColors": {
+        "land": 152947,
+        "water": 18261,
+        "saveButton": 5637,
+        "status": 44719,
+        "errorText": 215,
+        "cracked": 0
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j11-narrow-error.png",
+      "width": 390,
+      "height": 2040,
+      "bytes": 135234,
+      "distinctColors": 3293,
+      "keyColors": {
+        "land": 60640,
+        "water": 7559,
+        "saveButton": 4844,
+        "status": 14607,
+        "errorText": 772,
+        "cracked": 0
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j11-narrow-exported.png",
+      "width": 390,
+      "height": 2012,
+      "bytes": 132793,
+      "distinctColors": 3257,
+      "keyColors": {
+        "land": 60558,
+        "water": 7559,
+        "saveButton": 4844,
+        "status": 20131,
+        "errorText": 215,
+        "cracked": 0
+      }
+    },
+    {
+      "file": "docs/us/us011-json-evidence/screenshots/j11-narrow-initial.png",
+      "width": 390,
+      "height": 1993,
+      "bytes": 129463,
+      "distinctColors": 3128,
+      "keyColors": {
+        "land": 60988,
+        "water": 7559,
+        "saveButton": 4844,
+        "status": 13639,
+        "errorText": 215,
+        "cracked": 0
+      }
+    }
+  ],
+  "result": "PASS",
+  "finishedAt": "2026-10-23T14:35:34.037Z"
+}

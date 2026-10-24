@@ -1,0 +1,205 @@
+{
+  "scope": "US-021 H01～H20 实际浏览器验收（正常入口 + 专项夹具 + 旧档副本）",
+  "startedAt": "2026-10-22T06:52:38.990Z",
+  "steps": [
+    {
+      "id": "H20-1",
+      "kind": "正常入口（新旅程→跳过教学→营地）",
+      "pass": true,
+      "detail": "正常点击进入营地：猫粮 8、公共 SP 0、队伍 rook/pawn/pawn/horse",
+      "evidence": null
+    },
+    {
+      "id": "H20-2",
+      "kind": "正常入口：商店招募马",
+      "pass": true,
+      "detail": "点击招募马：猫粮 8→3，recruit-horse-0 进入后备（上阵 4/4）",
+      "evidence": null
+    },
+    {
+      "id": "H20-3",
+      "kind": "正常入口：营地换阵让招募马出战",
+      "pass": true,
+      "detail": "名单切换上阵 rook,starting-pawn,starting-pawn-2,recruit-horse-0；猫粮 3；截图 h20-camp-roster.png",
+      "evidence": null
+    },
+    {
+      "id": "H06/H13-营地技能面板",
+      "kind": "营地技能面板：马三项价格与 SP 不足禁用",
+      "pass": true,
+      "detail": "营地清单含马三项成长（1/2/2 SP），SP 0 时按钮禁用；截图 h06-camp-skills.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-4",
+      "kind": "正常入口：离开营地→选关→布阵",
+      "pass": true,
+      "detail": "布阵确认后进入我方行动：新马 (7,3)、SP 0、回合 1",
+      "evidence": null
+    },
+    {
+      "id": "H19-界面",
+      "kind": "我方马只有两个操作入口（无旧普通攻击）",
+      "pass": true,
+      "detail": "模式按钮=[\"普通移动\",\"跳跃攻击 2 格\"]；技能含强健/距离/伤害/推动；截图 h19-horse-modes.png",
+      "evidence": null
+    },
+    {
+      "id": "H02/H20-预览与取消",
+      "kind": "跳跃预览与取消：不改变资源、行动",
+      "pass": true,
+      "detail": "预览含“跳跃攻击/落地四邻格直接伤害 1 点/伤害范围”；取消后状态一致；截图 h20-jump-preview.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-5",
+      "kind": "正常入口：基础跳跃攻击（距离 2）落地击杀",
+      "pass": true,
+      "detail": "点击跳跃落点 (7,5)：击杀 w1-2、SP 0→1、马 [7,5]、ap 0；截图 h20-jump-executed.png",
+      "evidence": null
+    },
+    {
+      "id": "H01-界面",
+      "kind": "跳跃后本回合不能再普通移动",
+      "pass": true,
+      "detail": "跳跃后普通移动按钮禁用（disabled=true），强制点击也不改变状态",
+      "evidence": null
+    },
+    {
+      "id": "H06/H12-战斗购买",
+      "kind": "技能距离即时生效、不恢复行动、扣 1 SP",
+      "pass": true,
+      "detail": "点击“技能距离”：SP 1→0、距离 3、ap 仍 0、跳跃已用仍 true；截图 h12-buy-distance.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-6",
+      "kind": "走出回合并使用升级后的 3 格跳跃",
+      "pass": true,
+      "detail": "第 2 回合点击 3 格落点 (4,5)：预览“直线 3 格”、击杀 w1-1、SP 1；截图 h20-distance3-jump.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-7",
+      "kind": "正常入口：第 3 回合普通移动与撤回",
+      "pass": true,
+      "detail": "第 3 回合普通移动到 (5,3)（击杀/SP 不变、可撤回），撤回后回到 (4,5) 且 AP 恢复；截图 h20-normal-move.png,h20-normal-undo.png",
+      "evidence": null
+    },
+    {
+      "id": "H01-专项界面",
+      "kind": "先普通移动再释放跳跃：普通移动不伤害、跳跃照常结算",
+      "pass": true,
+      "detail": "普通移动 (4,4)→(5,6) 不造成伤害，随后跳跃 (5,5) 击杀 t、SP 1；截图 h01-move-then-jump.png",
+      "evidence": null
+    },
+    {
+      "id": "H15-专项界面",
+      "kind": "双王同亡：完整结算后失败优先（终局截图）",
+      "pass": true,
+      "detail": "同次技能击杀双方主将与其他方向目标，结果 dead/result；结算浮层含“主帅阵亡”；截图 h15-both-kings.png",
+      "evidence": null
+    },
+    {
+      "id": "H02/H03-专项界面",
+      "kind": "非法落点被拒绝并显示原因、不消耗技能",
+      "pass": true,
+      "detail": "依次点击 3 格/斜向/山/水/占用格：均显示对应原因且状态不变；点击自身格只选中；{\"x\":4,\"y\":1}→超过技能距离上限 2 格，不消耗技能；{\"x\":5,\"y\":5}→跳跃攻击只能选择上下左右直线方向，不能斜向；{\"x\":4,\"y\":2}→跳跃落点不能是山体，不消耗技能；{\"x\":4,\"y\":3}→跳跃落点不能是水格，不消耗技能；{\"x\":6,\"y\":4}→跳跃落点必须为空，不消耗技能；原地→选中自身（无技能结算）；截图 h03-illegal-targets.png",
+      "evidence": null
+    },
+    {
+      "id": "H04-专项界面",
+      "kind": "水中马不能跳跃、可普通移动离开",
+      "pass": true,
+      "detail": "水中跳跃被拒（提示含“水中”），随后普通移动离开到 (3,2) 且 HP 不变；截图 h04-water.png",
+      "evidence": null
+    },
+    {
+      "id": "H05/H07/H14-专项界面",
+      "kind": "推动预览、四邻伤害与推动结算",
+      "pass": true,
+      "detail": "购买推动(2SP)后预览含友军与推动；执行后敌方车→(4,0)、友军车→(2,2)、新友军尸体→(4,4)、既有尸体→(6,2)，击杀友军不计战绩；截图 h07-push-preview.png,h07-push-result.png",
+      "evidence": null
+    },
+    {
+      "id": "H10-专项界面",
+      "kind": "树林闪避分支（显式固定 rng）",
+      "pass": true,
+      "detail": "固定 rng 专项：seed0 双方闪避（伤害与推动都不生效）；seed200 双方命中并阵亡；截图 h10-forest-dodge.png,h10-forest-hit.png",
+      "evidence": null
+    },
+    {
+      "id": "H16-专项界面",
+      "kind": "疾行扩展移动真实点击（含马腿阻挡与解锁后免马腿）",
+      "pass": true,
+      "detail": "疾行夹具：扩展点 (2,4) 可点、无伤害、AP 只扣 1；解锁后 (4,3) 日字可通过原马腿位置；截图 h16-dash-move.png,h16-dash-unlocked.png",
+      "evidence": null
+    },
+    {
+      "id": "H11/H17-专项界面",
+      "kind": "普通移动可撤回；跳跃释放锁定撤回；购买清撤回且不刷新行动",
+      "pass": true,
+      "detail": "普通移动→撤回恢复 AP；移动后释放无伤害跳跃立即锁定撤回；购买成功后撤回清空、AP 仍为 0、跳跃仍可用；截图 h11-undo-lock.png",
+      "evidence": null
+    },
+    {
+      "id": "H19-专项界面",
+      "kind": "敌方马保持日字与旧攻击预告，无跳跃入口",
+      "pass": true,
+      "detail": "我方马入口 [\"普通移动\",\"跳跃攻击 2 格\"]；敌方意图面板正常（1将 · 待机已锁定 (9,9) → 当前落点 (9,9) · 待机2马 · 攻）；截图 h19-enemy-intents.png",
+      "evidence": null
+    },
+    {
+      "id": "H18-营地副本",
+      "kind": "旧旅程档加载：马自动接入基础技能、保留成长、不赠点不清档",
+      "pass": true,
+      "detail": "旧旅程副本：马 2/1/未解锁、击杀 2、HP 2/2、强健 1、SP 3、猫粮 4；截图 h18-old-camp.png",
+      "evidence": null
+    },
+    {
+      "id": "H18-续局副本",
+      "kind": "旧战斗续局加载：补齐基础技能、不赠点、不刷新已用行动",
+      "pass": true,
+      "detail": "旧续局副本：马字段 2/1/未解锁、horseJumpUsed=true、SP 3、跳跃入口禁用；截图 h18-old-battle.png",
+      "evidence": null
+    },
+    {
+      "id": "H18-重复恢复",
+      "kind": "重复恢复幂等：字段与行动不被重置或刷新",
+      "pass": true,
+      "detail": "第二次加载后字段仍为 2/1/未解锁、horseJumpUsed=true、SP 3",
+      "evidence": null
+    },
+    {
+      "id": "H13-专项界面",
+      "kind": "购买阶段限制：营地含后备、布阵/战斗仅场上存活",
+      "pass": true,
+      "detail": "专项阶段链：营地后备马购买(SP 5→4，距离 3)→布阵出战马购买(SP 4→3，距离 3)→战斗存活马购买(SP 3→1，伤害 2)；后备马未出战；截图 h13-camp-bench-buy.png,h13-battle-buy.png",
+      "evidence": null
+    },
+    {
+      "id": "H20-手机横版",
+      "kind": "手机横版 844x390：招募/营地/布阵/跳跃预览与执行/普通移动可达",
+      "pass": true,
+      "detail": "手机横版(844x390, layout=mobile)：招募→营地→布阵确认→跳跃预览(执行按钮可用)→执行落点 (7,5) 击杀 SP 1→第2回合普通移动 (6,3)；截图 h20-mobile-camp.png,h20-mobile-jump-preview.png,h20-mobile-jump.png,h20-mobile-move.png",
+      "evidence": null
+    }
+  ],
+  "pageErrors": [],
+  "versions": {
+    "web/index.html": "d65c03963e4ce6227b58c5fbf25bebb48877823ec05ff08d4804abe3c9761ac3",
+    "web/js/rules.js": "3000b57d86afcf432c6589ba251dedc4ea247469cd5ca77ae27649578f5d74cd",
+    "web/js/app.js": "bba42fbae68328d1b9434a30aaea096e9266623dcec5d30c59ff11bbdee201bd",
+    "web/js/campaign.js": "6b29c81f1bf01d15fb9130ad5c37e69fa83e8006aa25fda1af04c42814fe1b6b",
+    "tests/us021-horse.test.cjs": "f936d3c179e301e2f371fef467518db512103dfce9585b72a0ac389436f45e40",
+    "tests/us021-acceptance-browser.cjs": "0df42a5fe81441157dff7498393812c631a46c843c15d0caccb797b36ff77074"
+  },
+  "pageErrorsError": [],
+  "finishedAt": "2026-10-22T06:53:46.456Z",
+  "summary": {
+    "total": 26,
+    "pass": 26,
+    "fail": 0,
+    "pageErrors": 0
+  }
+}

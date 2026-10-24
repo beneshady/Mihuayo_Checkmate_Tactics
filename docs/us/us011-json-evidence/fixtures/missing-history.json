@@ -1,0 +1,143 @@
+{
+  "formatVersion": 2,
+  "meta": {
+    "kind": "battleInit",
+    "battleId": "level-01",
+    "displayName": "第一关 · 三桥山口"
+  },
+  "map": {
+    "name": "三桥山口",
+    "tiles": {
+      "0,4": "water",
+      "2,4": "water",
+      "3,4": "water",
+      "5,4": "water",
+      "6,4": "water",
+      "8,4": "water",
+      "1,4": "bridge",
+      "4,4": "bridge",
+      "7,4": "bridge",
+      "0,8": "mountain",
+      "1,8": "mountain",
+      "7,8": "mountain",
+      "8,8": "mountain",
+      "2,2": "mountain",
+      "6,6": "mountain",
+      "0,7": "forest",
+      "7,7": "forest",
+      "7,6": "forest",
+      "8,6": "forest",
+      "5,5": "forest",
+      "6,5": "forest",
+      "2,3": "forest",
+      "3,3": "forest"
+    }
+  },
+  "units": [
+    {
+      "id": "king",
+      "side": "player",
+      "kind": "king",
+      "x": 4,
+      "y": 0
+    },
+    {
+      "id": "u1",
+      "side": "player",
+      "kind": "rook",
+      "x": 0,
+      "y": 0,
+      "rookRole": "base"
+    },
+    {
+      "id": "u2",
+      "side": "player",
+      "kind": "cannon",
+      "x": 1,
+      "y": 2
+    },
+    {
+      "id": "u3",
+      "side": "player",
+      "kind": "pawn",
+      "x": 1,
+      "y": 3
+    },
+    {
+      "id": "u4",
+      "side": "player",
+      "kind": "archer",
+      "x": 4,
+      "y": 3
+    },
+    {
+      "id": "u5",
+      "side": "player",
+      "kind": "spearman",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "id": "w1-0",
+      "side": "enemy",
+      "kind": "pawn",
+      "x": 1,
+      "y": 5
+    },
+    {
+      "id": "w1-1",
+      "side": "enemy",
+      "kind": "pawn",
+      "x": 4,
+      "y": 5
+    },
+    {
+      "id": "w1-2",
+      "side": "enemy",
+      "kind": "pawn",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "id": "w1-3",
+      "side": "enemy",
+      "kind": "rook",
+      "x": 8,
+      "y": 7
+    },
+    {
+      "id": "w1-4",
+      "side": "enemy",
+      "kind": "cannon",
+      "x": 1,
+      "y": 7
+    },
+    {
+      "id": "w1-5",
+      "side": "enemy",
+      "kind": "advisor",
+      "x": 3,
+      "y": 8
+    },
+    {
+      "id": "w1-6",
+      "side": "enemy",
+      "kind": "advisor",
+      "x": 5,
+      "y": 8
+    },
+    {
+      "id": "w1-7",
+      "side": "enemy",
+      "kind": "king",
+      "x": 4,
+      "y": 8
+    }
+  ],
+  "turn": {
+    "round": 1,
+    "phase": "player"
+  },
+  "rng": 305419896,
+  "result": null
+}

@@ -1,0 +1,121 @@
+{
+  "task": "J03 接收方纯数据解析与地图校验（只读外部项目）",
+  "runId": "20261023T141319051Z-819e8000",
+  "startedAt": "2026-10-23T14:35:31.536Z",
+  "receiver": {
+    "root": "D:\\Projects\\mihuayou\\develop_suzukaze\\MihuayoCheckmateTactics",
+    "node": "v24.15.0",
+    "head": "7b313682060127c1ef568b2fb6e90de13b90f98f",
+    "source": {
+      "assets/Scripts/Core/BattleState.ts": "ecf2f6b2364c786607877e926531750cae3948e1b82a53a5f2097bbf52210f9e",
+      "assets/Scripts/Core/Config.ts": "6f013e8509326562f6d632f0a5d9b8cc2bc9cbaeb2e4f3be9ffe3c086e7b6744"
+    },
+    "transpile": {
+      "note": "只读复制到临时目录；仅将 ESM 导入说明符 ./Config 改为 ./Config.ts，语义未改；Node 24 原生类型剥离运行，无引擎依赖。",
+      "Config.ts": "6f013e8509326562f6d632f0a5d9b8cc2bc9cbaeb2e4f3be9ffe3c086e7b6744",
+      "BattleState.ts": "7cd29f4ea15320d3498885e13a11b9c2040f41a26a2c9c257a7f3622c596b609"
+    }
+  },
+  "files": [
+    {
+      "name": "level-02.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-02.json",
+      "sha256": "7b58cdf04dc12e460b6cf79a7e7c5ccc5b7ed132a7bb9bb9b2588ea9999fa8c5",
+      "rng": 236193021,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "level-cracked.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-cracked.json",
+      "sha256": "4bbbdcd679bc1fb6a892441c896d94c3effa10877ab92e531fa6c7cdf1918888",
+      "rng": 1537792153,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "level-04-retry.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-04-retry.json",
+      "sha256": "68fdbfb907fbc69f806fc22dccb8a7228e642c55821d80bcfd498ffc61047677",
+      "rng": 2733936388,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "j09-export-1.json",
+      "file": "docs/us/us011-json-evidence/downloads/j09-export-1.json",
+      "sha256": "5f01ae186dc582aab5317409d9ce0e2dddf4746841f7d8d732d7a244089943cd",
+      "rng": 3435335153,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "j09-export-2.json",
+      "file": "docs/us/us011-json-evidence/downloads/j09-export-2.json",
+      "sha256": "64c0f281da18116fe4d10751366769bbf35f97b5803da984671811e518a9f400",
+      "rng": 2458055956,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "level-05.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-05.json",
+      "sha256": "1f594fb7921f3d1ffe6fc7e3bbcc141cf086228ce37a3036dad872b3801e6730",
+      "rng": 1648638570,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "level-05-after-play.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-05-after-play.json",
+      "sha256": "6bbdc84253d12dca75d745d8898f272ca7121d324495f753cbd74d0cba1592f0",
+      "rng": 772805483,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    },
+    {
+      "name": "level-narrow.json",
+      "file": "docs/us/us011-json-evidence/downloads/level-narrow.json",
+      "sha256": "8029362eca9a93957a0d4a0b90d7efa2301a037a3f9b51c3c923de854f6d4d24",
+      "rng": 250926293,
+      "receiver": {
+        "tiles": 81,
+        "units": 14,
+        "validateMap": []
+      }
+    }
+  ],
+  "cases": [],
+  "result": "PASS",
+  "control": {
+    "file": "docs/us/us011-json-evidence/fixtures/unknown-kind.json",
+    "error": {
+      "name": "BattleParseError",
+      "message": "$.units[1].kind: 未知棋种 \"elephant\"",
+      "path": "$.units[1].kind"
+    }
+  },
+  "command": "node --experimental-strip-types tmp/us011-json-receiver/receiver-runner.mjs <下载文件>",
+  "finishedAt": "2026-10-23T14:35:32.765Z"
+}
