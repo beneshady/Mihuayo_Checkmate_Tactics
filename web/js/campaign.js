@@ -5,10 +5,10 @@ const $=id=>document.getElementById(id),params=new URLSearchParams(location.sear
 const internal=params.has('fixture')||params.get('editor-test')==='1'||params.has('device-preview');
 document.body.classList.toggle('campaign-player',!internal);
 const names=['关中','中原','江淮'],symbols=['隘','城','泽'];
-const RECRUITS=[['pawn','兵','HP 1 · 3 猫粮'],['rook','基础车','HP 2 / 攻击 4 格 · 5 猫粮'],['horse','马','日字走位 · 5 猫粮'],['cannon','炮','隔一炮架 / 攻击 2 · 8 猫粮'],['advisor','仕','固定防御塔 HP 2 · 5 猫粮 · 最多两座']];
-const PRICES={pawn:3,rook:5,horse:5,cannon:8,advisor:5};
-const TERRAIN_LABEL={land:'陆',water:'水',bridge:'桥',mountain:'山',cracked:'裂',forest:'林'};
-const KIND_LABEL={king:'帅',rook:'车',horse:'马',cannon:'炮',pawn:'兵',archer:'弓',spearman:'枪',advisor:'仕'};
+const RECRUITS=[['pawn','兵','HP 1 · 3 猫粮'],['rook','基础车','HP 2 / 攻击 4 格 · 5 猫粮'],['horse','马','日字走位 · 5 猫粮'],['cannon','炮','隔一炮架 / 攻击 2 · 8 猫粮'],['advisor','仕','固定防御塔 HP 2 · 5 猫粮 · 最多两座'],['elephant','象','控制法师 HP 1（坚守后 2）· 牵引/冰封 · 5 猫粮']];
+const PRICES={pawn:3,rook:5,horse:5,cannon:8,advisor:5,elephant:5};
+const TERRAIN_LABEL={land:'陆',water:'水',bridge:'桥',mountain:'山',cracked:'裂',rubble:'碎',forest:'林'};
+const KIND_LABEL={king:'帅',rook:'车',horse:'马',cannon:'炮',pawn:'兵',archer:'弓',spearman:'枪',advisor:'仕',elephant:'象'};
 let view='loading',journey=null,player=null,selected=1,tutorialOn=false,current=null,campNotice='',_tutorialState=null,battleLocked=false;
 const rules=()=>window.M0,bridge=()=>window.__M0_CAMPAIGN__;
 function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}

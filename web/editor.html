@@ -4,11 +4,17 @@
 <main id="edit-view">
  <header><a href="./" target="_blank" rel="noopener">正式游戏 ↗</a><h1>地图编辑器</h1><p>独立原稿 / 测试，不改正在进行的正式战局</p></header>
  <section class="library"><label>地图名称 <input id="map-name" maxlength="80" value="三桥山口草稿"></label><div class="row"><button id="new-map">新建</button><button id="save">保存草稿</button><button id="save-as">另存为</button></div><label>已保存地图 <select id="saved-maps"><option value="">暂无保存</option></select></label><button id="load">读取已保存地图</button><p>仅本浏览器、此站点保存；清理站点数据会丢失。未保存修改刷新后可能丢失。草稿可有错误，不能测试或应用。</p><div class="row"><label>用于第 <input id="level-number" type="number" min="1" step="1" value="2"> 关</label><button id="apply">应用保存版本</button></div><p id="binding-info"></p><p>保存不会自动更新正式图；应用只影响之后新进入该关，不改当前关或同次重试。</p></section>
+ <section class="json-io" aria-labelledby="json-io-title"><h2 id="json-io-title">标准地图 JSON（formatVersion 2）</h2>
+  <div class="row"><label>关卡编号 <input id="level-code" maxlength="100" value="level-01" placeholder="level-01"></label><label>关卡名称 <input id="level-name" maxlength="80"></label></div>
+  <div class="row"><label>导入地图 JSON <input id="import-file" type="file" accept=".json,application/json"></label><button id="save-export" class="primary">保存并导出</button><button id="retry-export" hidden>重试下载</button></div>
+  <ul id="json-errors" class="errors" hidden></ul>
+  <p>保存并导出先校验交换格式与布局，再保存到本机地图库，最后下载 &lt;关卡编号&gt;.json；不自动绑定关卡。导入只成为当前草稿、不自动保存，有未保存修改会先确认。浏览器无法确认下载文件是否已写入磁盘。</p>
+ </section>
  <div class="workspace"><section class="board-area"><h2>敌方在上 · 第9行</h2><div id="editor-board" role="group" aria-label="9乘9地图，坐标为列行1至9"></div><h2>我方在下 · 第1行</h2><p>红色圆形：我方；蓝色方形：敌方。九宫格有米字标记；↑ 为只读第二波出生点（第5回合预告、第6回合尝试）。</p></section>
  <section class="tools"><h2>当前工具：<span id="tool-name"></span></h2><div id="terrain-tools" class="row" aria-label="六种地形"></div><h3>棋子</h3><label>阵营 <select id="side"><option value="player">我方</option><option value="enemy">敌方</option></select></label><label>棋种 <select id="kind"></select></label><div class="row"><button data-tool="add">添加棋子</button><button data-tool="move">移动棋子</button><button data-tool="delete">删除棋子</button><button id="deselect">取消选取</button></div><p id="selection-info"></p><p>首波敌阵最多8枚（含唯一将），这是本版工具限制。敌人无技能。测试使用原稿阵容与正式基础属性，不赠SP/金币。</p><div class="row"><button id="undo">撤销</button><button id="redo">重做</button></div><p>Ctrl/⌘+Z 撤销，Shift+Z 重做，Esc 取消选取；输入框内沿用文字编辑。</p><h3>校验</h3><ul id="errors"></ul><div class="row"><button id="start-test" class="primary">开始独立测试</button><button id="cancel-edit" hidden>取消编辑，回到原测试</button></div></section></div>
  <p id="editor-status" role="status" aria-live="polite"></p>
 </main>
 <section id="test-view" hidden><nav><strong>独立地图测试 · 不写正式队伍/金币</strong><button id="return-edit">返回编辑原稿</button></nav><iframe id="test-frame" title="独立地图测试战局"></iframe></section>
 <div id="save-as-panel" hidden role="dialog" aria-label="另存为新地图"><label>新地图名称 <input id="save-as-name" maxlength="60"></label><button id="save-as-confirm">确认另存</button><button id="save-as-cancel">取消</button></div>
-<script src="js/rules.js"></script><script src="js/maps.js"></script><script src="js/editor.js"></script>
+<script src="js/rules.js"></script><script src="js/maps.js"></script><script src="js/mapjson.js"></script><script src="js/editor.js"></script>
 </body></html>

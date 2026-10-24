@@ -21,6 +21,8 @@ async function end(){await page.locator('#btn-end').click();await page.locator('
 async function inject(s){await page.evaluate(s=>window.__M0_DEBUG__.setState(s),s)}
 async function action(a){await select(a.actor);if(a.type==='directional'&&page.viewportSize().width<=900){await page.locator('[data-dir="'+a.direction+'"]').click();await page.locator('#btn-execute').click();return}
  if(['charge','charge-corpse','pull','pull-collision'].includes(a.type))await page.locator('[data-mode="'+(a.type.startsWith('charge')?'charge':'pull')+'"]').click();
+ // US-021：我方马改为「普通移动 / 跳跃攻击」两个入口，计划中的 horse-jump 需先切换模式（旧普通攻击断言已按新规则失效并在此说明）。
+ if(a.type==='horse-jump')await page.locator('[data-mode="horse-jump"]').click();
  await clickCell(a.to);if(page.viewportSize().width<=900&&!['move','rook-move'].includes(a.type))await page.locator('#btn-execute').click();
 }
 function snapshot(s){return {phase:s.phase,wave:s.wave,turn:s.turn,gold:s.gold,teamSp:s.teamSp,kills:s.kills,units:s.units.map(u=>[u.id,u.x,u.y,u.hp,u.kills])}}
