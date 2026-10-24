@@ -8,8 +8,7 @@ pwsh -File scripts/run-dsh.ps1 -TaskDoc docs/us/US-020-main-camp.md -CodexThread
 pwsh -File scripts/run-dsh.ps1 -RetryNotify <运行编号>
 .NOTES
 记录：tmp/dsh-runs/<运行编号>/。退出码：0=执行及通知成功，1=DSH失败但已通知，2=待通知/通知失败，3=启动被拒绝。
-通知成功不代表功能验收通过。等待进程退出不调用模型。目标忙碌时不自动轮询。
-优先使用 CODEX_CLI_PATH（桌面选择的版本），否则查 PATH。2026-10-21 实测：PATH 0.144.6 不支持分页历史，桌面 0.163.0-alpha.10.2 被现有桌面会话 active writer 锁拒绝；该会话尚未打通自动回调，不要解除锁或改写历史绕过。
+通知成功仅表示桌面接收，不代表审阅完成或验收通过。忙碌时每30秒通过桌面MCP查询，最多等6小时；不调用模型，不使用CLI续接。
 #>
 [CmdletBinding(DefaultParameterSetName = 'Run')]
 param(
@@ -17,7 +16,9 @@ param(
     [Parameter(Mandatory, ParameterSetName = 'Run')][guid]$CodexThreadId,
     [Parameter(Mandatory, ParameterSetName = 'Run')][string]$Instructions,
     [Parameter(Mandatory, ParameterSetName = 'Retry')][ValidatePattern('^[a-zA-Z0-9-]+$')][string]$RetryNotify,
-    [switch]$Background
+    [switch]$Background,
+    [ValidateRange(0, 86400)][int]$NotifyWaitSeconds = 21600,
+    [ValidateRange(1, 300)][int]$NotifyPollSeconds = 30
 )
 
 Set-StrictMode -Version Latest
@@ -25,6 +26,8 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 $runsRoot = Join-Path $projectRoot 'tmp/dsh-runs'
 $utf8 = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = $utf8
+[Console]::InputEncoding = $utf8
 [System.IO.Directory]::CreateDirectory($runsRoot) | Out-Null
 
 if ($Background) {
@@ -33,11 +36,12 @@ if ($Background) {
     $invokeText = '& ' + (Quote-Literal $PSCommandPath)
     if ($PSCmdlet.ParameterSetName -eq 'Retry') { $invokeText += ' -RetryNotify ' + (Quote-Literal $RetryNotify) }
     else { $invokeText += ' -TaskDoc ' + (Quote-Literal $TaskDoc) + ' -CodexThreadId ' + (Quote-Literal $CodexThreadId.ToString()) + ' -Instructions ' + (Quote-Literal $Instructions) }
+    $invokeText += ' -NotifyWaitSeconds ' + $NotifyWaitSeconds + ' -NotifyPollSeconds ' + $NotifyPollSeconds
     $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($invokeText))
     $launcherId = 'launcher-' + [guid]::NewGuid().ToString('N')
     $outPath = Join-Path $runsRoot "$launcherId.stdout.log"
     $errPath = Join-Path $runsRoot "$launcherId.stderr.log"
-    $launcher = Start-Process -FilePath (Get-Process -Id $PID).Path -ArgumentList @('-NoProfile', '-EncodedCommand', $encoded) -WorkingDirectory $projectRoot -WindowStyle Hidden -RedirectStandardOutput $outPath -RedirectStandardError $errPath -PassThru
+    $launcher = Start-Process -FilePath (Get-Process -Id $PID).Path -ArgumentList @('-NoProfile', '-NonInteractive', '-OutputFormat', 'Text', '-EncodedCommand', $encoded) -WorkingDirectory $projectRoot -WindowStyle Hidden -RedirectStandardOutput $outPath -RedirectStandardError $errPath -PassThru
     Write-Host "后台包装进程已启动：PID=$($launcher.Id)，启动日志：$outPath；实际 DSH 启动及运行编号以日志为准。请结束派发方当前轮次，让回调目标空闲。"
     exit 0
 }
@@ -58,10 +62,6 @@ function Open-Lock {
 
 function Get-Executable {
     param([string]$Name)
-    if ($Name -eq 'codex' -and $env:CODEX_CLI_PATH) {
-        if (!(Test-Path -LiteralPath $env:CODEX_CLI_PATH -PathType Leaf)) { throw 'CODEX_CLI_PATH 指向的命令不存在，请修正后重试。' }
-        return $env:CODEX_CLI_PATH
-    }
     return (Get-Command $Name -CommandType Application, ExternalScript -ErrorAction Stop | Select-Object -First 1).Source
 }
 
@@ -114,34 +114,6 @@ function Assert-PreviousDshStopped {
     }
 }
 
-function Get-ThreadAvailability {
-    param([string]$ThreadId)
-    # CLI 没有桌面会话忙碌查询命令。仅在本地持久化记录明确收尾时续接；未知状态拒绝发送。
-    $codexData = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE '.codex' }
-    $sessionRoot = Join-Path $codexData 'sessions'
-    $matches = @(Get-ChildItem -LiteralPath $sessionRoot -Recurse -Filter "*$ThreadId*.jsonl" -File -ErrorAction SilentlyContinue)
-    if ($matches.Count -ne 1) { return 'unknown' }
-    $reader = [System.IO.StreamReader]::new([System.IO.File]::Open($matches[0].FullName, 'Open', 'Read', 'ReadWrite'))
-    $state = 'unknown'
-    try {
-        while (($line = $reader.ReadLine()) -ne $null) {
-            if ($line -notmatch '"(session_meta|task_started|task_complete|turn_aborted)"') { continue }
-            try { $event = $line | ConvertFrom-Json } catch { $state = 'unknown'; continue }
-            if ($event.type -eq 'session_meta') {
-                if ([System.IO.Path]::GetFullPath($event.payload.cwd).TrimEnd('\', '/') -ne $projectRoot.TrimEnd('\', '/')) { return 'wrong-project' }
-            }
-            if ($event.type -eq 'event_msg') {
-                switch ($event.payload.type) {
-                    'task_started' { $state = 'busy' }
-                    'task_complete' { $state = 'idle' }
-                    'turn_aborted' { $state = 'idle' }
-                }
-            }
-        }
-    } finally { $reader.Dispose() }
-    return $state
-}
-
 $projectLock = $null
 $notifyLock = $null
 $child = $null
@@ -155,7 +127,8 @@ try {
         }
         if ([string]::IsNullOrWhiteSpace($Instructions)) { throw '执行要求不能为空。' }
         $dshExecutable = Get-Executable 'dsh'
-        $null = Get-Executable 'codex'
+        $null = Get-Executable 'node'
+        if (!$env:CODEX_THREAD_ID -or !$env:CODEX_APP_TOOLS_PIPE_PATH) { throw '缺少 Codex 桌面环境；请从 Codex 会话终端派发，勿从独立终端启动。' }
         $projectLock = Open-Lock (Join-Path $runsRoot 'project.lock')
         Assert-PreviousDshStopped
         $runId = [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssfffZ') + '-' + [guid]::NewGuid().ToString('N').Substring(0, 8)
@@ -163,6 +136,7 @@ try {
         [System.IO.Directory]::CreateDirectory($runDir) | Out-Null
         $recordPath = Join-Path $runDir 'run.json'
         $record = [ordered]@{
+            callerThreadId = $env:CODEX_THREAD_ID; notifyTransport = 'desktop-mcp'
             runId = $runId; taskDoc = $docPath; projectRoot = $projectRoot; codexThreadId = $CodexThreadId.ToString()
             createdAt = [DateTimeOffset]::UtcNow.ToString('o'); updatedAt = ''; instructions = $Instructions
             dshPermissionMode = 'danger-full-access'; dshState = 'launching'; dshPid = $null; dshStartedAt = $null; dshExitCode = $null
@@ -205,62 +179,23 @@ try {
     # 持久化后重新读取，避免并发重试重复发送。
     $record = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json -AsHashtable
     if ($record.notifyState -eq 'delivered') { Write-Host "本次已通知，不重复发送：$runId"; exit 0 }
-    if ($record.notifyState -in @('notifying', 'uncertain')) {
-        throw "上次通知是否已被接收尚不明确：$runId。先检查 codex.* 日志及目标会话，不自动重复发送。"
+    if ($record.notifyState -in @('notifying', 'sending', 'uncertain')) {
+        throw "上次通知是否已被接收尚不明确：$runId。先检查 desktop.* 回执、notify-* 日志及目标会话，不自动重复发送。"
     }
     if ($record.dshState -notin @('exited', 'start-failed')) { throw 'DSH 尚未确认退出，不能通知完成。' }
-    # 不与本项目其他开发任务或同会话回调并发。
-    $projectLock = Open-Lock (Join-Path $runsRoot 'project.lock')
-    Assert-PreviousDshStopped
-    $threadLock = Open-Lock (Join-Path $runsRoot "thread-$($record.codexThreadId).lock")
-    try {
-        $availability = Get-ThreadAvailability $record.codexThreadId
-        if ($availability -ne 'idle') {
-            $record.notifyState = 'pending'; $record.error = "目标会话状态：$availability，保留待通知。"
-            Save-Record $record $recordPath
-            Write-Warning "$($record.error) 稍后执行：pwsh -File scripts/run-dsh.ps1 -RetryNotify $runId"
-            exit 2
-        }
-        $callback = @"
-[DSH 完成回调 $runId]
-用户已授权本任务交付后的结果审阅。本次 DSH 状态：$($record.dshState)，退出码：$($record.dshExitCode)。进程结束不等于验收通过。
-需求文档：$($record.taskDoc)
-运行记录：$recordPath
-请先读取该运行记录、同目录 dsh.stdout.log / dsh.stderr.log 中必要的交付摘要及需求文档最新验收记录。仅审阅本次范围内的结果、证据覆盖和未验证项，不默认重跑测试或亲自浏览器验收。发现遗漏或缺陷按已授权范围经 scripts/run-dsh.ps1 串行退修/补验；真实外部阻塞向用户说明。不要创建或恢复定时巡检，不提交或推送。简短汇报结论，并包含本次运行编号以便核对通知。
-"@
-        $record.notifyAttempt++; $prefix = "codex.$($record.notifyAttempt)"
-        $codexExecutable = Get-Executable 'codex'
-        $child = New-Child $codexExecutable @('exec', 'resume', '--json', '-o', (Join-Path $runDir "$prefix.final.txt"), $record.codexThreadId, '-')
-        $record.notifyState = 'notifying'; $record.error = $null
-        Save-Record $record $recordPath
-        try { $null = $child.Start() } catch {
-            $record.notifyState = 'pending'; $record.error = $_.Exception.Message
-            Save-Record $record $recordPath
-            throw
-        }
-        # DSH 已退出，通知进程已创建；释放项目锁，允许 Codex 在审阅中派发下一次修复。
-        $projectLock.Dispose(); $projectLock = $null
-        $record.codexExitCode = Wait-Child $child $runDir $prefix $callback
-        $eventsPath = Join-Path $runDir "$prefix.stdout.log"
-        $accepted = $false; $completed = $false
-        foreach ($line in [System.IO.File]::ReadLines($eventsPath)) {
-            try { $event = $line | ConvertFrom-Json } catch { continue }
-            if ($event.type -eq 'turn.started') { $accepted = $true }
-            if ($event.type -eq 'turn.completed') { $completed = $true }
-        }
-        if ($record.codexExitCode -eq 0 -and $completed) { $record.notifyState = 'delivered' }
-        elseif ($accepted) { $record.notifyState = 'uncertain'; $record.error = 'Codex 已接收但本轮未正常完成；先查目标会话，不自动重发。' }
-        else {
-            $record.notifyState = 'pending'
-            $codexError = [System.IO.File]::ReadAllText((Join-Path $runDir "$prefix.stderr.log"), $utf8)
-            if ($codexError -match 'already has an active writer') { $record.error = '桌面仍持有目标会话写入锁，CLI 无法续接；保持待通知，不解除锁，不自动重试。' }
-            elseif ($codexError -match 'paginated_threads is not supported') { $record.error = '当前 Codex CLI 不支持目标分页历史；核对 CODEX_CLI_PATH 指向的桌面兼容版本。' }
-            else { $record.error = 'Codex 未返回接收确认，通知失败；重试前核对日志和目标会话。' }
-        }
-        Save-Record $record $recordPath
-        if ($record.notifyState -ne 'delivered') { Write-Warning "$($record.error) 运行记录：$recordPath"; exit 2 }
-        Write-Host "Codex 已完成本次回调：$runId。结果：$(Join-Path $runDir "$prefix.final.txt")"
-    } finally { $threadLock.Dispose() }
+    # 状态查询和发送走桌面现有连接；不争用桌面线程的 writer 锁。
+    $node = Get-Executable 'node'
+    $helper = Join-Path $PSScriptRoot 'codex-desktop-notify.mjs'
+    $child = New-Child $node @($helper, '--record', $recordPath, '--wait-seconds', $NotifyWaitSeconds.ToString(), '--poll-seconds', $NotifyPollSeconds.ToString())
+    $null = $child.Start()
+    $notifyExitCode = Wait-Child $child $runDir ('notify-' + [guid]::NewGuid().ToString('N'))
+    $record = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json -AsHashtable
+    if ($notifyExitCode -ne 0 -or $record.notifyState -ne 'delivered') {
+        if (!$record.error) { $record.error = '桌面通知未完成，查看 notify-*.stderr.log 后仅重试通知。'; Save-Record $record $recordPath }
+        Write-Warning "$($record.error) 运行记录：$recordPath"
+        exit 2
+    }
+    Write-Host "桌面已接收本次回调：$runId；交付审阅由接收会话执行。"
     if ($record.dshExitCode -ne 0 -or $record.dshState -eq 'start-failed') { exit 1 }
     exit 0
 } catch {
