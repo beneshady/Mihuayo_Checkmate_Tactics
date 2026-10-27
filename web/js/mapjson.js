@@ -46,7 +46,7 @@ function buildDocument(map,meta,rng){
   if(!u||typeof u!=='object')fail(path,'应为对象');
   if(typeof u.id!=='string'||!u.id)fail(path+'.id','棋子 id 不能为空');
   if(u.side!=='player'&&u.side!=='enemy')fail(path+'.side','应为 "player" 或 "enemy"');
-  if(!KINDS.includes(u.kind))fail(path+'.kind','未知棋种 "'+u.kind+'"');
+  if(!KINDS.includes(u.kind))fail(path+'.kind',u.kind==='elephant'?'外部 formatVersion 2 暂不支持象（UNIT_KINDS 无 elephant）；请保留本机原稿，不要标准导出':'未知棋种 "'+u.kind+'"');
   if(!Number.isInteger(u.x)||!Number.isInteger(u.y)||u.x<0||u.x>8||u.y<0||u.y>8)fail(path+'.x/y','坐标应为 0～8 的整数');
   const out={id:u.id,side:u.side,kind:u.kind,x:u.x,y:u.y};
   if(u.kind==='rook'){const role=u.rookRole||'base';if(!ROLES.includes(role))fail(path+'.rookRole','未知车职业 "'+role+'"');out.rookRole=role;}
@@ -93,7 +93,7 @@ function parseDocument(raw){
   const side=requireString(u.side,path+'.side');
   if(side!=='player'&&side!=='enemy')fail(path+'.side','应为 "player" 或 "enemy"，实际为 "'+side+'"');
   const kind=requireString(u.kind,path+'.kind');
-  if(!KINDS.includes(kind))fail(path+'.kind','未知棋种 "'+kind+'"');
+  if(!KINDS.includes(kind))fail(path+'.kind',kind==='elephant'?'外部 formatVersion 2 不支持象（UNIT_KINDS 无 elephant）；不能在导入中接收':'未知棋种 "'+kind+'"');
   if(typeof u.x!=='number'||!Number.isFinite(u.x)||typeof u.y!=='number'||!Number.isFinite(u.y))fail(path+'.x/y','坐标应为数字');
   if(!Number.isInteger(u.x)||!Number.isInteger(u.y)||u.x<0||u.x>8||u.y<0||u.y>8)fail(path+'.x/y','坐标越界（'+u.x+','+u.y+'）；9×9 棋盘应为 0～8 的整数');
   const cell=u.x+','+u.y;

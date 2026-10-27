@@ -17,6 +17,8 @@ const elephantSkillMode=u=>!!u&&u.kind==='elephant'&&u.side==='player'&&(elephan
 function modeOf(u){return u&&u.kind==='rook'?rookMode:u&&u.kind==='horse'&&u.side==='player'?horseMode:u&&u.kind==='elephant'&&u.side==='player'?elephantMode:undefined}
 function initial(){epoch++;interactionRevision++;moveHistory=[];hoveredEnemy=null;selected=preview=directionGhost=null;elephantMode='elephant-move';state=fixture?R.fixtureState(fixture,variant):activeTestMap?R.newTestGame(activeTestMap):R.newGame(mapStore?.level(1));}
 initial();
+// 独立地图测试的地界图例（与棋盘底色/边栏文字一致）；正式页面不添加。
+if(editorTest){const legend=$('board-legend');if(legend)legend.insertAdjacentHTML('beforeend','<span><i style="background:rgba(225,96,73,.6)"></i>我方地界 第1～4行</span><span><i style="background:rgba(240,186,75,.65)"></i>中央交界 第5行</span><span><i style="background:rgba(108,164,223,.6)"></i>敌方地界 第6～9行</span>');}
 
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x101722);scene.fog=new THREE.Fog(0x101722,28,48);
 const camera=new THREE.OrthographicCamera(-5,5,5,-5,.1,60);camera.position.set(7.8,11.5,9.5);camera.lookAt(0,0,0);
@@ -30,9 +32,15 @@ const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
 
 function boardTexture(){const c=document.createElement('canvas');c.width=c.height=textureSize;const x=c.getContext('2d'),m=textureMargin,w=R.CONFIG.width,h=R.CONFIG.height,cell=(textureSize-m*2)/w;x.fillStyle='#d8bd83';x.fillRect(0,0,textureSize,textureSize);
  for(let y=0;y<h;y++)for(let col=0;col<w;col++){x.fillStyle=(col+y)%2?'#cfae70':'#dfc58d';x.fillRect(m+col*cell,m+(h-1-y)*cell,cell,cell)}
+ // 独立地图测试（editor-test）显示固定双方地界：y=0～3 我方、y=4 中央交界、y=5～8 敌方，轻底色 + 边栏文字；正式页面不显示。
+ if(editorTest){const zones=[{y0:0,y1:3,color:'rgba(225,96,73,.10)',label:'我方地界'},{y0:4,y1:4,color:'rgba(240,186,75,.12)',label:'中央交界'},{y0:5,y1:8,color:'rgba(108,164,223,.10)',label:'敌方地界'}];for(const z of zones){const top=m+(h-1-z.y1)*cell,bottom=m+(h-z.y0)*cell;x.fillStyle=z.color;x.fillRect(m,top,textureSize-2*m,bottom-top)}}
  for(let y=0;y<9;y++)for(let col=0;col<9;col++){const t=R.terrain(state,{x:col,y}),bx=m+col*cell,by=m+(8-y)*cell,colors={water:'#3c86bc',bridge:'#c79a5b',forest:'#67905a',mountain:'#7c7a73',cracked:'#9d9280',rubble:'#a99a84'};if(colors[t]){x.fillStyle=colors[t];x.fillRect(bx,by,cell,cell)}if(['mountain','cracked','rubble','forest','bridge'].includes(t)){x.fillStyle=t==='forest'?'#163e20':t==='rubble'?'#4a3f30':'#302d26';x.font='bold 30px sans-serif';x.textAlign='center';x.fillText({mountain:'山',cracked:'裂山',rubble:'碎石',forest:'林',bridge:'桥'}[t],bx+cell/2,by+cell*.4)}}
  x.strokeStyle='#5b4329';x.lineWidth=4;for(let i=0;i<=w;i++){x.beginPath();x.moveTo(m+i*cell,m);x.lineTo(m+i*cell,textureSize-m);x.stroke();x.beginPath();x.moveTo(m,m+i*cell);x.lineTo(textureSize-m,m+i*cell);x.stroke()}
- x.fillStyle='#173e66';x.font='bold 24px sans-serif';x.textAlign='center';x.fillText('河  道',512,m+(h-R.CONFIG.river-.38)*cell);
+ if(editorTest){
+  const zones=[{y:1.5,label:'我方地界',color:'#8b3a2d'},{y:4,label:'中央交界',color:'#8a6a2a'},{y:6.5,label:'敌方地界',color:'#2f5d8a'}];
+  for(const z of zones){x.save();x.translate(m/2,m+(h-1-z.y+.5)*cell);x.rotate(-Math.PI/2);x.fillStyle=z.color;x.font='bold 17px Microsoft YaHei,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(z.label,0,0);x.restore()}
+  x.fillStyle='#7a5a2d';x.font='bold 20px Microsoft YaHei,sans-serif';x.textAlign='center';x.fillText('中央交界',512,m+(h-R.CONFIG.river-.38)*cell);
+ }else{x.fillStyle='#173e66';x.font='bold 24px sans-serif';x.textAlign='center';x.fillText('河  道',512,m+(h-R.CONFIG.river-.38)*cell);}
  function palace(q){const x0=m+q.minX*cell,x1=m+(q.maxX+1)*cell,y0=m+(h-1-q.maxY)*cell,y1=m+(h-q.minY)*cell;x.strokeStyle='#7a372d';x.lineWidth=5;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.moveTo(x1,y0);x.lineTo(x0,y1);x.stroke()}
  palace(R.CONFIG.playerPalace);palace(R.CONFIG.enemyPalace);x.fillStyle='#4a3726';x.font='18px sans-serif';for(let y=0;y<h;y++)for(let col=0;col<w;col++)x.fillText((col+1)+','+(y+1),m+(col+.5)*cell,m+(h-1-y+.56)*cell);return new THREE.CanvasTexture(c)}
 function world(x,y){return{x:-gridSize/2+(x+.5)*cellSize,z:gridSize/2-(y+.5)*cellSize}}
@@ -164,10 +172,11 @@ function renderRescueOptions(){const root=$('rescue-options');if(!root)return;co
  root.querySelectorAll('[data-rescue]').forEach(b=>b.onclick=()=>{const n=R.rescue(state,b.dataset.rescue);if(n===state)return;interactionRevision++;state=n;postState('救援使用')});}
 function syncOverlays(){
  const campaign=!!window.M0Campaign,tutorialOn=!!(window.M0Tutorial&&window.M0Tutorial.active()),
-  terminal=campaign&&state.phase==='intermission'&&state.level>=3;
+  terminal=campaign&&state.phase==='intermission'&&state.level>=3,
+  testVictory=editorTest&&state.phase==='intermission'&&state.result==='victory';
  $('ov-rescue').classList.toggle('show',state.phase==='rescue');
  $('ov-deploy').hidden=state.phase!=='deploy';
- $('ov-result').classList.toggle('show',!tutorialOn&&(state.phase==='result'||terminal));
+ $('ov-result').classList.toggle('show',!tutorialOn&&(state.phase==='result'||terminal||testVictory));
  if($('tutorial-hint'))$('tutorial-hint').hidden=!tutorialOn;
  if(state.phase==='rescue')renderRescueOptions();
  if(state.phase==='deploy'){
@@ -180,6 +189,7 @@ function syncOverlays(){
   $('deploy-population').textContent=`部署人口：${ordinary}／${limit}（上阵普通队友／部署上限，至少 1 名；主帅 1 与仕 ${advisors} 座单独计数，不计入部署人口）`;
  }
  if(terminal){$('result-title').textContent='三关通关';$('result-text').textContent=`第3关胜利 · 波次 ${state.wave} · 回合 ${state.turn} · 总击杀 ${state.kills} · 猫粮 ${state.gold}`;$('btn-restart-2').textContent='开始新一轮';}
+ else if(testVictory){$('result-title').textContent='独立测试胜利';$('result-text').textContent=`波次 ${state.wave} · 回合 ${state.turn} · 总击杀 ${state.kills} · 地图猫粮 ${state.gold}（独立测试，不写正式队伍/金币/成长）`;$('btn-restart-2').textContent='重开独立测试（恢复原稿）';}
  else if(state.phase==='result'){$('btn-restart-2').textContent='从本关布阵重试';$('result-title').textContent=state.result==='victory'?'胜利':state.result==='mate'?'将死':'主帅阵亡';$('result-text').textContent=`波次 ${state.wave} · 回合 ${state.turn} · 总击杀 ${state.kills}`}
 }
 function restart(){if(window.M0Campaign&&state.result!=='dead'){window.M0Campaign.menu();window.M0Campaign.requestNew();return;}if(editorTest&&activeTestMap){if(!window.confirm('重开独立测试，恢复采用的自定义原稿？'))return;initial();paused=false;startRenderLoop();$('ov-pause').classList.remove('show');postState();return}paused=false;startRenderLoop();$('ov-pause').classList.remove('show');$('ov-confirm').classList.remove('show');const retry=fixture?state:R.retryLevel(state);if(retry!==state){state=retry;selected=preview=directionGhost=null;postState('失败重试');toast('已从本关入口重试');return}initial();render();toast(fixture?`已重置 ${fixture}`:'已重新开始')}
