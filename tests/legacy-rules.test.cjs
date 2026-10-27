@@ -33,14 +33,17 @@ test('T03-T04 炮一发多杀、友伤不发成长、只扣一次 AP',()=>{
  A.equal(out.effect.victims.length,4);A.deepEqual([G(s,'c').kills,G(s,'c').level,s.teamSp,G(s,'c').ap],[3,4,3,0]);A.equal(G(s,'ally'),undefined);
 });
 
-test('T08-T13 四向早期距离、河界、阻挡、连动延迟且独立',()=>{
+test('T08-T13 四向早期距离、河界、阻挡、兵系固定单次行动（US-024）',()=>{
  let s=F(U('a','player','archer',2,3),U('e','enemy','pawn',2,5));grant(s,'a',1);s=up(s,'a','direction',0);
  A.deepEqual(G(s,'a').directionPaid,[1,0,0,0]);A.equal(G(s,'a').attack,2);A.ok(R.directionalAction(s,'a',0));A.equal(R.directionalAction(s,'a',1),undefined);
  let q=U('q','player','pawn',1,3);s=F(q);A.equal(R.actionAt(s,q,{x:2,y:3}),undefined);q.y=4;A.equal(R.actionAt(s,q,{x:2,y:4}),undefined);q.y=5;A.ok(R.actionAt(s,q,{x:2,y:5}));
  s=F(U('a','player','archer',2,4),U('ally','player','horse',2,5),U('far','enemy','pawn',2,6));G(s,'a').directionPaid[0]=3;A.equal(R.directionalAction(s,'a',0),undefined);
- s=F(U('p','player','pawn',2,4),U('q','player','pawn',4,4));grant(s,'p',1);A.strictEqual(up(s,'p','combo'),s);s.teamSp=4;G(s,'p').ap=0;
- s=up(s,'p','combo');A.deepEqual([G(s,'p').ap,G(s,'p').combo],[0,1]);s=up(s,'p','combo');s=turn(s);A.deepEqual([G(s,'p').ap,G(s,'p').apLimit],[3,3]);
- s=act(s,'p',{x:2,y:5});s=act(s,'p',{x:3,y:5});s=act(s,'p',{x:3,y:6});A.equal(G(s,'p').ap,0);A.equal(G(s,'q').ap,1);A.strictEqual(R.submit(s,'p',{x:4,y:6}).state,s);
+ s=F(U('p','player','pawn',2,4),U('q','player','pawn',4,4));s.teamSp=4;G(s,'p').ap=0;
+ A.strictEqual(up(s,'p','combo'),s,'US-024 连动已移除：旧 combo 购买被拒绝');A.deepEqual([s.teamSp,G(s,'p').ap,G(s,'p').apLimit],[4,0,1],'拒绝购买不扣 SP、不改行动');
+ s=turn(s);A.deepEqual([G(s,'p').ap,G(s,'p').apLimit],[1,1],'US-024 每回合固定 1 AP');
+ s=act(s,'p',{x:2,y:5});A.deepEqual([G(s,'p').ap,G(s,'p').apLimit],[0,1],'首次行动消耗预算');
+ A.strictEqual(R.submit(s,'p',{x:3,y:5}).state,s,'第二次行动被拒绝');
+ s=turn(s);A.deepEqual([G(s,'p').ap,G(s,'p').apLimit],[1,1],'下一回合恢复为 1');
 });
 
 test('T14-T16 V2.3 AC06–08：车转职、技能距离8封顶、震退1SP',()=>{
@@ -121,7 +124,7 @@ test('T39-T40 V2.3 AC19–24：关间继承、新购干净、奖励一次、重�
 });
 
 test('T41-T46 转职赠送一次、继承、总等级无上限、职业隔离',()=>{
- for(const kind of ['archer','spearman']){let s=F(U('p','player','pawn',2,4));s.teamSp=4;Object.assign(G(s,'p'),{level:5,kills:4,maxHp:3,hp:2,combo:1,fortify:2,ap:0});s=up(s,'p','promote-'+kind);const q=G(s,'p');A.deepEqual([q.id,q.kind,q.level,q.kills,q.combo,q.ap],['p',kind,5,4,1,0]);if(kind==='archer')A.deepEqual([q.attack,q.hp,q.maxHp],[2,2,3]);else A.deepEqual([q.attack,q.hp,q.maxHp],[1,3,4]);A.strictEqual(up(s,'p','promote-'+(kind==='archer'?'spearman':'archer')),s);}
+ for(const kind of ['archer','spearman']){let s=F(U('p','player','pawn',2,4));s.teamSp=4;Object.assign(G(s,'p'),{level:5,kills:4,maxHp:3,hp:2,fortify:2,ap:0});s=up(s,'p','promote-'+kind);const q=G(s,'p');A.deepEqual([q.id,q.kind,q.level,q.kills,q.ap],['p',kind,5,4,0]);if(kind==='archer')A.deepEqual([q.attack,q.hp,q.maxHp],[2,2,3]);else A.deepEqual([q.attack,q.hp,q.maxHp],[1,3,4]);A.strictEqual(up(s,'p','promote-'+(kind==='archer'?'spearman':'archer')),s);}
  let s=F(U('a','player','spearman',2,4),U('e1','enemy','pawn',2,5),U('e2','enemy','pawn',2,6),U('e3','enemy','pawn',2,7));Object.assign(G(s,'a'),{level:9,directionPaid:[6,0,0,0]});s=R.submitDirection(s,'a',0).state;A.deepEqual([G(s,'a').level,s.teamSp,G(s,'a').directionPaid[0]],[12,3,6]);A.strictEqual(up(s,'a','direction',0),s);s=up(s,'a','direction',2);A.equal(G(s,'a').directionPaid[2],1);
  let p=F(U('p','player','pawn',1,4));grant(p,'p',9);A.strictEqual(up(p,'p','direction',0),p);p=up(p,'p','promote-archer');A.strictEqual(up(p,'p','promote-spearman'),p);
 });
@@ -151,8 +154,8 @@ test('士专项：宫内米字、意图、炮架、马腿、禁止推出宫',()=
 });
 
 test('US-002 河道、宫、外缘与炮跨8步',()=>{
- let s=F(U('p','player','pawn',4,3),U('e','enemy','pawn',6,5));A.ok(R.actionAt(s,G(s,'p'),{x:4,y:4}));s=act(s,'p',{x:4,y:4});R.resetTurn(G(s,'p'));A.equal(R.actionAt(s,G(s,'p'),{x:5,y:4}),undefined);G(s,'p').ap=1;s=act(s,'p',{x:4,y:5});R.resetTurn(G(s,'p'));A.ok(R.actionAt(s,G(s,'p'),{x:5,y:5}));A.equal(R.actionAt(s,G(s,'p'),{x:4,y:4}),undefined);
- s=F(U('e','enemy','pawn',4,5));A.ok(R.actionAt(s,G(s,'e'),{x:4,y:4}));G(s,'e').y=4;A.equal(R.actionAt(s,G(s,'e'),{x:3,y:4}),undefined);G(s,'e').y=3;A.ok(R.actionAt(s,G(s,'e'),{x:3,y:3}));A.equal(R.actionAt(s,G(s,'e'),{x:4,y:4}),undefined);
+ let s=F(U('p','player','pawn',4,3),U('e','enemy','pawn',6,5));A.ok(R.actionAt(s,G(s,'p'),{x:4,y:4}));A.equal(R.actionAt(s,G(s,'p'),{x:4,y:2}),undefined,'未过河不能后退');s=act(s,'p',{x:4,y:4});R.resetTurn(G(s,'p'));A.equal(R.actionAt(s,G(s,'p'),{x:5,y:4}),undefined);G(s,'p').ap=1;s=act(s,'p',{x:4,y:5});R.resetTurn(G(s,'p'));A.ok(R.actionAt(s,G(s,'p'),{x:5,y:5}));A.ok(R.actionAt(s,G(s,'p'),{x:4,y:4}),'过河后可后退');
+ s=F(U('e','enemy','pawn',4,5));A.ok(R.actionAt(s,G(s,'e'),{x:4,y:4}));A.equal(R.actionAt(s,G(s,'e'),{x:4,y:6}),undefined,'敌兵未过河不能后退');G(s,'e').y=4;A.equal(R.actionAt(s,G(s,'e'),{x:3,y:4}),undefined);G(s,'e').y=3;A.ok(R.actionAt(s,G(s,'e'),{x:3,y:3}));A.equal(R.actionAt(s,G(s,'e'),{x:4,y:4}),undefined,'敌兵过河后仍不能后退（仅我方解禁）');
  s=R.emptyState([U('king','player','king',4,0),U('boss','enemy','king',8,8),U('r','player','rook',4,8),U('p','enemy','pawn',4,5)]);G(s,'p').hp=G(s,'p').maxHp=2;G(s,'r').rookChargeRange=3;G(s,'r').rookPush=true;standby(s);s=act(s,'r',{x:4,y:5},'charge');A.deepEqual([G(s,'p').x,G(s,'p').y],[4,4]);A.equal(R.actionAt(s,G(s,'p'),{x:3,y:4}),undefined);
  s=F(U('c','player','cannon',0,0),U('screen','player','horse',0,4),U('target','enemy','rook',0,8));const shot=R.actionAt(s,G(s,'c'),{x:0,y:8});A.ok(shot);A.equal(shot.path.length,8);
  for(let i=1;i<=8;i++)for(const u of R.fixtureState('P'+i).units)A.equal(R.inside(u),true,`P${i}:${u.id}`);const river=R.fixtureState('P1','river-edge');A.ok(R.actionAt(river,G(river,'pawn'),{x:4,y:4}));A.ok(R.actionAt(river,G(river,'rook'),{x:0,y:3},'rook-move'));

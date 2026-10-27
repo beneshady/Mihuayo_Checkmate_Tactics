@@ -285,10 +285,10 @@ test('C19 公共 SP：营地为上场与后备同伴升级，共用一个池',()
  const benchId=s.bench[0];
  A.ok(benchId);
  A.equal(R.activeOrdinary(s).length,4);
- const up=R.purchaseUpgrade(s,benchId,'combo');
+ const up=R.purchaseUpgrade(s,benchId,'promote-archer');
  A.notStrictEqual(up,s,'后备队友可在营地升级');
  A.equal(up.teamSp,4);
- A.equal(P(up,benchId).combo,1);
+ A.equal(P(up,benchId).kind,'archer');
  const up2=R.purchaseUpgrade(s,'rook','fortify');
  A.equal(P(up2,'rook').maxHp,3);
  A.equal(up2.teamSp,5);
